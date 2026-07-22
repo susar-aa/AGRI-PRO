@@ -1,0 +1,1010 @@
+# STAGE 1 — PROJECT INITIALIZATION, ARCHITECTURE & DATABASE FOUNDATION
+
+You are a senior software architect, ERP developer, accounting system designer, PHP/MySQL developer, database architect, and UI/UX designer.
+
+I am starting a completely new project from scratch. There is currently NO existing application, NO existing database, and NO existing code that needs to be preserved.
+
+Your task in this stage is to establish the complete technical foundation and architecture for a professional Accounting + Business Management ERP system for an agricultural cooperative society.
+
+IMPORTANT:
+Do NOT try to build the entire ERP in this stage.
+
+This is ONLY STAGE 1.
+
+In this stage, you must:
+
+1. Create the initial project structure.
+2. Create the database architecture.
+3. Create the database.
+4. Create the initial database schema.
+5. Create the basic application architecture.
+6. Create the authentication foundation.
+7. Create the basic ERP layout.
+8. Create the initial Chart of Accounts structure.
+9. Create the core accounting architecture.
+10. Create reusable foundation components.
+
+Do NOT implement the complete business modules yet.
+
+==================================================
+PROJECT DETAILS
+===============
+
+Project Name:
+
+Agri Co-Op Cooperative Society Limited
+Accounting & Business Management ERP
+
+Company Name:
+
+සීමා සහිත ඇග්‍රි කෝප් සමූපකාර සමිතිය
+
+English Name:
+
+Agri Co-Op Cooperative Society Limited
+
+Address:
+
+මීදූම, යටගම, රඹුක්කන
+
+English Address:
+
+Miduma, Yatagama, Rambukkana
+
+Registration No:
+
+කෑ/1027
+
+English Registration No:
+
+KE/1027
+
+Registration Date:
+
+2025.11.14
+
+Contact Numbers:
+
+075 377 0 145
+070 629 61 50
+071 82 110 10
+071 846 0 172
+071 80 28 774
+
+==================================================
+DEVELOPMENT ENVIRONMENT
+=======================
+
+The system is currently being developed locally using:
+
+* XAMPP
+* Apache
+* PHP
+* MySQL / MariaDB
+* phpMyAdmin
+* HTML5
+* CSS3
+* Bootstrap 5
+* JavaScript
+* AJAX / Fetch API where appropriate
+
+Use PHP PDO with prepared statements for all database operations.
+
+Use a clean modular architecture.
+
+The system must be designed so that it can later be deployed to a production hosting environment without major architectural changes.
+
+Do not hardcode localhost-specific paths or business logic.
+
+Use configuration files/environment configuration for:
+
+* Database credentials
+* Application URL
+* Environment
+* Debug mode
+* Company settings
+
+==================================================
+CORE ARCHITECTURE PRINCIPLE
+===========================
+
+The most important requirement is that this is NOT a collection of independent accounting systems.
+
+The organization has multiple profit-generating business activities.
+
+Each business activity should have its own operational module/panel.
+
+However, ALL business activities must connect to ONE CENTRAL ACCOUNTING SYSTEM.
+
+The architecture must follow:
+
+BUSINESS MODULE
+↓
+TRANSACTION
+↓
+CENTRAL ACCOUNTING ENGINE
+↓
+DOUBLE-ENTRY JOURNAL
+↓
+GENERAL LEDGER
+↓
+TRIAL BALANCE
+↓
+FINANCIAL STATEMENTS
+
+The system must have ONE centralized:
+
+* Chart of Accounts
+* Accounting Engine
+* Journal Engine
+* General Ledger
+* Expense Engine
+* Inventory Engine
+* Customer System
+* Supplier System
+* Payment System
+* Cost Center System
+* Project System
+* Batch System
+* Reporting System
+
+Individual modules must NEVER create their own separate accounting systems.
+
+All financial transactions must eventually flow through the central accounting engine.
+
+==================================================
+BUSINESS ACTIVITIES
+===================
+
+The organization currently has the following business activities:
+
+1. Agricultural Field Plowing / Agricultural Services
+
+They plow paddy fields and charge customers.
+
+Expenses can be incurred for individual service jobs, including:
+
+* Employee hire
+* Labour
+* Fuel
+* Meals
+* Transport
+* Machinery
+* Maintenance
+* Other expenses
+
+Each service job should eventually be able to calculate:
+
+Revenue
+Total Expenses
+Profit
+Profit Margin
+
+---
+
+2. Machinery Rental
+
+The organization owns machinery such as:
+
+* Pressure Washer
+* Generator
+* Grill
+* Other machinery
+
+These machines are rented to customers and charged by:
+
+* Hour
+* Day
+* Other configurable units
+
+The system must eventually support:
+
+Machinery Master
+Rental Booking
+Rental Contract
+Rental Period
+Usage
+Rental Revenue
+Rental Expenses
+Maintenance
+Profitability
+
+---
+
+3. Marketplace / Buying & Selling
+
+The organization purchases products and resells them.
+
+Examples:
+
+* Fertilizer
+* Coconut Oil
+* Other agricultural products
+* Other trading products
+
+The system must eventually support:
+
+Products
+Categories
+Suppliers
+Purchases
+GRN
+Inventory
+Sales
+Customers
+Payments
+Sales Returns
+Purchase Returns
+COGS
+Profitability
+
+---
+
+4. Plantation / Agricultural Production
+
+The organization owns land and grows crops.
+
+A Plantation Project represents a production cycle.
+
+A single project must support MULTIPLE crops/plants.
+
+Example:
+
+Project:
+2026 Mixed Plantation
+
+Crops:
+
+* Tomato
+* Chili
+* Cucumber
+
+The system must eventually support:
+
+Plantation Project
+Multiple Crops
+Planting
+Project Expenses
+Crop Expenses
+Harvest
+Harvest Quantity in KG
+Cost Per KG
+Selling Price Per KG
+Expected Revenue
+Actual Revenue
+Profit
+Margin
+
+Expenses may include:
+
+* Seeds
+* Seedlings
+* Fertilizer
+* Pesticides
+* Labour
+* Employee Hire
+* Fuel
+* Water
+* Irrigation
+* Transport
+* Machinery
+* Land Preparation
+* Other
+
+At the end of a plantation project:
+
+Total Cost
+÷
+Saleable Harvest KG
+===================
+
+Cost Per KG
+
+The system must eventually allow the finished harvest to be transferred to Marketplace inventory.
+
+The system must maintain full traceability:
+
+Marketplace Product
+→ Harvest Batch
+→ Crop
+→ Plantation Project
+→ Expenses
+→ Accounting Entries
+
+---
+
+5. Brick Manufacturing
+
+The organization manufactures bricks and sells them.
+
+The system must eventually support:
+
+Production Batch
+Raw Materials
+Production Expenses
+Labour
+Fuel
+Electricity
+Transport
+Other Costs
+Production Quantity
+Rejected Quantity
+Good Quantity
+Cost Per Brick
+Selling Price
+Profit
+Margin
+
+Completed production batches must be transferable to Marketplace inventory.
+
+---
+
+6. Fruit Packing
+
+The organization purchases fruits and packs them for resale.
+
+The system must eventually support:
+
+Raw Material Purchase
+Fruit Inventory
+Packing Batch
+Input Quantity
+Output Quantity
+Wastage
+Packaging Materials
+Labour
+Transport
+Other Expenses
+Cost Per KG
+Cost Per Pack
+Selling Price
+Profit
+Margin
+
+Completed packing batches must be transferable to Marketplace inventory.
+
+---
+
+7. Construction Contracts
+
+The organization accepts contracts such as road construction.
+
+Each contract must eventually be treated as a Project.
+
+The system must eventually support:
+
+Construction Project
+Contract
+Customer
+Contract Value
+Project Budget
+Project Expenses
+Project Phases
+Materials
+Labour
+Subcontractors
+Fuel
+Transport
+Machinery
+Meals
+Other Expenses
+Progress Billing
+Advance Payments
+Retention
+Project Revenue
+Project Cost
+Project Profit
+Profit Margin
+
+Each construction project must have full cost tracking.
+
+---
+
+8. Grinding Mill
+
+The organization has a grinding mill.
+
+There are TWO different business models.
+
+A. Grinding as a Service
+
+Customers bring materials such as coconut.
+
+The organization charges customers for grinding.
+
+Track:
+
+Customer
+Material
+Input Weight
+Rate
+Service Charge
+Machine
+Operator
+Expenses
+Profit
+
+B. Grinding as a Manufacturing Business
+
+The organization purchases raw materials, grinds them, packages them, and sells the finished products.
+
+The system must eventually support:
+
+Raw Material Purchase
+Grinding Batch
+Raw Material Consumption
+Production Expenses
+Packaging
+Output Quantity
+Wastage
+Cost Per KG
+Cost Per Bottle
+Cost Per Pack
+Selling Price
+Profit
+Margin
+
+Finished grinding products must be transferable to Marketplace inventory.
+
+==================================================
+FUTURE MODULE EXTENSIBILITY
+===========================
+
+The architecture must allow additional profit-generating activities to be added later.
+
+Do NOT hardcode the system so that only the current 8 business activities are possible.
+
+Design the architecture so new modules can use the same:
+
+* Accounting Engine
+* Inventory Engine
+* Expense Engine
+* Cost Center Engine
+* Project Engine
+* Batch Engine
+* Reporting Engine
+
+==================================================
+STAGE 1 — REQUIRED PROJECT STRUCTURE
+====================================
+
+Create a clean and scalable project structure.
+
+Use an MVC-like architecture or another clean modular PHP architecture.
+
+The structure should separate:
+
+* Configuration
+* Core
+* Controllers
+* Models
+* Services
+* Views
+* Components
+* API/AJAX
+* Assets
+* CSS
+* JavaScript
+* Database
+* Migrations
+* Reports
+* Uploads
+
+Keep accounting logic out of the UI.
+
+Keep database queries out of presentation files where possible.
+
+Create reusable services for future modules.
+
+The exact folder structure can be determined based on best practices for a PHP/MySQL ERP, but it must be clean, understandable, and scalable.
+
+==================================================
+DATABASE FOUNDATION
+===================
+
+Create the initial MySQL database.
+
+Use proper:
+
+* Primary Keys
+* Foreign Keys
+* Indexes
+* Unique Constraints
+* Timestamps
+* Soft Delete where appropriate
+* Status fields
+* Audit fields
+
+The database must be normalized and scalable.
+
+Create the foundational tables for:
+
+AUTHENTICATION:
+
+* users
+* roles
+* permissions
+* role_permissions
+* user_roles
+
+COMPANY:
+
+* company_settings
+* system_settings
+
+ACCOUNTING:
+
+* account_types
+* accounts
+* journal_entries
+* journal_lines
+* ledger_entries
+
+ORGANIZATION:
+
+* cost_centers
+
+CONTACTS:
+
+* customers
+* suppliers
+
+FINANCE:
+
+* cash_accounts
+* bank_accounts
+
+AUDIT:
+
+* audit_logs
+
+Do not create all business-specific tables yet unless required as foundational dependencies.
+
+The database must be designed so that future modules can be added without restructuring the entire database.
+
+==================================================
+CHART OF ACCOUNTS
+=================
+
+Create a hierarchical Chart of Accounts system.
+
+Account categories:
+
+1. Assets
+2. Liabilities
+3. Equity
+4. Revenue
+5. Cost of Goods Sold
+6. Expenses
+
+The accounts table must support:
+
+* Account ID
+* Account Code
+* Account Name
+* Parent Account
+* Account Type
+* Normal Balance
+* Is System Account
+* Is Active
+* Allow Manual Posting
+* Created At
+* Updated At
+
+The Chart of Accounts must be hierarchical.
+
+Example:
+
+1000 Assets
+1100 Current Assets
+1110 Cash
+1120 Bank
+1130 Petty Cash
+1140 Accounts Receivable
+1150 Inventory
+
+2000 Liabilities
+2100 Current Liabilities
+2110 Accounts Payable
+
+3000 Equity
+
+4000 Revenue
+4100 Agricultural Services Revenue
+4200 Machinery Rental Revenue
+4300 Marketplace Sales Revenue
+4400 Plantation Sales Revenue
+4500 Brick Sales Revenue
+4600 Fruit Packing Sales Revenue
+4700 Construction Contract Revenue
+4800 Grinding Service Revenue
+4900 Grinding Product Sales Revenue
+
+5000 Cost of Goods Sold
+
+6000 Expenses
+6100 Fuel Expense
+6200 Labour Expense
+6300 Employee Hire Expense
+6400 Meals Expense
+6500 Transport Expense
+6600 Machinery Maintenance
+6700 Electricity
+6800 Water
+6900 Packaging
+6910 Seeds
+6920 Fertilizer
+6930 Pesticides
+6940 Agricultural Inputs
+6950 Construction Materials
+6960 Raw Materials
+6970 Repairs
+6980 Other Expenses
+
+These are only initial accounts.
+
+The administrator must be able to create, edit, deactivate, and organize additional accounts.
+
+Do not allow deletion of accounts that have financial transactions.
+
+==================================================
+ACCOUNTING ENGINE FOUNDATION
+============================
+
+Create the foundation for a centralized double-entry accounting engine.
+
+Every future financial transaction must be capable of creating:
+
+Journal Entry
++
+Journal Lines
+
+Each Journal Entry should support:
+
+* Journal Number
+* Transaction Date
+* Description
+* Reference
+* Source Module
+* Source Transaction ID
+* Cost Center
+* Project ID
+* Batch ID
+* Created By
+* Status
+* Created At
+
+Each Journal Line should contain:
+
+* Account ID
+* Debit
+* Credit
+* Description
+
+Accounting rule:
+
+TOTAL DEBIT MUST ALWAYS EQUAL TOTAL CREDIT.
+
+The system must never allow an unbalanced journal to be posted.
+
+Do not implement every transaction workflow yet.
+
+Only create the reusable accounting foundation and database architecture in this stage.
+
+==================================================
+COST CENTER FOUNDATION
+======================
+
+Create Cost Center management.
+
+Initial cost centers:
+
+CC-001 Agricultural Services
+CC-002 Machinery Rental
+CC-003 Marketplace
+CC-004 Plantation
+CC-005 Brick Manufacturing
+CC-006 Fruit Packing
+CC-007 Construction
+CC-008 Grinding Mill
+CC-009 Administration
+
+Cost centers must be extendable.
+
+The system should eventually be able to report:
+
+Revenue by Cost Center
+Expenses by Cost Center
+Profit by Cost Center
+
+==================================================
+AUTHENTICATION FOUNDATION
+=========================
+
+Create a secure login system.
+
+Implement:
+
+* Login
+* Logout
+* Session management
+* Password hashing
+* User management foundation
+* Role-based access foundation
+
+Initial roles:
+
+Super Admin
+Administrator
+Accountant
+Manager
+Cashier
+Inventory Officer
+Sales Officer
+Production Officer
+
+The permission system must be granular and extendable.
+
+Do not hardcode permissions only in the frontend.
+
+Permissions must be validated server-side.
+
+==================================================
+BASIC ERP UI
+============
+
+Create the initial ERP interface.
+
+Design requirements:
+
+* Bootstrap 5
+* Modern professional ERP design
+* Clean layout
+* Responsive
+* Desktop optimized
+* Mobile responsive
+* Sidebar navigation
+* Top navigation
+* Breadcrumbs
+* User profile
+* Notifications area
+* Page title
+* Main content area
+
+Create the initial navigation structure:
+
+Dashboard
+
+ACCOUNTING
+
+* Chart of Accounts
+* Journal Entries
+* General Ledger
+* Trial Balance
+
+SALES & MARKETPLACE
+
+* Marketplace
+* Products
+* Sales
+* Customers
+
+PURCHASING
+
+* Suppliers
+* Purchases
+* GRN
+
+INVENTORY
+
+* Stock Overview
+* Stock Ledger
+
+SERVICES
+
+* Agricultural Services
+* Machinery Rental
+
+PRODUCTION
+
+* Plantation
+* Brick Manufacturing
+* Fruit Packing
+* Grinding Mill
+
+PROJECTS
+
+* Construction Projects
+
+FINANCE
+
+* Expenses
+* Cash
+* Bank
+
+REPORTS
+
+* Financial Reports
+* Business Reports
+
+ADMINISTRATION
+
+* Users
+* Roles & Permissions
+* Company Settings
+* Audit Logs
+
+For this stage, navigation items can show "Coming Soon" or placeholder pages.
+
+Do NOT implement the full modules yet.
+
+==================================================
+DASHBOARD FOUNDATION
+====================
+
+Create the initial dashboard UI.
+
+For now, show placeholder KPI cards for:
+
+* Total Revenue
+* Total Expenses
+* Net Profit
+* Cash Balance
+* Bank Balance
+* Accounts Receivable
+* Accounts Payable
+* Inventory Value
+
+Do not create fake hardcoded financial figures.
+
+If there is no data, show:
+
+LKR 0.00
+
+Create placeholder chart areas that can later be connected to real data.
+
+==================================================
+SECURITY REQUIREMENTS
+=====================
+
+Implement basic security from the beginning.
+
+Use:
+
+* PDO prepared statements
+* Password hashing
+* CSRF protection
+* Session security
+* Server-side authorization
+* Input validation
+* Output escaping
+* Secure file handling foundation
+
+Never trust frontend validation alone.
+
+==================================================
+CODING REQUIREMENTS
+===================
+
+Write clean, maintainable code.
+
+Use:
+
+* Meaningful variable names
+* Reusable functions/classes
+* Clear comments for complex accounting logic
+* Consistent naming conventions
+* Centralized configuration
+* Error handling
+* Exception handling
+
+Do not duplicate code unnecessarily.
+
+Do not put business logic directly inside HTML files.
+
+Do not mix SQL, HTML, and complex business logic unnecessarily.
+
+==================================================
+STAGE 1 IMPLEMENTATION PROCESS
+==============================
+
+Follow this exact workflow:
+
+STEP 1:
+Analyze the requirements above.
+
+STEP 2:
+Create a complete implementation plan.
+
+STEP 3:
+Create the project folder structure.
+
+STEP 4:
+Create the database configuration.
+
+STEP 5:
+Create the database and foundational tables.
+
+STEP 6:
+Create the initial Chart of Accounts.
+
+STEP 7:
+Create Cost Centers.
+
+STEP 8:
+Create authentication and role foundation.
+
+STEP 9:
+Create the basic ERP layout.
+
+STEP 10:
+Create the Chart of Accounts UI.
+
+STEP 11:
+Create the basic accounting foundation.
+
+STEP 12:
+Create the initial dashboard.
+
+STEP 13:
+Test everything.
+
+==================================================
+IMPORTANT — DO NOT DO THESE THINGS
+==================================
+
+Do NOT:
+
+* Build the entire ERP in one step.
+* Build all business modules now.
+* Create duplicate accounting systems.
+* Create separate ledgers for each business activity.
+* Hardcode account IDs throughout the code.
+* Hardcode company information throughout the application.
+* Use fake financial calculations.
+* Allow unbalanced journal entries.
+* Delete posted financial transactions.
+* Use raw SQL queries with user input.
+* Ignore database transactions.
+* Create unnecessary duplicated tables.
+* Overwrite files without checking dependencies.
+
+==================================================
+FINAL STAGE 1 DELIVERABLE
+=========================
+
+At the end of Stage 1, the application should be a working ERP foundation running on XAMPP.
+
+It should have:
+
+1. Working database
+2. Working application
+3. Working login
+4. User and role foundation
+5. Basic permission foundation
+6. Company settings
+7. ERP dashboard
+8. Responsive sidebar
+9. Chart of Accounts
+10. Cost Centers
+11. Accounting database foundation
+12. Journal database foundation
+13. Audit log foundation
+14. Clean scalable architecture
+
+After completing the implementation, provide a concise report containing:
+
+* Files created
+* Database tables created
+* Database relationships
+* Default Chart of Accounts
+* Default Cost Centers
+* Login credentials for the initial administrator
+* Features completed
+* Features intentionally postponed
+* Any errors found
+* Any remaining issues
+
+Do not proceed to Stage 2 automatically.
+
+Stop after Stage 1 is fully implemented and tested.

@@ -1,0 +1,1014 @@
+# STAGE 2 — CENTRAL DOUBLE-ENTRY ACCOUNTING ENGINE
+
+We are now continuing development of the Agri Co-Op Cooperative Society Limited Accounting & Business Management ERP.
+
+IMPORTANT:
+
+Stage 1 has already been completed.
+
+The project is now running on XAMPP localhost with:
+
+* PHP
+* MySQL / MariaDB
+* HTML
+* Bootstrap 5
+* JavaScript
+* PDO
+* Authentication
+* Users / Roles / Permissions foundation
+* Company Settings
+* Chart of Accounts foundation
+* Cost Centers foundation
+* Basic ERP layout
+
+Before starting this stage:
+
+1. Inspect the existing project structure.
+2. Inspect the existing database.
+3. Inspect the existing Chart of Accounts implementation.
+4. Inspect the existing authentication and permission system.
+5. Inspect the existing database relationships.
+6. Reuse existing code and components.
+7. Do NOT rebuild or duplicate features that already exist.
+8. Do NOT break existing Stage 1 functionality.
+
+This stage is ONLY about building the CENTRAL ACCOUNTING ENGINE.
+
+Do not implement:
+
+* Marketplace
+* Plantation
+* Brick Manufacturing
+* Fruit Packing
+* Construction
+* Grinding Mill
+* Machinery Rental
+* Agricultural Services
+
+Those will be implemented in later stages.
+
+The purpose of this stage is to create a reliable accounting core that every future module will use.
+
+==================================================
+
+1. ACCOUNTING ARCHITECTURE
+   ==================================================
+
+The accounting architecture must follow:
+
+Business Transaction
+↓
+Accounting Service
+↓
+Journal Entry
+↓
+Journal Lines
+↓
+General Ledger
+↓
+Trial Balance
+↓
+Financial Statements
+
+Every future business module must use this same accounting engine.
+
+Examples:
+
+Agricultural Service Sale
+→ Accounting Engine
+
+Machinery Rental
+→ Accounting Engine
+
+Marketplace Sale
+→ Accounting Engine
+
+Plantation Expense
+→ Accounting Engine
+
+Brick Production
+→ Accounting Engine
+
+Construction Expense
+→ Accounting Engine
+
+Grinding Sale
+→ Accounting Engine
+
+Do NOT create separate accounting logic for each future module.
+
+The accounting engine must be reusable.
+
+==================================================
+2. DOUBLE-ENTRY ACCOUNTING
+==========================
+
+Implement a proper double-entry bookkeeping system.
+
+Every journal entry must contain one or more journal lines.
+
+Each journal line must contain:
+
+* Account
+* Debit
+* Credit
+* Description
+
+Accounting rule:
+
+TOTAL DEBIT = TOTAL CREDIT
+
+Example:
+
+Journal:
+
+Dr Cash 100,000
+Cr Capital 100,000
+
+The system must reject:
+
+Dr Cash 100,000
+Cr Capital 90,000
+
+Because:
+
+Debit = 100,000
+Credit = 90,000
+
+The journal must not be posted.
+
+Also reject a journal where:
+
+Debit = 0
+Credit = 0
+
+A journal line must contain either:
+
+Debit OR Credit
+
+Never both.
+
+Never allow negative Debit or Credit values.
+
+==================================================
+3. JOURNAL ENTRY STATUS SYSTEM
+==============================
+
+Implement the following statuses:
+
+DRAFT
+PENDING_APPROVAL
+APPROVED
+POSTED
+REVERSED
+CANCELLED
+
+Workflow:
+
+DRAFT
+↓
+PENDING APPROVAL
+↓
+APPROVED
+↓
+POSTED
+
+Depending on user permissions, an authorized user may be able to post directly.
+
+Only POSTED journals affect:
+
+* General Ledger
+* Account Balances
+* Trial Balance
+* Profit & Loss
+* Balance Sheet
+
+DRAFT journals must NOT affect financial reports.
+
+PENDING_APPROVAL journals must NOT affect financial reports.
+
+APPROVED journals must NOT affect financial reports until posted.
+
+CANCELLED journals must NOT affect financial reports.
+
+REVERSED journals must be handled through a proper reversal journal.
+
+==================================================
+4. JOURNAL ENTRY NUMBERING
+==========================
+
+Create automatic journal numbering.
+
+Example:
+
+JE-2026-000001
+JE-2026-000002
+JE-2026-000003
+
+The numbering system must be:
+
+* Unique
+* Sequential
+* Year-aware
+
+Do not rely on the database ID as the visible journal number.
+
+The journal number should be generated safely to prevent duplicate numbers when multiple users create transactions.
+
+==================================================
+5. JOURNAL ENTRY DATA
+=====================
+
+Each journal entry should contain:
+
+* ID
+* Journal Number
+* Transaction Date
+* Posting Date
+* Description
+* Reference Number
+* Source Module
+* Source Type
+* Source Transaction ID
+* Cost Center ID
+* Project ID (nullable)
+* Batch ID (nullable)
+* Created By
+* Approved By
+* Posted By
+* Reversed By
+* Status
+* Created At
+* Updated At
+* Approved At
+* Posted At
+* Reversed At
+
+The following fields must be optional for now because future modules will use them:
+
+Project ID
+Batch ID
+Source Transaction ID
+
+The architecture must allow future modules to link their transactions to accounting journals.
+
+==================================================
+6. JOURNAL LINES
+================
+
+Each journal line should contain:
+
+* ID
+* Journal Entry ID
+* Account ID
+* Description
+* Debit
+* Credit
+* Cost Center ID
+* Project ID
+* Batch ID
+
+A journal can contain multiple lines.
+
+Example:
+
+Dr Fuel Expense                 10,000
+Dr Labour Expense              15,000
+Cr Cash                        25,000
+
+The system must validate:
+
+Total Debit = 25,000
+Total Credit = 25,000
+
+This is valid.
+
+Another example:
+
+Dr Cash                         50,000
+Dr Bank Charges                  1,000
+Cr Sales Revenue                51,000
+
+This is valid.
+
+==================================================
+7. ACCOUNTING SERVICE
+=====================
+
+Create a centralized Accounting Service.
+
+The exact class/file structure should follow the existing architecture, but the system should have a reusable service responsible for accounting operations.
+
+The service should support operations similar to:
+
+Create Journal
+Validate Journal
+Approve Journal
+Post Journal
+Reverse Journal
+Get Ledger
+Get Account Balance
+Get Trial Balance
+
+The Accounting Service must be the ONLY recommended entry point for creating accounting entries from application code.
+
+Future modules should be able to call something conceptually similar to:
+
+AccountingService::createJournal(...)
+
+Do not allow each module to directly insert journal lines into the database.
+
+The Accounting Service should:
+
+1. Validate the transaction.
+2. Validate accounts.
+3. Validate debit/credit amounts.
+4. Validate the journal balance.
+5. Create the journal header.
+6. Create journal lines.
+7. Save everything inside a database transaction.
+8. Roll back everything if any operation fails.
+
+==================================================
+8. DATABASE TRANSACTIONS
+========================
+
+Use MySQL database transactions for accounting operations.
+
+Example:
+
+BEGIN TRANSACTION
+
+Create Journal Header
+
+Create Journal Lines
+
+Validate Debit = Credit
+
+Commit
+
+If anything fails:
+
+ROLLBACK
+
+Never allow partially created journals.
+
+Example failure:
+
+Journal Header created successfully.
+
+Line 1 created.
+
+Line 2 fails.
+
+The entire transaction must be rolled back.
+
+The system must not leave an incomplete journal.
+
+==================================================
+9. POSTING ENGINE
+=================
+
+Create a proper posting process.
+
+When a journal is POSTED:
+
+1. Validate the journal.
+2. Confirm total debit = total credit.
+3. Confirm all accounts are active.
+4. Confirm all required fields.
+5. Create/update General Ledger records.
+6. Mark journal as POSTED.
+7. Record Posted By.
+8. Record Posted At.
+9. Create Audit Log.
+
+Only POSTED journals should appear in the official General Ledger.
+
+Do not duplicate financial amounts unnecessarily.
+
+The General Ledger should have a clear relationship with the original journal.
+
+Each ledger entry should be traceable back to:
+
+Journal
+→ Journal Lines
+→ Source Transaction
+
+==================================================
+10. GENERAL LEDGER
+==================
+
+Build a General Ledger screen.
+
+Allow users to:
+
+* Select an account.
+* Select date range.
+* Select cost center.
+* Select source module.
+* Search by reference.
+* Search by journal number.
+
+Display:
+
+Date
+Journal Number
+Reference
+Description
+Debit
+Credit
+Running Balance
+
+Example:
+
+Account:
+Cash
+
+Date       Journal       Description       Debit    Credit    Balance
+
+01/01      JE-0001       Opening Balance   100,000     -       100,000
+02/01      JE-0002       Purchase               -    20,000     80,000
+03/01      JE-0003       Sales              50,000     -       130,000
+
+Calculate running balance correctly according to the account's normal balance.
+
+The General Ledger must only include POSTED transactions.
+
+==================================================
+11. ACCOUNT BALANCES
+====================
+
+Create a reliable account balance calculation system.
+
+Account balances must be based on POSTED journal entries.
+
+Do not calculate balances using:
+
+* Draft journals
+* Pending journals
+* Cancelled journals
+* Unposted journals
+
+The system must understand the normal balance of each account type.
+
+Assets:
+Debit increases
+Credit decreases
+
+Expenses:
+Debit increases
+Credit decreases
+
+Liabilities:
+Credit increases
+Debit decreases
+
+Equity:
+Credit increases
+Debit decreases
+
+Revenue:
+Credit increases
+Debit decreases
+
+COGS:
+Debit increases
+Credit decreases
+
+Ensure account balances are mathematically correct.
+
+==================================================
+12. TRIAL BALANCE
+=================
+
+Create a Trial Balance screen.
+
+Allow filtering by:
+
+* Date From
+* Date To
+* Cost Center
+
+Display:
+
+Account Code
+Account Name
+Debit Balance
+Credit Balance
+
+At the bottom:
+
+Total Debit
+Total Credit
+
+The Trial Balance must always satisfy:
+
+Total Debit = Total Credit
+
+Only POSTED journal entries should be included.
+
+Provide a clear warning if the system detects an imbalance.
+
+Do not hide accounting errors.
+
+==================================================
+13. JOURNAL ENTRY UI
+====================
+
+Create a professional Journal Entry interface.
+
+The interface should allow:
+
+Journal Date
+Reference
+Description
+Cost Center
+Multiple Journal Lines
+
+Journal Lines should allow:
+
+Account Selection
+Description
+Debit
+Credit
+
+Provide an "Add Line" button.
+
+Provide a "Remove Line" button.
+
+Automatically calculate:
+
+Total Debit
+Total Credit
+Difference
+
+Display:
+
+Balanced
+
+or
+
+Not Balanced
+
+The user must not be able to post an unbalanced journal.
+
+Example:
+
+Total Debit:
+LKR 100,000
+
+Total Credit:
+LKR 100,000
+
+Difference:
+LKR 0.00
+
+Status:
+Balanced
+
+Use a clean accounting-style interface.
+
+==================================================
+14. JOURNAL ENTRY LIST
+======================
+
+Create a Journal Entries page.
+
+Columns:
+
+Journal Number
+Date
+Reference
+Description
+Source Module
+Cost Center
+Debit
+Credit
+Status
+Created By
+Created At
+Actions
+
+Actions should depend on permissions and status.
+
+Possible actions:
+
+View
+Edit
+Submit for Approval
+Approve
+Post
+Reverse
+Cancel
+
+Do not show invalid actions.
+
+For example:
+
+A POSTED journal should not have an Edit button.
+
+A REVERSED journal should not have a Post button.
+
+==================================================
+15. JOURNAL VIEW
+================
+
+Create a detailed Journal View page.
+
+Show:
+
+Journal Number
+Date
+Posting Date
+Reference
+Description
+Source Module
+Cost Center
+Status
+
+Journal Lines:
+
+Account Code
+Account Name
+Description
+Debit
+Credit
+
+Totals:
+
+Total Debit
+Total Credit
+
+Show:
+
+Created By
+Created At
+Approved By
+Approved At
+Posted By
+Posted At
+
+Show the complete audit history.
+
+Provide a link to the source transaction if the journal was created by another module.
+
+For Stage 2, source transactions may not exist yet, so handle this gracefully.
+
+==================================================
+16. JOURNAL REVERSAL
+====================
+
+Implement a proper reversal mechanism.
+
+A POSTED journal must never be edited directly.
+
+If a posted journal is incorrect:
+
+Create a reversal journal.
+
+Example original:
+
+Dr Expense 10,000
+Cr Cash 10,000
+
+Reversal:
+
+Dr Cash 10,000
+Cr Expense 10,000
+
+The reversal journal must reference the original journal.
+
+Add fields such as:
+
+Reversal Of Journal ID
+Reversal Reason
+
+Original journal status:
+
+REVERSED
+
+Reversal journal status:
+
+POSTED
+
+Maintain a clear relationship:
+
+Original Journal
+→ Reversal Journal
+
+Do not delete the original journal.
+
+==================================================
+17. AUDIT LOGGING
+=================
+
+Every important accounting action must be logged.
+
+Log:
+
+* Journal Created
+* Journal Updated
+* Journal Submitted
+* Journal Approved
+* Journal Posted
+* Journal Reversed
+* Journal Cancelled
+
+Audit log should include:
+
+User
+Action
+Module
+Record ID
+Description
+Timestamp
+IP Address if available
+
+Accounting audit logs must not be editable by normal users.
+
+==================================================
+18. PERMISSIONS
+===============
+
+Integrate with the Stage 1 permission system.
+
+Create permissions such as:
+
+accounting.view
+accounting.create
+accounting.edit
+accounting.submit
+accounting.approve
+accounting.post
+accounting.reverse
+accounting.cancel
+accounting.view_ledger
+accounting.view_trial_balance
+
+Server-side permission checks are mandatory.
+
+Do not rely only on hiding buttons in the UI.
+
+==================================================
+19. CHART OF ACCOUNTS INTEGRATION
+=================================
+
+Integrate the accounting engine with the existing Chart of Accounts.
+
+When selecting an account in a journal:
+
+Only accounts marked as:
+
+Active
+AND
+Allow Manual Posting = TRUE
+
+should be selectable for manual journal entries.
+
+Parent/group accounts should not be selectable if:
+
+Allow Manual Posting = FALSE
+
+Example:
+
+1000 Assets
+
+Should not be directly posted to.
+
+1110 Cash
+
+Can be posted to.
+
+==================================================
+20. COST CENTER INTEGRATION
+===========================
+
+Allow Journal Entries to be associated with Cost Centers.
+
+For Stage 2, Cost Center is optional for manual journals unless configured otherwise.
+
+Future business modules will automatically assign cost centers.
+
+Example:
+
+Agricultural Service
+→ Agricultural Services Cost Center
+
+Machinery Rental
+→ Machinery Rental Cost Center
+
+Marketplace
+→ Marketplace Cost Center
+
+Plantation
+→ Plantation Cost Center
+
+The accounting engine must support this relationship now.
+
+==================================================
+21. ACCOUNTING TESTING
+======================
+
+After implementation, perform complete accounting tests.
+
+TEST 1 — Capital
+
+Dr Cash 100,000
+Cr Capital 100,000
+
+Verify:
+
+Journal
+Ledger
+Account Balance
+Trial Balance
+
+TEST 2 — Expense
+
+Dr Fuel Expense 10,000
+Cr Cash 10,000
+
+Verify:
+
+Cash decreases
+Fuel Expense increases
+Trial Balance remains balanced
+
+TEST 3 — Revenue
+
+Dr Cash 50,000
+Cr Agricultural Service Revenue 50,000
+
+Verify:
+
+Cash increases
+Revenue increases
+Trial Balance remains balanced
+
+TEST 4 — Multiple Lines
+
+Dr Fuel Expense 10,000
+Dr Labour Expense 20,000
+Cr Cash 30,000
+
+Verify:
+
+Total Debit = 30,000
+Total Credit = 30,000
+
+TEST 5 — Unbalanced Journal
+
+Dr Cash 100,000
+Cr Capital 90,000
+
+Verify:
+
+System rejects posting.
+
+TEST 6 — Reversal
+
+Create a valid posted journal.
+
+Reverse it.
+
+Verify:
+
+Original remains unchanged.
+Original status = REVERSED.
+Reversal journal exists.
+Reversal has opposite debit/credit values.
+Trial Balance reflects both entries correctly.
+
+TEST 7 — Draft
+
+Create a draft journal.
+
+Verify:
+
+It does NOT affect the General Ledger.
+
+It does NOT affect Trial Balance.
+
+TEST 8 — Cancelled
+
+Cancel a journal.
+
+Verify:
+
+It does NOT affect official financial reports.
+
+==================================================
+22. UI/UX REQUIREMENTS
+======================
+
+Use the existing ERP UI from Stage 1.
+
+Maintain consistent:
+
+* Sidebar
+* Header
+* Breadcrumbs
+* Buttons
+* Cards
+* Tables
+* Modals
+* Toast notifications
+* Validation messages
+
+Use Bootstrap 5.
+
+Journal Entry screen should feel like a professional accounting application.
+
+Use:
+
+* Real-time debit/credit totals
+* Difference indicator
+* Balanced / Unbalanced status
+* Confirmation modal before posting
+* Confirmation modal before reversal
+* Clear status badges
+
+Make all screens responsive.
+
+==================================================
+23. IMPORTANT ACCOUNTING RULES
+==============================
+
+Never:
+
+* Delete posted journals.
+* Edit posted journals.
+* Allow unbalanced journals.
+* Allow inactive accounts to receive postings.
+* Allow parent accounts to receive postings if manual posting is disabled.
+* Create financial entries outside the central accounting engine.
+* Update account balances manually.
+* Use hardcoded account IDs.
+* Allow duplicate journal numbers.
+* Allow duplicate posting of the same source transaction.
+
+Prepare the architecture for future idempotency protection.
+
+For future automated transactions, the system should be able to identify:
+
+Source Module
+Source Transaction Type
+Source Transaction ID
+
+This will help prevent duplicate accounting entries.
+
+==================================================
+24. FINAL DELIVERABLE
+=====================
+
+After implementation, the system should have a fully functional Central Accounting Engine.
+
+The completed Stage 2 should include:
+
+1. Journal Entry Creation
+2. Journal Validation
+3. Journal Numbering
+4. Draft Journals
+5. Approval Workflow
+6. Posting Workflow
+7. General Ledger
+8. Account Balances
+9. Trial Balance
+10. Journal Reversal
+11. Audit Logging
+12. Cost Center Integration
+13. Permission Integration
+14. Accounting Transaction Safety
+15. Database Transaction Rollback
+16. Complete Accounting Test Suite
+
+At the end:
+
+1. Test every feature.
+2. Check for PHP errors.
+3. Check browser console errors.
+4. Check MySQL errors.
+5. Check database integrity.
+6. Check all accounting calculations.
+7. Verify every test case above.
+
+Provide a final Stage 2 report containing:
+
+* Files created
+* Files modified
+* Database tables created/modified
+* New accounting services/classes
+* New permissions
+* New features
+* Test results
+* Any errors found
+* Any remaining issues
+
+IMPORTANT:
+
+Do NOT start Stage 3 automatically.
+
+Do NOT implement Marketplace, Services, Plantation, Manufacturing, Construction, or Grinding yet.
+
+Stop after Stage 2 is fully implemented, tested, and stable.
