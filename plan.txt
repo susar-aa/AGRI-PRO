@@ -1,70 +1,73 @@
-# STAGE 1 — PROJECT INITIALIZATION, ARCHITECTURE & DATABASE FOUNDATION
+You are a senior software architect, senior PHP/MySQL developer, accounting system designer, ERP developer, database architect, and UI/UX designer.
 
-You are a senior software architect, ERP developer, accounting system designer, PHP/MySQL developer, database architect, and UI/UX designer.
+I am building a complete Accounting + Business Management ERP system for a cooperative agricultural society.
 
-I am starting a completely new project from scratch. There is currently NO existing application, NO existing database, and NO existing code that needs to be preserved.
+PROJECT NAME:
+Agri Co-Op Cooperative Society Limited Accounting & Business Management System
 
-Your task in this stage is to establish the complete technical foundation and architecture for a professional Accounting + Business Management ERP system for an agricultural cooperative society.
+DEVELOPMENT ENVIRONMENT:
+- Local development server: XAMPP
+- Backend: PHP
+- Database: MySQL / MariaDB
+- Database management: phpMyAdmin
+- Frontend: HTML5
+- CSS: CSS3 + Bootstrap 5
+- JavaScript: Vanilla JavaScript
+- AJAX / Fetch API where required
+- Use PHP PDO with prepared statements
+- Use modular MVC-like architecture where practical
+- Use reusable components
+- Use Bootstrap responsive UI
+- Use modern clean professional ERP dashboard design
+- Desktop-first but fully responsive
+- The system must be scalable for future online hosting
+- Current environment is localhost/XAMPP
+- Do not hardcode business logic that prevents future expansion
 
 IMPORTANT:
-Do NOT try to build the entire ERP in this stage.
+Do not build each business module as an isolated accounting system.
 
-This is ONLY STAGE 1.
+The system must have ONE CENTRAL ACCOUNTING ENGINE.
 
-In this stage, you must:
+All modules must connect to:
+1. Chart of Accounts
+2. General Ledger
+3. Journal Entries
+4. Double-Entry Bookkeeping
+5. Cash Accounts
+6. Bank Accounts
+7. Accounts Receivable
+8. Accounts Payable
+9. Inventory
+10. Cost Centers
+11. Projects
+12. Batches
+13. Financial Reporting
 
-1. Create the initial project structure.
-2. Create the database architecture.
-3. Create the database.
-4. Create the initial database schema.
-5. Create the basic application architecture.
-6. Create the authentication foundation.
-7. Create the basic ERP layout.
-8. Create the initial Chart of Accounts structure.
-9. Create the core accounting architecture.
-10. Create reusable foundation components.
+Every financial transaction must eventually create a balanced double-entry journal entry.
 
-Do NOT implement the complete business modules yet.
+The operational modules may have separate panels and workflows, but their accounting entries must flow into the central accounting system.
 
 ==================================================
-PROJECT DETAILS
-===============
+ORGANIZATION DETAILS
+==================================================
 
-Project Name:
-
-Agri Co-Op Cooperative Society Limited
-Accounting & Business Management ERP
-
-Company Name:
-
+Company / Issuer Name:
 සීමා සහිත ඇග්‍රි කෝප් සමූපකාර සමිතිය
-
-English Name:
-
 Agri Co-Op Cooperative Society Limited
 
 Address:
-
 මීදූම, යටගම, රඹුක්කන
-
-English Address:
-
 Miduma, Yatagama, Rambukkana
 
 Registration No:
-
 කෑ/1027
-
-English Registration No:
-
 KE/1027
 
 Registration Date:
-
 2025.11.14
 
 Contact Numbers:
-
 075 377 0 145
 070 629 61 50
 071 82 110 10
@@ -72,503 +75,260 @@ Contact Numbers:
 071 80 28 774
 
 ==================================================
-DEVELOPMENT ENVIRONMENT
-=======================
-
-The system is currently being developed locally using:
-
-* XAMPP
-* Apache
-* PHP
-* MySQL / MariaDB
-* phpMyAdmin
-* HTML5
-* CSS3
-* Bootstrap 5
-* JavaScript
-* AJAX / Fetch API where appropriate
-
-Use PHP PDO with prepared statements for all database operations.
-
-Use a clean modular architecture.
-
-The system must be designed so that it can later be deployed to a production hosting environment without major architectural changes.
-
-Do not hardcode localhost-specific paths or business logic.
-
-Use configuration files/environment configuration for:
-
-* Database credentials
-* Application URL
-* Environment
-* Debug mode
-* Company settings
-
+CORE BUSINESS ACTIVITIES
 ==================================================
-CORE ARCHITECTURE PRINCIPLE
-===========================
 
-The most important requirement is that this is NOT a collection of independent accounting systems.
+The organization generates profit through multiple business activities.
 
-The organization has multiple profit-generating business activities.
+The system must provide separate operational panels for each business activity while sharing one centralized accounting framework.
 
-Each business activity should have its own operational module/panel.
-
-However, ALL business activities must connect to ONE CENTRAL ACCOUNTING SYSTEM.
-
-The architecture must follow:
-
-BUSINESS MODULE
-↓
-TRANSACTION
-↓
-CENTRAL ACCOUNTING ENGINE
-↓
-DOUBLE-ENTRY JOURNAL
-↓
-GENERAL LEDGER
-↓
-TRIAL BALANCE
-↓
-FINANCIAL STATEMENTS
-
-The system must have ONE centralized:
-
-* Chart of Accounts
-* Accounting Engine
-* Journal Engine
-* General Ledger
-* Expense Engine
-* Inventory Engine
-* Customer System
-* Supplier System
-* Payment System
-* Cost Center System
-* Project System
-* Batch System
-* Reporting System
-
-Individual modules must NEVER create their own separate accounting systems.
-
-All financial transactions must eventually flow through the central accounting engine.
-
-==================================================
-BUSINESS ACTIVITIES
-===================
-
-The organization currently has the following business activities:
+BUSINESS MODULES:
 
 1. Agricultural Field Plowing / Agricultural Services
-
-They plow paddy fields and charge customers.
-
-Expenses can be incurred for individual service jobs, including:
-
-* Employee hire
-* Labour
-* Fuel
-* Meals
-* Transport
-* Machinery
-* Maintenance
-* Other expenses
-
-Each service job should eventually be able to calculate:
-
-Revenue
-Total Expenses
-Profit
-Profit Margin
-
----
-
 2. Machinery Rental
-
-The organization owns machinery such as:
-
-* Pressure Washer
-* Generator
-* Grill
-* Other machinery
-
-These machines are rented to customers and charged by:
-
-* Hour
-* Day
-* Other configurable units
-
-The system must eventually support:
-
-Machinery Master
-Rental Booking
-Rental Contract
-Rental Period
-Usage
-Rental Revenue
-Rental Expenses
-Maintenance
-Profitability
-
----
-
 3. Marketplace / Buying & Selling
-
-The organization purchases products and resells them.
-
-Examples:
-
-* Fertilizer
-* Coconut Oil
-* Other agricultural products
-* Other trading products
-
-The system must eventually support:
-
-Products
-Categories
-Suppliers
-Purchases
-GRN
-Inventory
-Sales
-Customers
-Payments
-Sales Returns
-Purchase Returns
-COGS
-Profitability
-
----
-
 4. Plantation / Agricultural Production
+5. Brick Manufacturing
+6. Fruit Packing
+7. Construction Contracts / Project Contracts
+8. Grinding Mill
+9. Future business modules must be easy to add
 
-The organization owns land and grows crops.
+==================================================
+GLOBAL ACCOUNTING PRINCIPLE
+==================================================
 
-A Plantation Project represents a production cycle.
+Implement proper double-entry accounting.
 
-A single project must support MULTIPLE crops/plants.
+Every financial transaction must have:
+
+Debit Account
+Credit Account
+Amount
+Transaction Date
+Reference Number
+Description
+Source Module
+Source Transaction ID
+Cost Center if applicable
+Project if applicable
+Batch if applicable
+User
+Created Date
+Status
 
 Example:
 
-Project:
-2026 Mixed Plantation
+Paddy Field Plowing Service Revenue
 
-Crops:
+Dr Cash / Accounts Receivable
+    Cr Agricultural Service Revenue
 
-* Tomato
-* Chili
-* Cucumber
+Fuel Expense
 
-The system must eventually support:
+Dr Fuel / Vehicle Operating Expense
+    Cr Cash / Bank / Payable
 
-Plantation Project
-Multiple Crops
-Planting
-Project Expenses
-Crop Expenses
-Harvest
-Harvest Quantity in KG
-Cost Per KG
-Selling Price Per KG
-Expected Revenue
-Actual Revenue
-Profit
-Margin
+Employee Hire Expense
 
-Expenses may include:
+Dr Contract Labour Expense
+    Cr Cash / Bank / Payable
 
-* Seeds
-* Seedlings
-* Fertilizer
-* Pesticides
-* Labour
-* Employee Hire
-* Fuel
-* Water
-* Irrigation
-* Transport
-* Machinery
-* Land Preparation
-* Other
+Machinery Rental
 
-At the end of a plantation project:
+Dr Cash / Accounts Receivable
+    Cr Machinery Rental Revenue
 
-Total Cost
-÷
-Saleable Harvest KG
-===================
+Machinery Fuel Expense
 
-Cost Per KG
+Dr Fuel Expense
+    Cr Cash
 
-The system must eventually allow the finished harvest to be transferred to Marketplace inventory.
+Marketplace Purchase
 
-The system must maintain full traceability:
+Dr Inventory Asset
+    Cr Cash / Accounts Payable
 
-Marketplace Product
-→ Harvest Batch
-→ Crop
-→ Plantation Project
-→ Expenses
-→ Accounting Entries
+Marketplace Sale
 
----
+Dr Cash / Accounts Receivable
+    Cr Sales Revenue
 
-5. Brick Manufacturing
+At the time of sale, also post:
 
-The organization manufactures bricks and sells them.
+Dr Cost of Goods Sold
+    Cr Inventory Asset
 
-The system must eventually support:
+Plantation Expense
 
-Production Batch
-Raw Materials
-Production Expenses
-Labour
-Fuel
-Electricity
-Transport
-Other Costs
-Production Quantity
-Rejected Quantity
-Good Quantity
-Cost Per Brick
-Selling Price
-Profit
-Margin
+Dr Plantation / Work-in-Progress Asset
+    Cr Cash / Payable / Inventory / Labour
 
-Completed production batches must be transferable to Marketplace inventory.
+When plantation is harvested:
 
----
+Dr Agricultural Finished Goods Inventory
+    Cr Plantation WIP
 
-6. Fruit Packing
+When products are sold:
 
-The organization purchases fruits and packs them for resale.
+Dr Cash / Accounts Receivable
+    Cr Sales Revenue
 
-The system must eventually support:
+Dr Cost of Goods Sold
+    Cr Agricultural Finished Goods Inventory
 
-Raw Material Purchase
-Fruit Inventory
-Packing Batch
-Input Quantity
-Output Quantity
-Wastage
-Packaging Materials
-Labour
-Transport
-Other Expenses
-Cost Per KG
-Cost Per Pack
-Selling Price
-Profit
-Margin
-
-Completed packing batches must be transferable to Marketplace inventory.
-
----
-
-7. Construction Contracts
-
-The organization accepts contracts such as road construction.
-
-Each contract must eventually be treated as a Project.
-
-The system must eventually support:
-
-Construction Project
-Contract
-Customer
-Contract Value
-Project Budget
-Project Expenses
-Project Phases
-Materials
-Labour
-Subcontractors
-Fuel
-Transport
-Machinery
-Meals
-Other Expenses
-Progress Billing
-Advance Payments
-Retention
-Project Revenue
-Project Cost
-Project Profit
-Profit Margin
-
-Each construction project must have full cost tracking.
-
----
-
-8. Grinding Mill
-
-The organization has a grinding mill.
-
-There are TWO different business models.
-
-A. Grinding as a Service
-
-Customers bring materials such as coconut.
-
-The organization charges customers for grinding.
-
-Track:
-
-Customer
-Material
-Input Weight
-Rate
-Service Charge
-Machine
-Operator
-Expenses
-Profit
-
-B. Grinding as a Manufacturing Business
-
-The organization purchases raw materials, grinds them, packages them, and sells the finished products.
-
-The system must eventually support:
-
-Raw Material Purchase
-Grinding Batch
-Raw Material Consumption
-Production Expenses
-Packaging
-Output Quantity
-Wastage
-Cost Per KG
-Cost Per Bottle
-Cost Per Pack
-Selling Price
-Profit
-Margin
-
-Finished grinding products must be transferable to Marketplace inventory.
+The system must maintain a complete audit trail.
 
 ==================================================
-FUTURE MODULE EXTENSIBILITY
-===========================
+CENTRAL DASHBOARD
+==================================================
 
-The architecture must allow additional profit-generating activities to be added later.
+Create a main ERP dashboard.
 
-Do NOT hardcode the system so that only the current 8 business activities are possible.
+Dashboard should display:
 
-Design the architecture so new modules can use the same:
+- Total Revenue
+- Total Expenses
+- Gross Profit
+- Net Profit
+- Cash Balance
+- Bank Balance
+- Accounts Receivable
+- Accounts Payable
+- Inventory Value
+- Active Plantation Projects
+- Active Construction Projects
+- Active Manufacturing Batches
+- Machinery Currently Rented
+- Pending Customer Payments
+- Pending Supplier Payments
+- Today's Sales
+- Today's Expenses
+- Monthly Revenue
+- Monthly Expenses
+- Profit by Business Activity
 
-* Accounting Engine
-* Inventory Engine
-* Expense Engine
-* Cost Center Engine
-* Project Engine
-* Batch Engine
-* Reporting Engine
+Charts:
+
+- Revenue by Business Activity
+- Expense by Business Activity
+- Profit Trend
+- Cash Flow
+- Sales Trend
+- Expense Trend
+- Inventory Value
+- Accounts Receivable Aging
+- Accounts Payable Aging
+
+Allow date filtering.
 
 ==================================================
-STAGE 1 — REQUIRED PROJECT STRUCTURE
-====================================
-
-Create a clean and scalable project structure.
-
-Use an MVC-like architecture or another clean modular PHP architecture.
-
-The structure should separate:
-
-* Configuration
-* Core
-* Controllers
-* Models
-* Services
-* Views
-* Components
-* API/AJAX
-* Assets
-* CSS
-* JavaScript
-* Database
-* Migrations
-* Reports
-* Uploads
-
-Keep accounting logic out of the UI.
-
-Keep database queries out of presentation files where possible.
-
-Create reusable services for future modules.
-
-The exact folder structure can be determined based on best practices for a PHP/MySQL ERP, but it must be clean, understandable, and scalable.
-
+MAIN SYSTEM NAVIGATION
 ==================================================
-DATABASE FOUNDATION
-===================
 
-Create the initial MySQL database.
+Create the following sidebar navigation:
 
-Use proper:
+Dashboard
 
-* Primary Keys
-* Foreign Keys
-* Indexes
-* Unique Constraints
-* Timestamps
-* Soft Delete where appropriate
-* Status fields
-* Audit fields
+ACCOUNTING
+- Chart of Accounts
+- Journal Entries
+- General Ledger
+- Cash & Bank
+- Accounts Receivable
+- Accounts Payable
+- Trial Balance
+- Profit & Loss
+- Balance Sheet
+- Cash Flow Statement
+- Financial Reports
 
-The database must be normalized and scalable.
+SALES & MARKETPLACE
+- Marketplace
+- Products
+- Categories
+- Customers
+- Sales
+- Sales Returns
+- Customer Payments
+- Sales Reports
 
-Create the foundational tables for:
+PURCHASING
+- Suppliers
+- Purchase Orders
+- Goods Received
+- Purchases
+- Purchase Returns
+- Supplier Payments
 
-AUTHENTICATION:
+INVENTORY
+- Stock Overview
+- Stock Ledger
+- Stock Adjustments
+- Stock Transfers
+- Inventory Valuation
+- Batch Tracking
 
-* users
-* roles
-* permissions
-* role_permissions
-* user_roles
+SERVICES
+- Agricultural Services
+- Service Jobs
+- Service Expenses
+- Machinery Rental
+- Rental Contracts
+- Rental Expenses
 
-COMPANY:
+PRODUCTION
+- Plantation Projects
+- Brick Manufacturing
+- Fruit Packing
+- Grinding Mill
+- Production Batches
+- Production Expenses
+- Production Costing
 
-* company_settings
-* system_settings
+PROJECTS
+- Construction Projects
+- Contracts
+- Project Expenses
+- Project Payments
+- Project Profitability
 
-ACCOUNTING:
+FINANCE
+- Expenses
+- Petty Cash
+- Cash Accounts
+- Bank Accounts
+- Bank Reconciliation
+- Deposits
+- Withdrawals
+- Transfers
 
-* account_types
-* accounts
-* journal_entries
-* journal_lines
-* ledger_entries
+REPORTS
+- Business Activity Reports
+- Cost Center Reports
+- Project Profitability
+- Batch Profitability
+- Product Profitability
+- Expense Reports
+- Revenue Reports
+- Tax Reports
+- Audit Reports
 
-ORGANIZATION:
-
-* cost_centers
-
-CONTACTS:
-
-* customers
-* suppliers
-
-FINANCE:
-
-* cash_accounts
-* bank_accounts
-
-AUDIT:
-
-* audit_logs
-
-Do not create all business-specific tables yet unless required as foundational dependencies.
-
-The database must be designed so that future modules can be added without restructuring the entire database.
+ADMINISTRATION
+- Users
+- Roles & Permissions
+- Company Settings
+- System Settings
+- Audit Logs
+- Backup & Restore
 
 ==================================================
 CHART OF ACCOUNTS
-=================
+==================================================
 
-Create a hierarchical Chart of Accounts system.
+Create a flexible hierarchical Chart of Accounts.
 
-Account categories:
+Account types:
 
 1. Assets
 2. Liabilities
@@ -577,127 +337,95 @@ Account categories:
 5. Cost of Goods Sold
 6. Expenses
 
-The accounts table must support:
+Support:
 
-* Account ID
-* Account Code
-* Account Name
-* Parent Account
-* Account Type
-* Normal Balance
-* Is System Account
-* Is Active
-* Allow Manual Posting
-* Created At
-* Updated At
+- Parent accounts
+- Child accounts
+- Account codes
+- Account names
+- Account type
+- Normal balance
+- Active/inactive
+- System account flag
+- Allow manual posting flag
 
-The Chart of Accounts must be hierarchical.
+Create appropriate default accounts for:
 
-Example:
+Cash
+Bank
+Petty Cash
+Accounts Receivable
+Accounts Payable
+Inventory
+Raw Materials
+Finished Goods
+Work in Progress
+Plantation WIP
+Machinery
+Accumulated Depreciation
+Vehicles
+Land
+Buildings
+Equipment
 
-1000 Assets
-1100 Current Assets
-1110 Cash
-1120 Bank
-1130 Petty Cash
-1140 Accounts Receivable
-1150 Inventory
+Revenue:
+Agricultural Services Revenue
+Machinery Rental Revenue
+Marketplace Sales Revenue
+Plantation Sales Revenue
+Brick Sales Revenue
+Fruit Packing Sales Revenue
+Construction Contract Revenue
+Grinding Service Revenue
+Grinding Product Sales Revenue
 
-2000 Liabilities
-2100 Current Liabilities
-2110 Accounts Payable
+COGS:
+Marketplace COGS
+Plantation COGS
+Brick COGS
+Fruit Packing COGS
+Grinding Product COGS
 
-3000 Equity
+Expenses:
+Fuel
+Labour
+Employee Hire
+Meals
+Transport
+Vehicle Expenses
+Machinery Maintenance
+Electricity
+Water
+Packaging
+Seeds
+Fertilizer
+Pesticides
+Agricultural Inputs
+Raw Materials
+Construction Materials
+Brick Production Materials
+Grinding Materials
+Rent
+Salaries
+Utilities
+Repairs
+Maintenance
+Office Expenses
+Bank Charges
+Depreciation
+Other Expenses
 
-4000 Revenue
-4100 Agricultural Services Revenue
-4200 Machinery Rental Revenue
-4300 Marketplace Sales Revenue
-4400 Plantation Sales Revenue
-4500 Brick Sales Revenue
-4600 Fruit Packing Sales Revenue
-4700 Construction Contract Revenue
-4800 Grinding Service Revenue
-4900 Grinding Product Sales Revenue
-
-5000 Cost of Goods Sold
-
-6000 Expenses
-6100 Fuel Expense
-6200 Labour Expense
-6300 Employee Hire Expense
-6400 Meals Expense
-6500 Transport Expense
-6600 Machinery Maintenance
-6700 Electricity
-6800 Water
-6900 Packaging
-6910 Seeds
-6920 Fertilizer
-6930 Pesticides
-6940 Agricultural Inputs
-6950 Construction Materials
-6960 Raw Materials
-6970 Repairs
-6980 Other Expenses
-
-These are only initial accounts.
-
-The administrator must be able to create, edit, deactivate, and organize additional accounts.
-
-Do not allow deletion of accounts that have financial transactions.
-
-==================================================
-ACCOUNTING ENGINE FOUNDATION
-============================
-
-Create the foundation for a centralized double-entry accounting engine.
-
-Every future financial transaction must be capable of creating:
-
-Journal Entry
-+
-Journal Lines
-
-Each Journal Entry should support:
-
-* Journal Number
-* Transaction Date
-* Description
-* Reference
-* Source Module
-* Source Transaction ID
-* Cost Center
-* Project ID
-* Batch ID
-* Created By
-* Status
-* Created At
-
-Each Journal Line should contain:
-
-* Account ID
-* Debit
-* Credit
-* Description
-
-Accounting rule:
-
-TOTAL DEBIT MUST ALWAYS EQUAL TOTAL CREDIT.
-
-The system must never allow an unbalanced journal to be posted.
-
-Do not implement every transaction workflow yet.
-
-Only create the reusable accounting foundation and database architecture in this stage.
+The administrator must be able to create additional accounts.
 
 ==================================================
-COST CENTER FOUNDATION
-======================
+COST CENTER SYSTEM
+==================================================
 
-Create Cost Center management.
+Implement Cost Centers.
 
-Initial cost centers:
+Each business activity can have a cost center.
+
+Examples:
 
 CC-001 Agricultural Services
 CC-002 Machinery Rental
@@ -707,35 +435,933 @@ CC-005 Brick Manufacturing
 CC-006 Fruit Packing
 CC-007 Construction
 CC-008 Grinding Mill
-CC-009 Administration
 
-Cost centers must be extendable.
+Transactions should optionally or mandatorily require a Cost Center depending on configuration.
 
-The system should eventually be able to report:
+Generate reports:
 
 Revenue by Cost Center
-Expenses by Cost Center
+Expense by Cost Center
 Profit by Cost Center
+Cost Center P&L
 
 ==================================================
-AUTHENTICATION FOUNDATION
-=========================
+1. AGRICULTURAL SERVICE MODULE
+==================================================
 
-Create a secure login system.
+Create a dedicated Agricultural Services panel.
+
+Primary service:
+Paddy field plowing.
+
+Workflow:
+
+Create Service Job
+
+Fields:
+- Job Number
+- Customer
+- Customer Contact
+- Customer Address
+- Field Location
+- Field Size
+- Unit
+- Service Type
+- Machine Used
+- Operator
+- Start Date
+- End Date
+- Agreed Price
+- Status
+
+Service Types:
+- Paddy Field Plowing
+- Land Preparation
+- Other Agricultural Services
+
+Allow billing by:
+- Acre
+- Per Day
+- Per Hour
+- Fixed Price
+
+Record service-specific expenses:
+
+- Employee hire
+- Labour
+- Fuel
+- Meals
+- Transport
+- Machine maintenance
+- Other expenses
+
+Every expense must be linked to the Service Job.
+
+Show:
+
+Revenue
+Total Expenses
+Gross Profit
+Profit Margin
+Cost Breakdown
+
+When service is completed, generate invoice.
+
+Post accounting entries automatically.
+
+==================================================
+2. MACHINERY RENTAL MODULE
+==================================================
+
+Create machinery master.
+
+Examples:
+- Pressure Washer
+- Generator
+- Grill
+- Future machines
+
+Fields:
+
+Machine ID
+Machine Name
+Category
+Serial Number
+Purchase Date
+Purchase Cost
+Current Value
+Hourly Rental Rate
+Daily Rental Rate
+Status
+Location
+Maintenance Status
+
+Rental workflow:
+
+Create Rental Booking
+
+Customer
+Machine
+Start Date
+End Date
+Start Hour Meter
+End Hour Meter
+Total Hours
+Rate Per Hour
+Total Rental Charge
+Deposit
+Status
+
+Calculate rental charge automatically.
+
+Track:
+
+Available
+Reserved
+Rented
+Returned
+Maintenance
+
+Record rental-related expenses:
+
+Fuel
+Transport
+Operator
+Maintenance
+Repair
+Cleaning
+Other
+
+Calculate:
+
+Rental Revenue
+Rental Expenses
+Net Profit
+Profit Margin
+Profit by Machine
+
+Generate double-entry accounting entries.
+
+==================================================
+3. MARKETPLACE MODULE
+==================================================
+
+Create a complete marketplace / buying and selling module.
+
+The organization can buy products and resell them.
+
+Examples:
+Fertilizer
+Coconut Oil
+Agricultural Products
+Other Trading Products
+
+Features:
+
+Product Master
+SKU
+Barcode
+Product Name
+Category
+Unit
+Purchase Price
+Selling Price
+Minimum Stock
+Reorder Level
+Tax
+Supplier
+Product Image
+Active Status
+
+Purchasing workflow:
+
+Purchase Order
+GRN
+Purchase Invoice
+Supplier Payment
+
+Sales workflow:
+
+Customer
+Sales Invoice
+Cash Sale
+Credit Sale
+Payment
+Sales Return
+
+Inventory must automatically update.
+
+Use stock ledger.
+
+Track:
+
+Opening Stock
+Purchases
+Sales
+Sales Returns
+Purchase Returns
+Adjustments
+Closing Stock
+
+Use FIFO or weighted average costing, configurable.
+
+Every sale should automatically calculate COGS.
+
+Marketplace dashboard:
+
+Sales
+Purchases
+Gross Profit
+Inventory Value
+Low Stock
+Top Products
+Top Customers
+
+==================================================
+4. PLANTATION / AGRICULTURAL PRODUCTION MODULE
+==================================================
+
+Create a full plantation project system.
+
+A Plantation Project represents one production cycle.
+
+Example:
+
+Project:
+2026 Vegetable Plantation
+
+Start Date
+Expected Harvest Date
+Land
+Area
+Project Manager
+Status
+
+Allow multiple crops/plants in one project.
+
+Example:
+
+Project:
+2026 Mixed Plantation
+
+Crops:
+Tomato
+Chili
+Cucumber
+
+Each crop should have:
+
+Plant Name
+Variety
+Quantity Planted
+Area
+Expected Yield
+Expected Harvest Date
+
+Allow the user to start a plantation project.
+
+After starting, record expenses against the project.
+
+Expense categories:
+
+Seeds
+Seedlings
+Fertilizer
+Pesticides
+Water
+Irrigation
+Labour
+Employee Hire
+Machinery
+Fuel
+Transport
+Land Preparation
+Land Rent
+Electricity
+Materials
+Packaging
+Other
+
+Every expense must be linked to:
+
+Plantation Project
+Crop
+Cost Center
+
+Support:
+
+Cash Expense
+Bank Expense
+Supplier Invoice
+Inventory Issue
+Labour Cost
+
+At harvest:
+
+Enter:
+
+Harvest Date
+Crop
+Harvest Quantity
+Unit = KG
+Quality Grade
+Rejected Quantity
+Usable Quantity
+
+Calculate automatically:
+
+Total Project Cost
+Total Harvest KG
+Cost Per KG
+
+Formula:
+
+Cost Per KG =
+Total Allocated Production Cost / Total Saleable Harvest KG
+
+Allow entering:
+
+Expected Selling Price Per KG
+Actual Selling Price Per KG
+
+Calculate:
+
+Expected Revenue
+Actual Revenue
+Total COGS
+Gross Profit
+Profit Margin
+
+Example:
+
+Total Cost = LKR 100,000
+Harvest = 2,000 KG
+
+Cost Per KG = LKR 50
+
+Selling Price = LKR 80
+
+Margin Per KG = LKR 30
+
+Expected Profit = LKR 60,000
+
+IMPORTANT:
+
+Allow multiple crops in a single plantation project.
+
+Support cost allocation between crops.
+
+Cost allocation methods:
+
+- Direct Crop Allocation
+- Area Based
+- Quantity Based
+- Manual Allocation
+
+After harvest completion:
+
+Button:
+"Transfer to Marketplace"
+
+When clicked:
+
+Create finished agricultural product automatically.
+
+Example:
+
+Product:
+Tomato - 2026 Harvest Batch
+
+Product Type:
+Agricultural Finished Product
+
+Batch Number
+Harvest Date
+Source Plantation Project
+Total Quantity
+Cost Per KG
+Selling Price Per KG
+
+The product must appear in Marketplace inventory.
+
+Maintain traceability:
+
+Marketplace Product
+→ Harvest Batch
+→ Crop
+→ Plantation Project
+→ Expenses
+→ Accounting Entries
+
+==================================================
+5. BRICK MANUFACTURING MODULE
+==================================================
+
+Create brick production system.
+
+Production Batch:
+
+Batch Number
+Start Date
+End Date
+Brick Type
+Brick Size
+Planned Quantity
+Actual Quantity
+Rejected Quantity
+
+Record expenses:
+
+Clay
+Cement
+Sand
+Water
+Fuel
+Electricity
+Labour
+Transport
+Machine Maintenance
+Packaging
+Other
+
+Track all expenses against batch.
+
+Calculate:
+
+Total Production Cost
+Good Quantity
+Rejected Quantity
+Cost Per Brick
+
+Formula:
+
+Cost Per Brick =
+Total Production Cost / Good Bricks Produced
+
+Allow entering:
+
+Selling Price Per Brick
+
+Calculate:
+
+Expected Revenue
+Gross Profit
+Profit Margin
+
+When production batch is completed:
+
+Button:
+"Transfer to Marketplace"
+
+Create finished product:
+
+Product:
+Brick - [Type]
+
+Batch Number
+Production Date
+Quantity
+Cost Per Unit
+Selling Price
+
+Move finished quantity to inventory.
+
+Maintain batch traceability.
+
+==================================================
+6. FRUIT PACKING MODULE
+==================================================
+
+Create fruit purchasing and packing system.
+
+Process:
+
+Purchase Raw Fruits
+Receive Stock
+Create Packing Batch
+Consume Raw Fruits
+Add Packaging Materials
+Record Labour
+Record Other Expenses
+Produce Packed Product
+Transfer to Marketplace
+
+Packing Batch:
+
+Batch Number
+Date
+Supplier
+Raw Fruit Type
+Input Quantity KG
+Output Quantity KG
+Wastage KG
+Packaging Type
+Number of Packs
+
+Expenses:
+
+Fruit Purchase
+Packaging
+Labour
+Transport
+Electricity
+Other
+
+Calculate:
+
+Total Input Cost
+Packaging Cost
+Labour Cost
+Other Cost
+Total Batch Cost
+Total Good Output
+Cost Per KG
+Cost Per Pack
+
+Allow selling price:
+
+Per KG
+Per Pack
+
+Calculate margin automatically.
+
+Transfer finished batch to marketplace.
+
+Maintain traceability:
+
+Supplier
+→ Purchase
+→ Packing Batch
+→ Raw Material Consumption
+→ Finished Product
+→ Marketplace Sale
+
+==================================================
+7. CONSTRUCTION CONTRACT / PROJECT MODULE
+==================================================
+
+Create construction project management.
+
+Each contract is a project.
+
+Fields:
+
+Project Number
+Contract Number
+Customer
+Project Name
+Location
+Start Date
+Expected Completion
+Contract Value
+Advance
+Retention
+Status
+
+Project types:
+
+Road Construction
+Building
+Land Development
+Other
+
+Record expenses:
+
+Materials
+Cement
+Sand
+Metal
+Asphalt
+Fuel
+Vehicle
+Machinery
+Labour
+Subcontractors
+Employee Hire
+Meals
+Transport
+Accommodation
+Equipment Rental
+Other
+
+Every expense must link to project.
+
+Track:
+
+Budget
+Actual Cost
+Committed Cost
+Remaining Budget
+
+Revenue:
+
+Contract Value
+Progress Billing
+Advance Payments
+Retention
+Final Payment
+
+Calculate:
+
+Contract Revenue
+Total Project Cost
+Gross Profit
+Profit Margin
+Budget Variance
+
+Project status:
+
+Planning
+Active
+On Hold
+Completed
+Cancelled
+
+Support project batches / phases.
+
+Example:
+
+Road Project
+Phase 1
+Phase 2
+Phase 3
+
+Allow expenses to be assigned to phases.
+
+Generate project profitability report.
+
+==================================================
+8. GRINDING MILL MODULE
+==================================================
+
+The organization has two different grinding businesses.
+
+A. Grinding as a Service
+
+Customers bring materials such as coconut.
+
+Charge customer for grinding.
+
+Workflow:
+
+Customer
+Material Type
+Input Weight
+Rate Per KG
+Service Charge
+Date
+Machine
+Operator
+
+Record:
+
+Electricity
+Labour
+Maintenance
+Other Expenses
+
+Calculate service profit.
+
+Accounting:
+
+Dr Cash / Receivable
+    Cr Grinding Service Revenue
+
+B. Grinding as a Manufacturing Business
+
+The organization buys raw materials.
+
+Process:
+
+Purchase Raw Material
+Create Grinding Batch
+Consume Raw Material
+Record Production Expenses
+Produce Finished Product
+Transfer to Marketplace
+
+Batch fields:
+
+Batch Number
+Raw Material
+Input KG
+Output KG
+Wastage KG
+Production Date
+
+Expenses:
+
+Raw Material
+Electricity
+Labour
+Packaging
+Machine Maintenance
+Transport
+Other
+
+Calculate:
+
+Total Batch Cost
+Total Output
+Cost Per KG
+Cost Per Bottle
+Cost Per Pack
+
+Support different packaging units:
+
+Bottle
+Pack
+Bag
+KG
+
+Example:
+
+Input:
+500 KG
+
+Output:
+450 KG
+
+Total Batch Cost:
+LKR 90,000
+
+Cost Per KG:
+LKR 200
+
+If one bottle contains 1 KG:
+
+Cost Per Bottle:
+LKR 200
+
+If packaging cost is included, calculate full landed production cost.
+
+Allow selling price.
+
+Calculate:
+
+Revenue
+COGS
+Gross Profit
+Margin
+
+Transfer finished products to Marketplace.
+
+Maintain batch traceability.
+
+==================================================
+INTEGRATED EXPENSE ENGINE
+==================================================
+
+Create a centralized Expense Entry system.
+
+However, expenses can originate from different modules.
+
+Expense Source:
+
+General
+Agricultural Service
+Machinery Rental
+Plantation
+Brick Manufacturing
+Fruit Packing
+Construction Project
+Grinding Mill
+Marketplace
+Administration
+
+Each expense should support:
+
+Expense Number
+Date
+Supplier / Payee
+Expense Category
+Amount
+Payment Method
+Cash Account
+Bank Account
+Description
+Attachment
+Cost Center
+Project
+Batch
+Service Job
+Plantation
+Reference
+
+Allow direct expenses and allocated expenses.
+
+Accounting entry:
+
+Dr Expense / WIP / Inventory
+    Cr Cash / Bank / Accounts Payable
+
+The system must prevent duplicate accounting entries.
+
+==================================================
+INTEGRATED INVENTORY ENGINE
+==================================================
+
+Create centralized inventory.
+
+Inventory types:
+
+Trading Stock
+Raw Materials
+Work In Progress
+Finished Goods
+Agricultural Products
+Manufactured Products
+Packaging Materials
+
+Stock movements:
+
+Purchase
+GRN
+Sale
+Sales Return
+Purchase Return
+Production Consumption
+Production Output
+Plantation Harvest
+Batch Output
+Transfer to Marketplace
+Adjustment
+Opening Stock
+
+Every stock movement must create a Stock Ledger entry.
+
+Maintain:
+
+Opening Qty
+In Qty
+Out Qty
+Balance Qty
+Unit Cost
+Total Value
+Reference
+Source Module
+Batch
+Project
+
+==================================================
+CENTRAL JOURNAL ENGINE
+==================================================
+
+Create a Journal Entry Engine.
+
+Journal Number
+Date
+Reference
+Description
+Source Module
+Source Transaction
+Cost Center
+Project
+Batch
+
+Journal Lines:
+
+Account
+Debit
+Credit
+
+Validation:
+
+Total Debit = Total Credit
+
+Never allow posting an unbalanced journal.
+
+Each module must use this central engine.
+
+Never directly manipulate financial balances without creating journal entries.
+
+==================================================
+FINANCIAL REPORTING
+==================================================
+
+Create:
+
+Trial Balance
+General Ledger
+Profit & Loss
+Balance Sheet
+Cash Flow Statement
+
+Additional reports:
+
+Revenue by Business Activity
+Expense by Business Activity
+Profit by Business Activity
+Profit by Cost Center
+Profit by Project
+Profit by Batch
+Profit by Product
+Profit by Machine
+Plantation Cost Report
+Plantation Cost Per KG
+Brick Cost Per Unit
+Fruit Packing Cost Per Pack
+Grinding Cost Per KG
+Grinding Cost Per Bottle
+Construction Project Profitability
+Agricultural Service Profitability
+Machinery Rental Profitability
+
+All reports must derive data from the central accounting and transaction databases.
+
+==================================================
+AUDIT & SECURITY
+==================================================
 
 Implement:
 
-* Login
-* Logout
-* Session management
-* Password hashing
-* User management foundation
-* Role-based access foundation
+User Login
+Roles
+Permissions
 
-Initial roles:
+Roles:
 
 Super Admin
-Administrator
 Accountant
 Manager
 Cashier
@@ -743,268 +1369,212 @@ Inventory Officer
 Sales Officer
 Production Officer
 
-The permission system must be granular and extendable.
+Track:
 
-Do not hardcode permissions only in the frontend.
+Created By
+Updated By
+Approved By
+Created At
+Updated At
 
-Permissions must be validated server-side.
+Audit log for:
 
-==================================================
-BASIC ERP UI
-============
+Create
+Update
+Delete
+Approve
+Post
+Reverse
+Cancel
 
-Create the initial ERP interface.
+IMPORTANT:
 
-Design requirements:
-
-* Bootstrap 5
-* Modern professional ERP design
-* Clean layout
-* Responsive
-* Desktop optimized
-* Mobile responsive
-* Sidebar navigation
-* Top navigation
-* Breadcrumbs
-* User profile
-* Notifications area
-* Page title
-* Main content area
-
-Create the initial navigation structure:
-
-Dashboard
-
-ACCOUNTING
-
-* Chart of Accounts
-* Journal Entries
-* General Ledger
-* Trial Balance
-
-SALES & MARKETPLACE
-
-* Marketplace
-* Products
-* Sales
-* Customers
-
-PURCHASING
-
-* Suppliers
-* Purchases
-* GRN
-
-INVENTORY
-
-* Stock Overview
-* Stock Ledger
-
-SERVICES
-
-* Agricultural Services
-* Machinery Rental
-
-PRODUCTION
-
-* Plantation
-* Brick Manufacturing
-* Fruit Packing
-* Grinding Mill
-
-PROJECTS
-
-* Construction Projects
-
-FINANCE
-
-* Expenses
-* Cash
-* Bank
-
-REPORTS
-
-* Financial Reports
-* Business Reports
-
-ADMINISTRATION
-
-* Users
-* Roles & Permissions
-* Company Settings
-* Audit Logs
-
-For this stage, navigation items can show "Coming Soon" or placeholder pages.
-
-Do NOT implement the full modules yet.
-
-==================================================
-DASHBOARD FOUNDATION
-====================
-
-Create the initial dashboard UI.
-
-For now, show placeholder KPI cards for:
-
-* Total Revenue
-* Total Expenses
-* Net Profit
-* Cash Balance
-* Bank Balance
-* Accounts Receivable
-* Accounts Payable
-* Inventory Value
-
-Do not create fake hardcoded financial figures.
-
-If there is no data, show:
-
-LKR 0.00
-
-Create placeholder chart areas that can later be connected to real data.
-
-==================================================
-SECURITY REQUIREMENTS
-=====================
-
-Implement basic security from the beginning.
+Financial transactions should not be permanently deleted after posting.
 
 Use:
 
-* PDO prepared statements
-* Password hashing
-* CSRF protection
-* Session security
-* Server-side authorization
-* Input validation
-* Output escaping
-* Secure file handling foundation
+Draft
+Pending Approval
+Approved
+Posted
+Reversed
+Cancelled
 
-Never trust frontend validation alone.
+If a posted transaction needs correction, create a reversal and correction entry.
 
 ==================================================
-CODING REQUIREMENTS
-===================
+DATABASE ARCHITECTURE
+==================================================
 
-Write clean, maintainable code.
+Design normalized MySQL database.
 
 Use:
 
-* Meaningful variable names
-* Reusable functions/classes
-* Clear comments for complex accounting logic
-* Consistent naming conventions
-* Centralized configuration
-* Error handling
-* Exception handling
+Primary Keys
+Foreign Keys
+Indexes
+Unique Constraints
+Transactions
+Database-level integrity
 
-Do not duplicate code unnecessarily.
+Important tables should include:
 
-Do not put business logic directly inside HTML files.
+users
+roles
+permissions
+accounts
+account_types
+journal_entries
+journal_lines
+ledger_entries
+cost_centers
+customers
+suppliers
+products
+product_categories
+inventory
+stock_movements
+sales
+sale_items
+purchases
+purchase_items
+payments
+expenses
+cash_accounts
+bank_accounts
+bank_transactions
+service_jobs
+service_expenses
+machinery
+machinery_rentals
+plantation_projects
+plantation_crops
+plantation_expenses
+plantation_harvests
+production_batches
+production_expenses
+construction_projects
+construction_phases
+project_expenses
+grinding_batches
+fruit_packing_batches
+brick_batches
+attachments
+audit_logs
 
-Do not mix SQL, HTML, and complex business logic unnecessarily.
+Add proper relationships.
 
-==================================================
-STAGE 1 IMPLEMENTATION PROCESS
-==============================
-
-Follow this exact workflow:
-
-STEP 1:
-Analyze the requirements above.
-
-STEP 2:
-Create a complete implementation plan.
-
-STEP 3:
-Create the project folder structure.
-
-STEP 4:
-Create the database configuration.
-
-STEP 5:
-Create the database and foundational tables.
-
-STEP 6:
-Create the initial Chart of Accounts.
-
-STEP 7:
-Create Cost Centers.
-
-STEP 8:
-Create authentication and role foundation.
-
-STEP 9:
-Create the basic ERP layout.
-
-STEP 10:
-Create the Chart of Accounts UI.
-
-STEP 11:
-Create the basic accounting foundation.
-
-STEP 12:
-Create the initial dashboard.
-
-STEP 13:
-Test everything.
+Use database migrations or a structured SQL installation file.
 
 ==================================================
-IMPORTANT — DO NOT DO THESE THINGS
-==================================
+UI/UX REQUIREMENTS
+==================================================
 
-Do NOT:
+Design should look like a professional modern ERP.
 
-* Build the entire ERP in one step.
-* Build all business modules now.
-* Create duplicate accounting systems.
-* Create separate ledgers for each business activity.
-* Hardcode account IDs throughout the code.
-* Hardcode company information throughout the application.
-* Use fake financial calculations.
-* Allow unbalanced journal entries.
-* Delete posted financial transactions.
-* Use raw SQL queries with user input.
-* Ignore database transactions.
-* Create unnecessary duplicated tables.
-* Overwrite files without checking dependencies.
+Use Bootstrap 5.
+
+Use:
+
+Cards
+DataTables
+Modals
+Offcanvas panels
+Tabs
+Breadcrumbs
+Badges
+Progress bars
+Charts
+Filters
+Date range selectors
+
+Use a clean sidebar.
+
+Dashboard must have visual KPIs.
+
+Use responsive tables.
+
+Use confirmation dialogs before destructive actions.
+
+Use toast notifications.
+
+Use AJAX for dynamic operations.
+
+Avoid unnecessary page reloads.
+
+Use loading indicators.
+
+Use validation messages.
+
+Support Sinhala and English labels in future.
+
+Keep all company details configurable from Settings.
 
 ==================================================
-FINAL STAGE 1 DELIVERABLE
-=========================
+IMPORTANT DEVELOPMENT RULE
+==================================================
 
-At the end of Stage 1, the application should be a working ERP foundation running on XAMPP.
+Do not immediately generate the entire system in one step.
 
-It should have:
+Develop the application in controlled stages.
 
-1. Working database
-2. Working application
-3. Working login
-4. User and role foundation
-5. Basic permission foundation
-6. Company settings
-7. ERP dashboard
-8. Responsive sidebar
-9. Chart of Accounts
-10. Cost Centers
-11. Accounting database foundation
-12. Journal database foundation
-13. Audit log foundation
-14. Clean scalable architecture
+Before implementing a stage:
 
-After completing the implementation, provide a concise report containing:
+1. Inspect the existing project structure.
+2. Inspect the current database.
+3. Identify existing functionality.
+4. Do not overwrite working functionality.
+5. Reuse existing components.
+6. Identify dependencies.
+7. Create a plan.
+8. Implement the stage.
+9. Test the implementation.
+10. Fix errors.
+11. Verify database integrity.
+12. Verify accounting entries.
+13. Verify UI responsiveness.
 
-* Files created
-* Database tables created
-* Database relationships
-* Default Chart of Accounts
-* Default Cost Centers
-* Login credentials for the initial administrator
-* Features completed
-* Features intentionally postponed
-* Any errors found
-* Any remaining issues
+For every accounting feature, test the complete flow:
 
-Do not proceed to Stage 2 automatically.
+Transaction
+→ Operational Record
+→ Accounting Journal
+→ General Ledger
+→ Trial Balance
+→ Profit & Loss / Balance Sheet
 
-Stop after Stage 1 is fully implemented and tested.
+For every inventory feature:
+
+Purchase
+→ Stock In
+→ Stock Ledger
+→ Production / Sale
+→ Stock Out
+→ COGS
+→ Inventory Valuation
+
+Never create fake balances.
+
+Never calculate financial reports from isolated module totals if the data should come from accounting.
+
+Use the central accounting ledger as the source of truth.
+
+==================================================
+FINAL OBJECTIVE
+==================================================
+
+Build a complete modular Cooperative Society ERP that allows the organization to manage all of its different profit-generating activities from separate operational panels while maintaining one centralized accounting system.
+
+The final system should provide complete traceability:
+
+Business Activity
+→ Transaction
+→ Project / Service / Batch
+→ Expense / Revenue
+→ Inventory
+→ Costing
+→ Double Entry Journal
+→ General Ledger
+→ Financial Reports
+
+The architecture must allow future modules to be added without redesigning the core accounting engine.

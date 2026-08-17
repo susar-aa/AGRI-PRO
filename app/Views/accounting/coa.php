@@ -45,10 +45,7 @@
                         <th style="width: 140px;">Account Code</th>
                         <th>Account Name</th>
                         <th>Category</th>
-                        <th>Normal Balance</th>
-                        <th class="text-center">Posting</th>
-                        <th class="text-center">Type</th>
-                        <th class="text-center">Status</th>
+                        <th class="text-end">Current Balance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -79,28 +76,7 @@
                                     <?php endif; ?>
                                 </td>
                                 <td><span class="badge <?= $badgeClass; ?> px-2 py-1"><?= htmlspecialchars($acc['category']); ?></span></td>
-                                <td><span class="text-uppercase small fw-semibold text-muted"><?= htmlspecialchars($acc['normal_balance']); ?></span></td>
-                                <td class="text-center">
-                                    <?php if ($acc['allow_manual_posting']): ?>
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle">Posting</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-light text-secondary border">Header</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="text-center">
-                                    <?php if ($acc['is_system']): ?>
-                                        <span class="badge bg-dark text-white">System</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-light text-dark border">Custom</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td class="text-center">
-                                    <?php if ($acc['is_active']): ?>
-                                        <span class="badge bg-success rounded-pill">Active</span>
-                                    <?php else: ?>
-                                        <span class="badge bg-secondary rounded-pill">Inactive</span>
-                                    <?php endif; ?>
-                                </td>
+                                <td class="text-end font-monospace fw-bold text-dark">LKR <?= number_format($acc['current_balance'], 2); ?></td>
                             </tr>
                             <?php 
                             if (!empty($acc['children'])) {
@@ -112,7 +88,7 @@
                     if (!empty($accountsTree)) {
                         renderCoaRows($accountsTree);
                     } else {
-                        echo '<tr><td colspan="7" class="text-center text-muted py-4">No Chart of Accounts found.</td></tr>';
+                        echo '<tr><td colspan="4" class="text-center text-muted py-4">No Chart of Accounts found.</td></tr>';
                     }
                     ?>
                 </tbody>

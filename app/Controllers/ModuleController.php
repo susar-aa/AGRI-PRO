@@ -17,4 +17,8 @@ class ModuleController extends Controller {
             'icon' => $icon
         ]);
     }
+
+    public function renderView(string $view, array $data = []): void {
+        $this->render($view, $data);
+    }
 }

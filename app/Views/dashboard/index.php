@@ -13,8 +13,8 @@
             <p class="mb-0 text-white-50">Central Accounting & Business Management System | Miduma, Yatagama, Rambukkana</p>
         </div>
         <div>
-            <a href="<?= \Core\Helper::baseUrl('accounting/journal-entries'); ?>" class="btn btn-light text-success fw-bold px-4 rounded-pill shadow-sm">
-                <i class="bi bi-plus-circle me-1"></i> New Journal Entry
+            <a href="<?= \Core\Helper::baseUrl('modules/invoices/create'); ?>" class="btn btn-light text-success fw-bold px-4 rounded-pill shadow-sm">
+                <i class="bi bi-file-earmark-plus me-1"></i> Create Invoice
             </a>
         </div>
     </div>

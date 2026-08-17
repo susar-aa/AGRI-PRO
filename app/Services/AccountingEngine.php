@@ -445,15 +445,15 @@ class AccountingEngine {
                 ]);
             }
 
-            // Update original journal entry to 'reversed' status
+            // Update original journal entry to 'cancelled' status
             $updateOrig = $db->prepare("
                 UPDATE journal_entries 
-                SET status = 'reversed', reversed_by = :reversed_by, reversed_at = NOW() 
+                SET status = 'cancelled', reversal_reason = :reason 
                 WHERE id = :id
             ");
             $updateOrig->execute([
                 'id' => $journalId,
-                'reversed_by' => $userId
+                'reason' => $reason
             ]);
 
             AuditService::log('reverse_journal', 'accounting', $journalId, null, [

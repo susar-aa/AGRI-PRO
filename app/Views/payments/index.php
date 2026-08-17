@@ -1,0 +1,124 @@
+<?php if ($flashSuccess = \Core\Session::getFlash('success')): ?>
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> <?= htmlspecialchars($flashSuccess, ENT_QUOTES, 'UTF-8'); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h4 class="fw-bold mb-1 text-dark">Supplier Payment Vouchers</h4>
+        <p class="text-muted small mb-0">Record and track payment disbursements paid to suppliers via cash drawers or bank transfers.</p>
+    </div>
+    <div>
+        <?php if (\Core\Auth::hasPermission('supplier_payments.create')): ?>
+            <a href="<?= \Core\Helper::baseUrl('supplier-payments/create'); ?>" class="btn btn-success rounded-pill px-4" style="background-color: #1b4332; border-color: #1b4332;">
+                <i class="bi bi-plus-lg me-1"></i> Make Payment
+            </a>
+        <?php endif; ?>
+    </div>
+</div>
+
+<!-- Filters Card -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+    <div class="card-body p-3">
+        <form action="<?= \Core\Helper::baseUrl('supplier-payments'); ?>" method="GET" class="row g-3 small">
+            <div class="col-12 col-md-4">
+                <label class="form-label fw-semibold">Search Payments</label>
+                <input type="text" class="form-control form-control-sm" name="search" value="<?= htmlspecialchars($filters['search']); ?>" placeholder="Payment #, Supplier, Reference...">
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label fw-semibold">Method</label>
+                <select class="form-select form-select-sm" name="payment_method">
+                    <option value="">-- All --</option>
+                    <option value="Cash" <?= ($filters['payment_method'] === 'Cash') ? 'selected' : ''; ?>>Cash</option>
+                    <option value="Bank Transfer" <?= ($filters['payment_method'] === 'Bank Transfer') ? 'selected' : ''; ?>>Bank Transfer</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label fw-semibold">Status</label>
+                <select class="form-select form-select-sm" name="status">
+                    <option value="">-- All --</option>
+                    <option value="draft" <?= ($filters['status'] === 'draft') ? 'selected' : ''; ?>>Draft</option>
+                    <option value="posted" <?= ($filters['status'] === 'posted') ? 'selected' : ''; ?>>Posted</option>
+                    <option value="reversed" <?= ($filters['status'] === 'reversed') ? 'selected' : ''; ?>>Reversed</option>
+                </select>
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label fw-semibold">From Date</label>
+                <input type="date" class="form-control form-control-sm" name="date_from" value="<?= htmlspecialchars($filters['date_from']); ?>">
+            </div>
+            <div class="col-6 col-md-2">
+                <label class="form-label fw-semibold">To Date</label>
+                <input type="date" class="form-control form-control-sm" name="date_to" value="<?= htmlspecialchars($filters['date_to']); ?>">
+            </div>
+            <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                <button type="submit" class="btn btn-success btn-sm rounded-pill px-4" style="background-color: #1b4332; border-color: #1b4332;">
+                    <i class="bi bi-filter"></i> Filter
+                </button>
+                <a href="<?= \Core\Helper::baseUrl('supplier-payments'); ?>" class="btn btn-outline-secondary btn-sm rounded-pill px-4">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Table Card -->
+<div class="card border-0 shadow-sm rounded-4">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Payment #</th>
+                        <th>Date</th>
+                        <th>Supplier</th>
+                        <th>Payment Method</th>
+                        <th class="text-end">Amount</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (!empty($payments)): ?>
+                        <?php foreach ($payments as $p): ?>
+                            <tr>
+                                <td class="fw-bold font-monospace">
+                                    <a href="<?= \Core\Helper::baseUrl('supplier-payments/view?id=' . $p['id']); ?>" class="text-success text-decoration-none">
+                                        <?= htmlspecialchars($p['payment_number']); ?>
+                                    </a>
+                                </td>
+                                <td><?= htmlspecialchars($p['payment_date']); ?></td>
+                                <td>
+                                    <div class="fw-semibold text-dark"><?= htmlspecialchars($p['party_name']); ?></div>
+                                    <small class="text-muted font-monospace"><?= htmlspecialchars($p['party_code']); ?></small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border"><?= htmlspecialchars($p['payment_method']); ?></span>
+                                </td>
+                                <td class="text-end fw-bold text-danger"><?= \Core\Helper::formatCurrency($p['amount']); ?></td>
+                                <td class="text-center">
+                                    <?php
+                                    $st = $p['status'];
+                                    $badgeClass = 'bg-secondary';
+                                    if ($st === 'posted') $badgeClass = 'bg-success';
+                                    elseif ($st === 'reversed') $badgeClass = 'bg-danger';
+                                    ?>
+                                    <span class="badge <?= $badgeClass ?> px-3 py-1"><?= ucfirst($st); ?></span>
+                                </td>
+                                <td class="text-center">
+                                    <a href="<?= \Core\Helper::baseUrl('supplier-payments/view?id=' . $p['id']); ?>" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                        <i class="bi bi-eye"></i> View
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">No payments recorded.</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

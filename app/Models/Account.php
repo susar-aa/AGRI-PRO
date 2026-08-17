@@ -8,14 +8,30 @@ class Account extends Model {
 
     public function getAllHierarchical(): array {
         $stmt = $this->db->query("
-            SELECT a.*, at.name AS account_type_name, p.account_code AS parent_code, p.account_name AS parent_name
+            SELECT a.*, at.name AS account_type_name, p.account_code AS parent_code, p.account_name AS parent_name,
+                   COALESCE(SUM(CASE WHEN je.status = 'posted' THEN jl.debit ELSE 0.00 END), 0.00) AS total_debit,
+                   COALESCE(SUM(CASE WHEN je.status = 'posted' THEN jl.credit ELSE 0.00 END), 0.00) AS total_credit
             FROM accounts a
             JOIN account_types at ON a.account_type_id = at.id
             LEFT JOIN accounts p ON a.parent_id = p.id
+            LEFT JOIN journal_lines jl ON a.id = jl.account_id
+            LEFT JOIN journal_entries je ON jl.journal_entry_id = je.id
             WHERE a.deleted_at IS NULL
+            GROUP BY a.id, at.name, p.account_code, p.account_name
             ORDER BY a.account_code ASC
         ");
         $allAccounts = $stmt->fetchAll();
+
+        // Calculate dynamic balance based on normal balance configuration
+        foreach ($allAccounts as &$acc) {
+            $debit = (float)$acc['total_debit'];
+            $credit = (float)$acc['total_credit'];
+            if ($acc['normal_balance'] === 'debit') {
+                $acc['current_balance'] = $debit - $credit;
+            } else {
+                $acc['current_balance'] = $credit - $debit;
+            }
+        }
 
         // Build tree
         return self::buildTree($allAccounts, null);
@@ -39,6 +55,12 @@ class Account extends Model {
                 $children = self::buildTree($accounts, $account['id']);
                 if ($children) {
                     $account['children'] = $children;
+                    // For header/parent accounts, roll up children balances
+                    $childSum = 0.00;
+                    foreach ($children as $child) {
+                        $childSum += (float)$child['current_balance'];
+                    }
+                    $account['current_balance'] += $childSum;
                 } else {
                     $account['children'] = [];
                 }

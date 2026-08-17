@@ -1,0 +1,10 @@
+ALTER TABLE agri_erp.machinery_rentals
+ADD COLUMN start_time TIME AFTER end_date,
+ADD COLUMN end_time TIME AFTER start_time,
+ADD COLUMN rental_unit VARCHAR(50) AFTER end_time,
+ADD COLUMN quantity DECIMAL(15,2) DEFAULT 0.00 AFTER rental_unit,
+ADD COLUMN rental_rate DECIMAL(15,2) DEFAULT 0.00 AFTER quantity,
+ADD COLUMN notes TEXT AFTER total_charge,
+ADD COLUMN created_by INT UNSIGNED AFTER journal_entry_id,
+ADD COLUMN created_at DATETIME DEFAULT CURRENT_TIMESTAMP AFTER created_by,
+ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER created_at;

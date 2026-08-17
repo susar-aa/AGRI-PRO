@@ -1,3 +1,305 @@
 [22-Jul-2026 07:30:31 Europe/Berlin] PHP Warning:  Undefined variable $asOfDate in C:\xampp\htdocs\AGRI PRO\app\Views\accounting\trial_balance.php on line 8
 [22-Jul-2026 07:30:31 Europe/Berlin] PHP Warning:  Undefined variable $asOfDate in C:\xampp\htdocs\AGRI PRO\app\Views\accounting\trial_balance.php on line 16
 [22-Jul-2026 07:30:31 Europe/Berlin] PHP Warning:  Undefined variable $asOfDate in C:\xampp\htdocs\AGRI PRO\app\Views\accounting\trial_balance.php on line 49
+[22-Jul-2026 08:41:20 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_group' in 'where clause' in C:\xampp\htdocs\AGRI PRO\app\Models\Product.php:28
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\Product.php(28): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\InventoryController.php(113): App\Models\Product->getPostingAccounts()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\InventoryController->products()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(113): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\Product.php on line 28
+[22-Jul-2026 08:41:22 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_group' in 'where clause' in C:\xampp\htdocs\AGRI PRO\app\Models\Product.php:28
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\Product.php(28): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\InventoryController.php(113): App\Models\Product->getPostingAccounts()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\InventoryController->products()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(113): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\Product.php on line 28
+[22-Jul-2026 08:41:27 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_group' in 'where clause' in C:\xampp\htdocs\AGRI PRO\app\Models\Product.php:28
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\Product.php(28): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\InventoryController.php(113): App\Models\Product->getPostingAccounts()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\InventoryController->products()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(113): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\Product.php on line 28
+[22-Jul-2026 10:38:49 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.sales' doesn't exist in Command line code:1
+Stack trace:
+#0 Command line code(1): PDO->query('DESCRIBE sales')
+#1 {main}
+  thrown in Command line code on line 1
+[22-Jul-2026 12:39:18 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.suppliers' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php:106
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php(106): PDO->prepare('SELECT id, supp...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\ExpenseController->create()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(204): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php on line 106
+[22-Jul-2026 13:08:15 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.suppliers' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php:158
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php(158): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php(69): App\Models\Expense->getById(8)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\ExpenseController->view()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(202): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php on line 158
+[22-Jul-2026 13:59:30 Europe/Berlin] PHP Warning:  include(C:\xampp\htdocs\AGRI PRO\app\Views\invoices/_invoice_style.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 5
+[22-Jul-2026 13:59:30 Europe/Berlin] PHP Warning:  include(): Failed opening 'C:\xampp\htdocs\AGRI PRO\app\Views\invoices/_invoice_style.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 5
+[22-Jul-2026 13:59:30 Europe/Berlin] PHP Warning:  include(C:\xampp\htdocs\AGRI PRO\app\Views\invoices/_invoice_script.php): Failed to open stream: No such file or directory in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 352
+[22-Jul-2026 13:59:30 Europe/Berlin] PHP Warning:  include(): Failed opening 'C:\xampp\htdocs\AGRI PRO\app\Views\invoices/_invoice_script.php' for inclusion (include_path='C:\xampp\php\PEAR') in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 352
+[23-Jul-2026 06:24:13 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.suppliers' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php:106
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php(106): PDO->prepare('SELECT id, supp...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\ExpenseController->create()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(211): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php on line 106
+[23-Jul-2026 06:24:58 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.suppliers' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php:106
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php(106): PDO->prepare('SELECT id, supp...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\ExpenseController->create()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(211): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php on line 106
+[23-Jul-2026 06:24:59 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.suppliers' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php:106
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php(106): PDO->prepare('SELECT id, supp...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\ExpenseController->create()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(211): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php on line 106
+[23-Jul-2026 07:35:46 Europe/Berlin] PHP Warning:  Undefined array key "default_selling_price" in C:\xampp\htdocs\AGRI PRO\app\Views\operations\plantation_marketplace.php on line 237
+[23-Jul-2026 07:35:54 Europe/Berlin] PHP Warning:  Undefined array key "default_selling_price" in C:\xampp\htdocs\AGRI PRO\app\Views\operations\plantation_marketplace.php on line 237
+[23-Jul-2026 07:39:20 Europe/Berlin] PHP Warning:  Undefined array key "default_selling_price" in C:\xampp\htdocs\AGRI PRO\app\Views\operations\plantation_marketplace.php on line 237
+[23-Jul-2026 07:52:48 Europe/Berlin] PHP Warning:  Undefined variable $balanceBefore in C:\xampp\htdocs\AGRI PRO\tests\test_plantation_transfer.php on line 119
+[23-Jul-2026 08:10:39 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'prod.unit' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php:553
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php(553): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\OperationsController->plantationMarketplace()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(215): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php on line 553
+[23-Jul-2026 08:11:07 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'prod.unit' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php:553
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php(553): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\OperationsController->plantationMarketplace()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(215): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php on line 553
+[23-Jul-2026 08:11:08 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'prod.unit' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php:553
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php(553): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\OperationsController->plantationMarketplace()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(215): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php on line 553
+[23-Jul-2026 17:18:15 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to protected method Core\Controller::render() from global scope in C:\xampp\htdocs\AGRI PRO\public\index.php:244
+Stack trace:
+#0 [internal function]: {closure}()
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(43): call_user_func(Object(Closure))
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(282): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\public\index.php on line 244
+[23-Jul-2026 17:18:19 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to protected method Core\Controller::render() from global scope in C:\xampp\htdocs\AGRI PRO\public\index.php:244
+Stack trace:
+#0 [internal function]: {closure}()
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(43): call_user_func(Object(Closure))
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(282): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\public\index.php on line 244
+[23-Jul-2026 17:19:25 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to protected method Core\Controller::render() from global scope in C:\xampp\htdocs\AGRI PRO\public\index.php:244
+Stack trace:
+#0 [internal function]: {closure}()
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(43): call_user_func(Object(Closure))
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(282): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\public\index.php on line 244
+[14-Aug-2026 19:54:49 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.inventory_locations' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Controllers\InvoiceController.php:111
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\InvoiceController.php(111): PDO->query('SELECT id, code...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\InvoiceController->create()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(297): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\InvoiceController.php on line 111
+[14-Aug-2026 20:07:27 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.invoice_id' in 'where clause' in C:\xampp\htdocs\AGRI PRO\app\Controllers\InvoiceController.php:158
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\InvoiceController.php(158): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\InvoiceController->create()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(297): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\InvoiceController.php on line 158
+[14-Aug-2026 20:07:29 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.invoice_id' in 'where clause' in C:\xampp\htdocs\AGRI PRO\app\Controllers\InvoiceController.php:158
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\InvoiceController.php(158): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\InvoiceController->create()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(297): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\InvoiceController.php on line 158
+[14-Aug-2026 20:07:39 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'mr.invoice_id' in 'where clause' in C:\xampp\htdocs\AGRI PRO\app\Controllers\InvoiceController.php:158
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\InvoiceController.php(158): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\InvoiceController->create()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(297): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\InvoiceController.php on line 158
+[14-Aug-2026 20:09:45 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.service_categories' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\ServiceModel.php:46
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\ServiceModel.php(46): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\ServiceController.php(30): App\Models\ServiceModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\ServiceController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(297): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\ServiceModel.php on line 46
+[14-Aug-2026 20:27:35 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'quantity_on_hand' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Services\InventoryEngine.php:15
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Services\InventoryEngine.php(15): PDO->prepare('SELECT quantity...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\MarketplaceController.php(84): App\Services\InventoryEngine::getStockOnHand(3, 1)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\MarketplaceController->products()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(297): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Services\InventoryEngine.php on line 15
+[14-Aug-2026 21:18:23 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.service_categories' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\ServiceModel.php:46
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\ServiceModel.php(46): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\ServiceController.php(30): App\Models\ServiceModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\ServiceController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(297): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\ServiceModel.php on line 46
+[14-Aug-2026 21:27:29 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.expenses' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php:23
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php(23): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\OperationsController->plantation()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(297): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php on line 23
+[14-Aug-2026 21:47:02 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.expenses' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php:164
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php(164): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\OperationsController->viewPlantationProject()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(297): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php on line 164
+[14-Aug-2026 21:50:24 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.expenses' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php:567
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php(567): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\OperationsController->plantationMarketplace()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(297): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php on line 567
+[14-Aug-2026 22:01:44 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.expense_categories' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php:9
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php(9): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php(212): App\Models\Expense->getAllCategories()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\OperationsController->plantationExpenses()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(298): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php on line 9
+[14-Aug-2026 22:01:47 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.expense_categories' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php:9
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php(9): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php(212): App\Models\Expense->getAllCategories()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\OperationsController->plantationExpenses()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(298): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php on line 9
+[14-Aug-2026 22:02:10 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.expense_categories' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php:9
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php(9): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php(212): App\Models\Expense->getAllCategories()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\OperationsController->plantationExpenses()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(298): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php on line 9
+[14-Aug-2026 22:02:11 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.expense_categories' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php:9
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php(9): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php(212): App\Models\Expense->getAllCategories()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\OperationsController->plantationExpenses()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(298): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php on line 9
+[14-Aug-2026 22:02:11 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.expense_categories' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php:9
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php(9): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\OperationsController.php(212): App\Models\Expense->getAllCategories()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\OperationsController->plantationExpenses()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(298): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\Expense.php on line 9
+[14-Aug-2026 22:03:07 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: There is no active transaction in C:\xampp\htdocs\AGRI PRO\scratch\setup_expenses.php:94
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\scratch\setup_expenses.php(94): PDO->rollBack()
+#1 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\scratch\setup_expenses.php on line 94
+[14-Aug-2026 22:03:42 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'account_type' in 'where clause' in C:\xampp\htdocs\AGRI PRO\scratch\insert.php:4
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\scratch\insert.php(4): PDO->query('SELECT id FROM ...')
+#1 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\scratch\insert.php on line 4
+[14-Aug-2026 22:15:12 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.party_opening_balances' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php:13
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php(13): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\PartyController.php(163): App\Models\PartyLedger->getLedgerEntries(2, 'EMPLOYEE')
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\PartyController->view()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(298): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php on line 13
+[15-Aug-2026 08:19:58 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[15-Aug-2026 08:21:27 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[15-Aug-2026 08:23:56 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[15-Aug-2026 08:24:14 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[15-Aug-2026 08:27:06 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[15-Aug-2026 08:29:21 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[15-Aug-2026 08:30:18 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[15-Aug-2026 08:34:26 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'description' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php:111
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php(111): PDO->query('SELECT id, job_...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\ExpenseController->create()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(298): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php on line 111
+[15-Aug-2026 08:35:46 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'description' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php:111
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php(111): PDO->query('SELECT id, job_...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\ExpenseController->create()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(298): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php on line 111
+[15-Aug-2026 08:37:11 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[15-Aug-2026 08:44:01 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(298): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[15-Aug-2026 08:45:14 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:09:41 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:10:10 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:12:41 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:12:53 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:15:01 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:15:15 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:17:11 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:17:20 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:19:07 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:28:43 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:28:49 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:30:08 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:30:14 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:30:39 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:30:44 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:30:44 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:30:46 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:30:53 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[16-Aug-2026 20:31:22 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'description' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php:111
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php(111): PDO->query('SELECT id, job_...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\ExpenseController->create()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(306): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php on line 111
