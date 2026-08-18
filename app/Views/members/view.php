@@ -22,6 +22,16 @@
     </div>
     
     <div class="d-flex gap-2">
+        <a href="<?= \Core\Helper::baseUrl('modules/members/edit?id=' . $member['id']); ?>" class="btn btn-outline-primary rounded-pill px-3">
+            <i class="bi bi-pencil-square me-1"></i> Edit
+        </a>
+        <form action="<?= \Core\Helper::baseUrl('modules/members/delete'); ?>" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this member?');">
+            <?= \Core\CSRF::getFormField(); ?>
+            <input type="hidden" name="id" value="<?= $member['id']; ?>">
+            <button type="submit" class="btn btn-outline-danger rounded-pill px-3">
+                <i class="bi bi-trash me-1"></i> Delete
+            </button>
+        </form>
         <?php if (!$member['party_id']): ?>
             <button class="btn btn-success rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#linkModal">
                 <i class="bi bi-link-45deg me-1"></i> Link Customer Ledger

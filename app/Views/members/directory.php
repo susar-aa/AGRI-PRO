@@ -74,7 +74,15 @@
                                             <span class="badge bg-success-subtle text-success"><?= htmlspecialchars($m['status']); ?></span>
                                         </td>
                                         <td class="text-end">
-                                            <a href="<?= \Core\Helper::baseUrl('modules/members/view?id=' . $m['id']); ?>" class="btn btn-sm btn-outline-success rounded-pill px-3">Profile</a>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="<?= \Core\Helper::baseUrl('modules/members/view?id=' . $m['id']); ?>" class="btn btn-outline-success px-3" title="Profile"><i class="bi bi-person-fill"></i> Profile</a>
+                                                <a href="<?= \Core\Helper::baseUrl('modules/members/edit?id=' . $m['id']); ?>" class="btn btn-outline-primary px-3" title="Edit"><i class="bi bi-pencil-square"></i></a>
+                                                <form action="<?= \Core\Helper::baseUrl('modules/members/delete'); ?>" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this member?');">
+                                                    <?= \Core\CSRF::getFormField(); ?>
+                                                    <input type="hidden" name="id" value="<?= $m['id']; ?>">
+                                                    <button type="submit" class="btn btn-outline-danger px-3" title="Delete"><i class="bi bi-trash"></i></button>
+                                                </form>
+                                            </div>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -88,10 +96,6 @@
                 </div>
             </div>
         </div>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 </div>
