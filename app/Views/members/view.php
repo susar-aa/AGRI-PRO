@@ -16,9 +16,9 @@
     <div>
         <a href="<?= \Core\Helper::baseUrl('modules/members/directory'); ?>" class="btn btn-sm btn-outline-secondary rounded-pill mb-2">
             <i class="bi bi-arrow-left me-1"></i> Back to Directory
-        </a>
-        <h4 class="fw-bold mb-1 text-dark">Member Profile: <?= htmlspecialchars($member['full_name']); ?></h4>
-        <p class="text-muted small mb-0">Registered on: <strong><?= htmlspecialchars($member['registration_date']); ?></strong> | Membership No: <strong class="text-success font-monospace"><?= htmlspecialchars($member['member_no']); ?></strong></p>
+    <div>
+        <h4 class="fw-bold mb-1 text-dark" style="letter-spacing: -0.5px;">Member Profile</h4>
+        <p class="text-muted small mb-0">Manage member details, fixed deposits, and linked ledger accounts.</p>
     </div>
     
     <div class="d-flex gap-2">
@@ -45,23 +45,53 @@
 .nav-tabs-custom .nav-link { color: #64748b; font-weight: 500; border: none; padding: 0.75rem 1.5rem; margin-bottom: -2px; }
 .nav-tabs-custom .nav-link:hover { color: #0f172a; border-bottom: 2px solid #cbd5e1; }
 .nav-tabs-custom .nav-link.active { color: #0f172a; border-bottom: 2px solid #16a34a; background: transparent; }
-</style>
+<!-- Profile Banner & Header -->
+<div class="card border-0 shadow-sm rounded-4 mb-4 overflow-hidden hover-elevate">
+    <div class="profile-banner"></div>
+    <div class="card-body px-4 pb-4 position-relative" style="margin-top: -40px;">
+        <div class="d-flex flex-wrap align-items-end justify-content-between gap-3">
+            <div class="d-flex align-items-end gap-3">
+                <?php 
+                    $initials = substr(preg_replace('/[^a-zA-Z]/', '', $member['full_name']), 0, 2); 
+                    $initials = strtoupper($initials ?: 'M');
+                ?>
+                <div class="avatar-circle avatar-circle-lg bg-white text-success">
+                    <?= $initials; ?>
+                </div>
+                <div class="pb-1">
+                    <h4 class="fw-bold mb-1 text-dark"><?= htmlspecialchars($member['full_name']); ?></h4>
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-person-badge text-success me-1"></i> Membership No: <strong class="text-success font-monospace"><?= htmlspecialchars($member['member_no']); ?></strong> &nbsp;|&nbsp; 
+                        <i class="bi bi-calendar3 text-muted me-1"></i> Joined: <strong><?= htmlspecialchars($member['registration_date']); ?></strong>
+                    </p>
+                </div>
+            </div>
+            <div class="pb-1">
+                <?php if ($member['status'] === 'active'): ?>
+                    <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle px-4 py-2 fs-6"><i class="bi bi-check-circle-fill me-1"></i> Active Member</span>
+                <?php else: ?>
+                    <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-4 py-2 fs-6">Inactive</span>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
 
 <ul class="nav nav-tabs nav-tabs-custom mb-4" id="memberTabs" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
+        <button class="nav-link active fw-bold" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab"><i class="bi bi-grid-1x2 me-1"></i> Overview</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button" role="tab">Sales Invoices</button>
+        <button class="nav-link fw-bold" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button" role="tab"><i class="bi bi-receipt me-1"></i> Sales Invoices</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">Receipts & Payments</button>
+        <button class="nav-link fw-bold" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab"><i class="bi bi-cash-stack me-1"></i> Receipts & Payments</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="rentals-tab" data-bs-toggle="tab" data-bs-target="#rentals" type="button" role="tab">Machinery Rentals</button>
+        <button class="nav-link fw-bold" id="rentals-tab" data-bs-toggle="tab" data-bs-target="#rentals" type="button" role="tab"><i class="bi bi-truck me-1"></i> Machinery Rentals</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="ledger-tab" data-bs-toggle="tab" data-bs-target="#ledger" type="button" role="tab">Account Ledger</button>
+        <button class="nav-link fw-bold" id="ledger-tab" data-bs-toggle="tab" data-bs-target="#ledger" type="button" role="tab"><i class="bi bi-journal-text me-1"></i> Account Ledger</button>
     </li>
 </ul>
 
@@ -71,10 +101,9 @@
     <!-- Profile & Fixed Deposits Info -->
     <div class="col-12 col-lg-8">
         <!-- Profile Card -->
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 mb-4 hover-elevate">
             <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
-                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-person-fill text-success me-2"></i> Profile Specifications</h6>
-                <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill"><?= htmlspecialchars($member['status']); ?></span>
+                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-person-lines-fill text-success me-2"></i> Personal Specifications</h6>
             </div>
             <div class="card-body pt-0 small">
                 <div class="row g-3">
@@ -99,9 +128,9 @@
         </div>
 
         <!-- Heir Info Card -->
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 mb-4 hover-elevate">
             <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
-                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-people-fill text-success me-2"></i> Heir Information</h6>
+                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-shield-lock-fill text-success me-2"></i> Nominated Heir Information</h6>
             </div>
             <div class="card-body pt-0 small">
                 <div class="row g-3">
@@ -126,9 +155,9 @@
         </div>
 
         <!-- Fixed Deposits List -->
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 mb-4 hover-elevate">
             <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-wallet2 text-success me-2"></i> Member Fixed Deposits</h6>
+                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-safe2-fill text-success me-2"></i> Member Fixed Deposits</h6>
                 <?php
                 $memberActiveFDs = 0;
                 $memberTotalPrincipal = 0.00;
@@ -189,9 +218,9 @@
 
     <!-- Registration Payments Sidebar Details -->
     <div class="col-12 col-lg-4">
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
+        <div class="card border-0 shadow-sm rounded-4 mb-4 hover-elevate">
             <div class="card-header bg-white py-3 border-0">
-                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-cash-coin text-success me-2"></i> Registration & Share Fees</h6>
+                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-cash-stack text-success me-2"></i> Registration & Share Fees</h6>
             </div>
             <div class="card-body pt-0 small">
                 <ul class="list-group list-group-flush">
