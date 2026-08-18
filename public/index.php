@@ -23,6 +23,7 @@ use App\Controllers\PartyController;
 use App\Controllers\ReceiptPaymentController;
 use App\Controllers\ChequeController;
 use App\Controllers\DepositController;
+use App\Controllers\GrnController;
 use App\Controllers\MarketplaceController;
 use App\Controllers\InvoiceController;
 use App\Controllers\ServiceController;
@@ -30,6 +31,7 @@ use App\Controllers\ServiceJobController;
 use App\Controllers\MachineryController;
 use App\Controllers\MachineryRentalController;
 use App\Controllers\OperationsController;
+use App\Controllers\UserController;
 use App\Controllers\CashController;
 use App\Controllers\BankController;
 use App\Controllers\MemberController;
@@ -132,6 +134,11 @@ $router->get('/deposits/view', [DepositController::class, 'view']);
 $router->post('/deposits/post', [DepositController::class, 'post']);
 $router->post('/deposits/cancel', [DepositController::class, 'cancel']);
 
+// GRN Routing (Stage 6A part 2)
+$router->get('/grn', [GrnController::class, 'index']);
+$router->get('/grn/create', [GrnController::class, 'create']);
+$router->post('/grn/store', [GrnController::class, 'store']);
+
 // Marketplace Routing (Stage 6A)
 $router->get('/modules/marketplace', [MarketplaceController::class, 'dashboard']);
 $router->get('/modules/marketplace/products', [MarketplaceController::class, 'products']);
@@ -231,6 +238,14 @@ $router->get('/modules/fixed-deposits/view', [FDController::class, 'view']);
 $router->post('/modules/fixed-deposits/mature', [FDController::class, 'processMaturity']);
 $router->post('/modules/fixed-deposits/premature-close', [FDController::class, 'prematureClose']);
 
+// Users Management Routing
+$router->get('/modules/users', [UserController::class, 'index']);
+$router->get('/modules/users/create', [UserController::class, 'create']);
+$router->post('/modules/users/store', [UserController::class, 'store']);
+$router->get('/modules/users/edit', [UserController::class, 'edit']);
+$router->post('/modules/users/update', [UserController::class, 'update']);
+$router->post('/modules/users/toggle', [UserController::class, 'toggleStatus']);
+
 // Cash & Banking Dashboard Overview
 $router->get('/modules/cash-bank-overview', function() {
     $db = \Core\Database::getInstance();
@@ -294,7 +309,6 @@ $placeholders = [
     'construction' => ['Construction Contracts', 'bi-building'],
     'financial-reports' => ['Financial Reports', 'bi-file-earmark-bar-graph'],
     'business-reports' => ['Business Reports', 'bi-pie-chart'],
-    'users' => ['Users & Role Management', 'bi-person-gear'],
     'audit-logs' => ['System Audit Logs', 'bi-shield-check']
 ];
 

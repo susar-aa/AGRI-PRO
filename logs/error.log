@@ -303,3 +303,737 @@ Stack trace:
 #2 C:\xampp\htdocs\AGRI PRO\public\index.php(306): Core\Router->dispatch()
 #3 {main}
   thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\ExpenseController.php on line 111
+[18-Aug-2026 17:57:30 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[18-Aug-2026 18:03:21 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 493
+[18-Aug-2026 19:05:48 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:05:51 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:08:16 Europe/Berlin] PHP Fatal error:  Uncaught Error: Cannot call constructor in C:\xampp\htdocs\AGRI PRO\app\Controllers\CustomerActivityController.php:15
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\core\Router.php(50): App\Controllers\CustomerActivityController->__construct()
+#1 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#2 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\CustomerActivityController.php on line 15
+[18-Aug-2026 19:08:41 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.members' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\FDModel.php:47
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\FDModel.php(47): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\FDController.php(40): App\Models\FDModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\FDController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\FDModel.php on line 47
+[18-Aug-2026 19:08:48 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.members' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\FDModel.php:47
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\FDModel.php(47): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\FDController.php(40): App\Models\FDModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\FDController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\FDModel.php on line 47
+[18-Aug-2026 19:18:16 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:20:08 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 490
+[18-Aug-2026 19:20:38 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 490
+[18-Aug-2026 19:20:42 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 490
+[18-Aug-2026 19:22:09 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:25:05 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:31:53 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:06 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:13 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:15 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:15 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:15 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:16 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:16 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:16 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:16 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:17 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:17 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:17 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:17 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:18 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:18 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:18 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:18 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:19 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:19 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:19 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:19 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:20 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:20 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:20 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:20 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:20 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:21 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:21 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:21 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:21 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:22 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:22 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:22 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:22 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:23 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:23 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:23 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:23 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:23 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:24 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:24 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:24 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:25 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:25 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:25 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:28 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:29 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:32 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:32 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:33 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:34 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:35 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:37 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:38 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:40 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:41 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:42 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:43 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:43 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:44 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:44 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:44 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:45 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:45 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:46 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:46 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:46 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:47 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:47 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:48 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:48 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:49 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:49 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:32:49 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.bank_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php:69
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php(69): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\DepositController.php(37): App\Models\DepositModel->getAll(Array, 20, 0)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\DepositController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(309): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\DepositModel.php on line 69
+[18-Aug-2026 19:39:42 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 490
+[18-Aug-2026 19:40:08 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 490
+[18-Aug-2026 19:40:44 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 252
+[18-Aug-2026 19:40:44 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 252
+[18-Aug-2026 19:42:12 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 490
+[18-Aug-2026 19:42:25 Europe/Berlin] PHP Warning:  Undefined array key "category" in C:\xampp\htdocs\AGRI PRO\app\Views\invoices\create.php on line 490
+[18-Aug-2026 19:49:56 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'u.name' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Controllers\GrnController.php:19
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\GrnController.php(19): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\GrnController->index()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(315): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\GrnController.php on line 19
+[18-Aug-2026 19:49:59 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'u.name' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Controllers\GrnController.php:19
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\GrnController.php(19): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\GrnController->index()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(315): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Controllers\GrnController.php on line 19
+[18-Aug-2026 20:14:55 Europe/Berlin] PHP Fatal error:  Uncaught TypeError: Cannot assign PDO to property App\Models\FixedAssetModel::$db of type Core\Database in C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php:10
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Controllers\FixedAssetController.php(18): App\Models\FixedAssetModel->__construct()
+#1 C:\xampp\htdocs\AGRI PRO\core\Router.php(50): App\Controllers\FixedAssetController->__construct()
+#2 C:\xampp\htdocs\AGRI PRO\public\index.php(322): Core\Router->dispatch()
+#3 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php on line 10
+[18-Aug-2026 20:16:27 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'aa.name' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php:14
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php(14): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\FixedAssetController.php(24): App\Models\FixedAssetModel->getAll()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\FixedAssetController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(322): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php on line 14
+[18-Aug-2026 20:16:40 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'aa.name' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php:14
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php(14): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\FixedAssetController.php(24): App\Models\FixedAssetModel->getAll()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\FixedAssetController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(322): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php on line 14
+[18-Aug-2026 20:16:41 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'aa.name' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php:14
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php(14): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\FixedAssetController.php(24): App\Models\FixedAssetModel->getAll()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\FixedAssetController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(322): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php on line 14
+[18-Aug-2026 20:16:41 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'aa.name' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php:14
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php(14): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\FixedAssetController.php(24): App\Models\FixedAssetModel->getAll()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\FixedAssetController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(322): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php on line 14
+[18-Aug-2026 20:16:42 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'aa.name' in 'field list' in C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php:14
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php(14): PDO->query('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\FixedAssetController.php(24): App\Models\FixedAssetModel->getAll()
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\FixedAssetController->index()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(322): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\FixedAssetModel.php on line 14

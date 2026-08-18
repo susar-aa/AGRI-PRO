@@ -77,6 +77,7 @@ class MarketplaceController extends Controller {
         $warehouses = $db->query("SELECT id, name FROM inventory_locations WHERE is_active = 1 OR 1=1 ORDER BY name ASC")->fetchAll();
         $categories = $db->query("SELECT id, name FROM product_categories ORDER BY name ASC")->fetchAll();
         $units = $db->query("SELECT id, code, name FROM units_of_measure ORDER BY name ASC")->fetchAll();
+        $suppliers = $db->query("SELECT id, name, party_code FROM parties WHERE party_type IN ('SUPPLIER', 'BOTH') AND status = 'active' ORDER BY name ASC")->fetchAll();
 
         foreach ($products as &$p) {
             $p['stock'] = [];
@@ -92,6 +93,7 @@ class MarketplaceController extends Controller {
             'filters' => $filters,
             'categories' => $categories,
             'units' => $units,
+            'suppliers' => $suppliers,
             'pagination' => [
                 'current' => $page,
                 'total' => $totalPages,
@@ -110,6 +112,7 @@ class MarketplaceController extends Controller {
             'product_code' => $productCode,
             'name_en' => trim($_POST['name_en'] ?? ''),
             'category_id' => !empty($_POST['category_id']) ? (int)$_POST['category_id'] : null,
+            'supplier_id' => !empty($_POST['supplier_id']) ? (int)$_POST['supplier_id'] : null,
             'product_type' => $_POST['product_type'] ?? 'TRADING',
             'base_unit_id' => !empty($_POST['base_unit_id']) ? (int)$_POST['base_unit_id'] : 0,
             'default_purchase_price' => (float)($_POST['default_purchase_price'] ?? 0),

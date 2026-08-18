@@ -141,13 +141,18 @@ class ReceiptPaymentController extends Controller {
         $cashAccounts = $this->expenseModel->getCashAccounts();
         $bankAccounts = $this->expenseModel->getBankAccounts();
 
-        // Fetch active customers
+        // Fetch active customers, members and directors
         $db = \Core\Database::getInstance();
-        $customers = $db->query("SELECT id, party_code, name FROM parties WHERE party_type IN ('CUSTOMER', 'BOTH') AND status = 'active' ORDER BY name ASC")->fetchAll();
+        $customers = $db->query("SELECT id, party_code, name, party_type FROM parties WHERE party_type IN ('CUSTOMER', 'BOTH', 'MEMBER', 'DIRECTOR') AND status = 'active' ORDER BY name ASC")->fetchAll();
 
         // Fetch undeposited cheques (Stage 5E)
         $chModel = new ChequeModel();
+        // Fetch undeposited cheques (Stage 5E)
+        $chModel = new ChequeModel();
         $undepositedCheques = $chModel->getUndepositedCheques();
+
+        // Fetch income accounts for Receipts (A/R, Share Capital, Registration Fees, Other Income)
+        $incomeAccounts = $db->query("SELECT id, account_name, account_code FROM accounts WHERE id IN (12, 25, 37, 62) ORDER BY account_code ASC")->fetchAll();
 
         $this->render('receipts/create', [
             'pageTitle' => 'Record Customer Collection Receipt',
@@ -156,7 +161,8 @@ class ReceiptPaymentController extends Controller {
             'cashAccounts' => $cashAccounts,
             'bankAccounts' => $bankAccounts,
             'customers' => $customers,
-            'cheques' => $undepositedCheques
+            'cheques' => $undepositedCheques,
+            'incomeAccounts' => $incomeAccounts
         ]);
     }
 
@@ -247,6 +253,7 @@ class ReceiptPaymentController extends Controller {
             'amount' => (float)($_POST['amount'] ?? 0),
             'reference_number' => trim($_POST['reference_number'] ?? ''),
             'notes' => trim($_POST['notes'] ?? ''),
+            'income_account_id' => !empty($_POST['income_account_id']) ? (int)$_POST['income_account_id'] : null,
             'created_by' => Auth::id() ?? 1
         ];
 

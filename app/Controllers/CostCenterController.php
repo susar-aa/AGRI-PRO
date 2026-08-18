@@ -19,7 +19,7 @@ class CostCenterController extends Controller {
         $costCenters = $this->ccModel->getAll();
 
         $this->render('cost_centers/index', [
-            'pageTitle' => 'Cost Centers Management',
+            'pageTitle' => 'Operations Management',
             'activeNav' => 'cost_centers',
             'costCenters' => $costCenters
         ]);
@@ -29,12 +29,16 @@ class CostCenterController extends Controller {
         Auth::requirePermission('settings.manage');
         $this->validateCsrf();
 
-        $code = trim($_POST['code'] ?? '');
+        $db = \Core\Database::getInstance();
+        $stmt = $db->query("SELECT MAX(id) FROM cost_centers");
+        $maxId = (int)$stmt->fetchColumn();
+        $code = 'OP-' . str_pad($maxId + 1, 3, '0', STR_PAD_LEFT);
+        
         $name = trim($_POST['name'] ?? '');
         $description = trim($_POST['description'] ?? '');
 
-        if (empty($code) || empty($name)) {
-            Session::setFlash('error', 'Cost Center code and name are required.');
+        if (empty($name)) {
+            Session::setFlash('error', 'Operation name is required.');
             Helper::redirect('cost_centers');
         }
 
@@ -45,9 +49,9 @@ class CostCenterController extends Controller {
                 'description' => $description,
                 'is_active' => isset($_POST['is_active']) ? 1 : 0
             ]);
-            Session::setFlash('success', "Cost Center [{$code}] added successfully!");
+            Session::setFlash('success', "Operation [{$code}] added successfully!");
         } catch (\Exception $e) {
-            Session::setFlash('error', "Failed to add Cost Center: " . $e->getMessage());
+            Session::setFlash('error', "Failed to add Operation: " . $e->getMessage());
         }
 
         Helper::redirect('cost_centers');

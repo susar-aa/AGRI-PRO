@@ -24,8 +24,8 @@
                         <select class="form-select" name="member_id" id="memberSelect" onchange="updateMemberDetails()" required>
                             <option value="">-- Select Member --</option>
                             <?php foreach ($members as $m): ?>
-                                <option value="<?= $m['id']; ?>" data-nic="<?= htmlspecialchars($m['nic']); ?>" data-phone="<?= htmlspecialchars($m['phone']); ?>" data-no="<?= htmlspecialchars($m['membership_no']); ?>">
-                                    <?= htmlspecialchars($m['full_name']); ?> (<?= htmlspecialchars($m['membership_no']); ?>)
+                                <option value="<?= $m['id']; ?>" data-nic="<?= htmlspecialchars($m['nic']); ?>" data-phone="<?= htmlspecialchars($m['phone']); ?>" data-no="<?= htmlspecialchars($m['member_no']); ?>">
+                                    <?= htmlspecialchars($m['full_name']); ?> (<?= htmlspecialchars($m['member_no']); ?>)
                                 </option>
                             <?php endforeach; ?>
                         </select>

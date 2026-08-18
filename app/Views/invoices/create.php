@@ -263,7 +263,7 @@
                                 <optgroup label="Society Members">
                                     <?php foreach ($members as $m): ?>
                                         <option value="M_<?= $m['id']; ?>" data-is-member="1">
-                                            <?= htmlspecialchars($m['membership_no']); ?> &mdash; <?= htmlspecialchars($m['full_name']); ?>
+                                            <?= htmlspecialchars($m['member_no']); ?> &mdash; <?= htmlspecialchars($m['full_name']); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </optgroup>
@@ -350,9 +350,6 @@
                         <div class="d-grid gap-2">
                             <button type="submit" name="action" value="post" class="post-btn" onclick="return validateInvoiceForm(event)">
                                 <i class="bi bi-send-check me-1"></i> Post Invoice
-                            </button>
-                            <button type="submit" name="action" value="draft" class="draft-btn">
-                                <i class="bi bi-floppy me-1"></i> Save as Draft
                             </button>
                         </div>
                     </div>
@@ -490,7 +487,7 @@
                         </thead>
                         <tbody>
                             <?php foreach ($machineryAssets as $m): ?>
-                                <tr class="rental-row" data-search="<?= htmlspecialchars(strtolower($m['machinery_name'] . ' ' . $m['machinery_code'] . ' ' . $m['category'])); ?>">
+                                <tr class="rental-row" data-search="<?= htmlspecialchars(strtolower((string)($m['machinery_name'] ?? '') . ' ' . (string)($m['machinery_code'] ?? '') . ' ' . (string)($m['category'] ?? ''))); ?>">
                                     <td>
                                         <div class="fw-bold text-dark"><?= htmlspecialchars($m['machinery_name']); ?></div>
                                         <small class="text-muted font-monospace">Code: <?= htmlspecialchars($m['machinery_code']); ?> &bull; Serial: <?= htmlspecialchars($m['serial_number'] ?: '-'); ?></small>

@@ -174,9 +174,23 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="name_en" class="form-label fw-semibold small">Product Name (EN) <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control form-control-sm" id="name_en" name="name_en" required>
+                    <div class="row g-3 mb-3">
+                        <div class="col-12">
+                            <label for="name_en" class="form-label fw-semibold small">Product Name (EN) <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-sm" id="name_en" name="name_en" required>
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-12">
+                            <label for="supplier_id" class="form-label fw-semibold small">Supplier (Optional)</label>
+                            <select class="form-select form-select-sm" id="supplier_id" name="supplier_id">
+                                <option value="">-- No Supplier --</option>
+                                <?php foreach ($suppliers as $sup): ?>
+                                    <option value="<?= $sup['id']; ?>"><?= htmlspecialchars($sup['party_code']); ?> - <?= htmlspecialchars($sup['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="row g-3 mb-3">
@@ -243,14 +257,15 @@
 document.addEventListener('DOMContentLoaded', function() {
     // Tooltips activation
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-    tooltipTriggerList.map(function (tooltipTriggerEl) {
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
-    const editPricesModal = document.getElementById('editPricesModal');
+    // Edit Prices Modal setup
+    var editPricesModal = document.getElementById('editPricesModal');
     if (editPricesModal) {
-        editPricesModal.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
+        editPricesModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
             document.getElementById('editProdId').value = button.getAttribute('data-id');
             document.getElementById('editProdName').textContent = button.getAttribute('data-name');
             document.getElementById('default_purchase_price').value = button.getAttribute('data-cost');

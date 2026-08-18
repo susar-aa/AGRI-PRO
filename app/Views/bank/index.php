@@ -18,6 +18,9 @@
         <p class="text-muted small mb-0">Add and configure bank accounts, monitor current balances, and post bank transfers.</p>
     </div>
     <div class="d-flex gap-2">
+        <a href="<?= \Core\Helper::baseUrl('deposits'); ?>" class="btn btn-warning rounded-pill px-3 shadow-sm">
+            <i class="bi bi-box-arrow-in-down-right me-1"></i> Bank Deposits
+        </a>
         <button class="btn btn-success rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#bankTxModal">
             <i class="bi bi-arrow-left-right me-1"></i> Post Bank Transaction
         </button>
@@ -27,66 +30,53 @@
     </div>
 </div>
 
-<!-- Bank Accounts List -->
-<div class="card border-0 shadow-sm rounded-4 mb-4">
-    <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light">
-                    <tr>
-                        <th>Bank / Branch</th>
-                        <th>Account Name & Number</th>
-                        <th>Swift Code</th>
-                        <th>Linked GL Account</th>
-                        <th class="text-end">Current Balance</th>
-                        <th class="text-center">Status</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($bankAccounts as $ba): ?>
-                        <tr>
-                            <td>
-                                <div class="fw-bold text-dark"><?= htmlspecialchars($ba['bank_name']); ?></div>
-                                <small class="text-muted"><?= htmlspecialchars($ba['branch'] ?? '-'); ?></small>
-                            </td>
-                            <td>
-                                <div class="fw-semibold text-secondary"><?= htmlspecialchars($ba['account_name']); ?></div>
-                                <code class="text-success font-monospace"><?= htmlspecialchars($ba['account_number']); ?></code>
-                            </td>
-                            <td class="font-monospace text-uppercase small"><?= htmlspecialchars($ba['swift_code'] ?? '-'); ?></td>
-                            <td>
-                                <span class="badge bg-light text-dark border small">
-                                    <?= htmlspecialchars($ba['coa_name'] ?? 'Unmapped'); ?> (<?= htmlspecialchars($ba['account_code'] ?? '-'); ?>)
-                                </span>
-                            </td>
-                            <td class="text-end fw-bold font-monospace <?= $ba['current_balance'] >= 0 ? 'text-success' : 'text-danger'; ?>">
-                                LKR <?= number_format($ba['current_balance'], 2); ?>
-                            </td>
-                            <td class="text-center">
-                                <span class="badge <?= $ba['status'] === 'active' ? 'bg-success' : 'bg-secondary'; ?> rounded-pill px-2">
-                                    <?= ucfirst($ba['status']); ?>
-                                </span>
-                            </td>
-                            <td class="text-center">
-                                <button class="btn btn-sm btn-outline-primary rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#addAccountModal" 
-                                        data-id="<?= $ba['id']; ?>" 
-                                        data-bank_name="<?= htmlspecialchars($ba['bank_name']); ?>"
-                                        data-branch="<?= htmlspecialchars($ba['branch'] ?? ''); ?>"
-                                        data-account_number="<?= htmlspecialchars($ba['account_number']); ?>"
-                                        data-account_name="<?= htmlspecialchars($ba['account_name']); ?>"
-                                        data-swift_code="<?= htmlspecialchars($ba['swift_code'] ?? ''); ?>"
-                                        data-account_id="<?= $ba['account_id']; ?>"
-                                        data-status="<?= $ba['status']; ?>">
-                                    <i class="bi bi-pencil"></i> Edit
-                                </button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+<div class="row g-4 mb-4">
+    <!-- Cash in Hand Balance Card -->
+    <div class="col-12 col-md-4">
+        <div class="card border-0 shadow-sm rounded-4 bg-success text-white p-3 h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="text-white-50 mb-1">Cash in Hand Balance</h6>
+                    <h3 class="fw-bold mb-0">LKR <?= number_format($cashBalance, 2); ?></h3>
+                </div>
+                <div class="fs-1"><i class="bi bi-cash-stack"></i></div>
+            </div>
         </div>
     </div>
+    
+    <!-- Bank Accounts Cards -->
+    <?php foreach ($bankAccounts as $ba): ?>
+        <div class="col-12 col-md-4">
+            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 <?= $ba['status'] === 'active' ? 'bg-light' : 'bg-secondary text-white opacity-75'; ?>">
+                <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <div>
+                            <h6 class="fw-bold <?= $ba['status'] === 'active' ? 'text-dark' : 'text-white'; ?> mb-0"><?= htmlspecialchars($ba['bank_name']); ?></h6>
+                            <small class="<?= $ba['status'] === 'active' ? 'text-muted' : 'text-white-50'; ?>"><?= htmlspecialchars($ba['branch'] ?? '-'); ?></small>
+                        </div>
+                        <button class="btn btn-sm <?= $ba['status'] === 'active' ? 'btn-outline-secondary' : 'btn-outline-light'; ?> rounded-circle border-0" data-bs-toggle="modal" data-bs-target="#addAccountModal" 
+                                data-id="<?= $ba['id']; ?>" 
+                                data-bank_name="<?= htmlspecialchars($ba['bank_name']); ?>"
+                                data-branch="<?= htmlspecialchars($ba['branch'] ?? ''); ?>"
+                                data-account_number="<?= htmlspecialchars($ba['account_number']); ?>"
+                                data-account_name="<?= htmlspecialchars($ba['account_name']); ?>"
+                                data-swift_code="<?= htmlspecialchars($ba['swift_code'] ?? ''); ?>"
+                                data-account_id="<?= $ba['account_id']; ?>"
+                                data-status="<?= $ba['status']; ?>" title="Edit Account">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <div class="<?= $ba['status'] === 'active' ? 'text-secondary' : 'text-white-50'; ?> small mb-1"><?= htmlspecialchars($ba['account_name']); ?></div>
+                        <div class="<?= $ba['status'] === 'active' ? 'text-success' : 'text-white'; ?> font-monospace mb-2"><?= htmlspecialchars($ba['account_number']); ?></div>
+                        <h4 class="fw-bold <?= $ba['status'] === 'active' ? ($ba['current_balance'] >= 0 ? 'text-dark' : 'text-danger') : 'text-white'; ?> mb-0">
+                            LKR <?= number_format($ba['current_balance'], 2); ?>
+                        </h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <?php endforeach; ?>
 </div>
 
 <!-- Recent Transactions -->

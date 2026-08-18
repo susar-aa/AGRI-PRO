@@ -44,8 +44,8 @@ class PaymentEngine {
         $method = $data['payment_method'];
 
         if ($type === 'RECEIPT') {
-            if (!in_array($party['party_type'], ['CUSTOMER', 'BOTH'])) {
-                throw new Exception("Receipts can only be recorded for customer profiles.");
+            if (!in_array($party['party_type'], ['CUSTOMER', 'BOTH', 'MEMBER', 'DIRECTOR'])) {
+                throw new Exception("Receipts can only be recorded for customer, member, or director profiles.");
             }
         } else {
             if (!in_array($party['party_type'], ['SUPPLIER', 'BOTH'])) {
@@ -96,9 +96,9 @@ class PaymentEngine {
 
         $stmt = $db->prepare("
             INSERT INTO payment_receipts 
-            (payment_number, payment_type, payment_date, party_id, payment_method, cash_account_id, bank_account_id, cheque_id, amount, reference_number, notes, status, created_by)
+            (payment_number, payment_type, payment_date, party_id, payment_method, cash_account_id, bank_account_id, cheque_id, amount, reference_number, notes, income_account_id, status, created_by)
             VALUES 
-            (:payment_number, :payment_type, :payment_date, :party_id, :payment_method, :cash_account_id, :bank_account_id, :cheque_id, :amount, :reference_number, :notes, 'draft', :created_by)
+            (:payment_number, :payment_type, :payment_date, :party_id, :payment_method, :cash_account_id, :bank_account_id, :cheque_id, :amount, :reference_number, :notes, :income_account_id, 'draft', :created_by)
         ");
 
         $stmt->execute([
@@ -113,6 +113,7 @@ class PaymentEngine {
             'amount' => $amount,
             'reference_number' => $data['reference_number'] ?? null,
             'notes' => $data['notes'] ?? null,
+            'income_account_id' => $data['income_account_id'] ?? null,
             'created_by' => $createdBy
         ]);
 
@@ -172,9 +173,9 @@ class PaymentEngine {
         // Accounts Receivable: ID 12 (1140)
         // Accounts Payable: ID 20 (2110)
         if ($type === 'RECEIPT') {
-            // Receipt: Dr Cash/Bank/Cheques, Cr Accounts Receivable
+            // Receipt: Dr Cash/Bank/Cheques, Cr Accounts Receivable (or custom income account)
             $debitAccountId = $assetAccountId;
-            $creditAccountId = 12; // AR
+            $creditAccountId = !empty($pr['income_account_id']) ? (int)$pr['income_account_id'] : 12;
         } else {
             // Payment: Dr Accounts Payable, Cr Cash/Bank
             $debitAccountId = 20; // AP

@@ -18,7 +18,8 @@ class DashboardController extends Controller {
             SELECT COALESCE(SUM(jl.credit - jl.debit), 0.00) 
             FROM journal_lines jl 
             JOIN accounts a ON jl.account_id = a.id 
-            WHERE a.category = 'Revenue'
+            JOIN journal_entries je ON jl.journal_entry_id = je.id
+            WHERE a.category = 'Revenue' AND je.status = 'posted'
         ");
         $totalRevenue = (float)$stmt->fetchColumn();
 
@@ -27,7 +28,8 @@ class DashboardController extends Controller {
             SELECT COALESCE(SUM(jl.debit - jl.credit), 0.00) 
             FROM journal_lines jl 
             JOIN accounts a ON jl.account_id = a.id 
-            WHERE a.category IN ('Expense', 'COGS')
+            JOIN journal_entries je ON jl.journal_entry_id = je.id
+            WHERE a.category IN ('Expense', 'COGS') AND je.status = 'posted'
         ");
         $totalExpenses = (float)$stmt->fetchColumn();
 
@@ -38,7 +40,8 @@ class DashboardController extends Controller {
             SELECT COALESCE(SUM(jl.debit - jl.credit), 0.00) 
             FROM journal_lines jl 
             JOIN accounts a ON jl.account_id = a.id 
-            WHERE a.account_code IN ('1110', '1130')
+            JOIN journal_entries je ON jl.journal_entry_id = je.id
+            WHERE a.account_code IN ('1110', '1130') AND je.status = 'posted'
         ");
         $cashBalance = (float)$stmt->fetchColumn();
 
@@ -47,7 +50,8 @@ class DashboardController extends Controller {
             SELECT COALESCE(SUM(jl.debit - jl.credit), 0.00) 
             FROM journal_lines jl 
             JOIN accounts a ON jl.account_id = a.id 
-            WHERE a.account_code = '1120'
+            JOIN journal_entries je ON jl.journal_entry_id = je.id
+            WHERE a.account_code = '1120' AND je.status = 'posted'
         ");
         $bankBalance = (float)$stmt->fetchColumn();
 
@@ -56,7 +60,8 @@ class DashboardController extends Controller {
             SELECT COALESCE(SUM(jl.debit - jl.credit), 0.00) 
             FROM journal_lines jl 
             JOIN accounts a ON jl.account_id = a.id 
-            WHERE a.account_code = '1140'
+            JOIN journal_entries je ON jl.journal_entry_id = je.id
+            WHERE a.account_code = '1140' AND je.status = 'posted'
         ");
         $accountsReceivable = (float)$stmt->fetchColumn();
 
@@ -65,7 +70,8 @@ class DashboardController extends Controller {
             SELECT COALESCE(SUM(jl.credit - jl.debit), 0.00) 
             FROM journal_lines jl 
             JOIN accounts a ON jl.account_id = a.id 
-            WHERE a.account_code = '2110'
+            JOIN journal_entries je ON jl.journal_entry_id = je.id
+            WHERE a.account_code = '2110' AND je.status = 'posted'
         ");
         $accountsPayable = (float)$stmt->fetchColumn();
 
@@ -74,7 +80,8 @@ class DashboardController extends Controller {
             SELECT COALESCE(SUM(jl.debit - jl.credit), 0.00) 
             FROM journal_lines jl 
             JOIN accounts a ON jl.account_id = a.id 
-            WHERE a.account_code IN ('1150', '1160', '1170')
+            JOIN journal_entries je ON jl.journal_entry_id = je.id
+            WHERE a.account_code IN ('1150', '1160', '1170') AND je.status = 'posted'
         ");
         $inventoryValue = (float)$stmt->fetchColumn();
 

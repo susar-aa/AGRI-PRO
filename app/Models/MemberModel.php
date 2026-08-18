@@ -9,9 +9,9 @@ class MemberModel extends Model {
     public function getById(int $id): ?array {
         $stmt = $this->db->prepare("
             SELECT m.*, p.name AS customer_name, p.party_code
-            FROM members m
+            FROM coop_members m
             LEFT JOIN parties p ON m.party_id = p.id
-            WHERE m.id = :id LIMIT 1
+            WHERE m.id = :id AND m.member_type = 'MEMBER' LIMIT 1
         ");
         $stmt->execute(['id' => $id]);
         return $stmt->fetch() ?: null;
@@ -20,14 +20,14 @@ class MemberModel extends Model {
     public function getAll(array $filters = [], int $limit = 50, int $offset = 0): array {
         $sql = "
             SELECT m.*, p.name AS customer_name, p.party_code
-            FROM members m
+            FROM coop_members m
             LEFT JOIN parties p ON m.party_id = p.id
-            WHERE 1=1
+            WHERE m.member_type = 'MEMBER'
         ";
         $params = [];
 
         if (!empty($filters['search'])) {
-            $sql .= " AND (m.full_name LIKE :search_name OR m.membership_no LIKE :search_no OR m.nic LIKE :search_nic OR m.phone LIKE :search_phone)";
+            $sql .= " AND (m.full_name LIKE :search_name OR m.member_no LIKE :search_no OR m.nic LIKE :search_nic OR m.phone LIKE :search_phone)";
             $params['search_name'] = '%' . $filters['search'] . '%';
             $params['search_no'] = '%' . $filters['search'] . '%';
             $params['search_nic'] = '%' . $filters['search'] . '%';
@@ -51,11 +51,11 @@ class MemberModel extends Model {
     }
 
     public function getCount(array $filters = []): int {
-        $sql = "SELECT COUNT(*) FROM members m WHERE 1=1";
+        $sql = "SELECT COUNT(*) FROM coop_members m WHERE m.member_type = 'MEMBER'";
         $params = [];
 
         if (!empty($filters['search'])) {
-            $sql .= " AND (m.full_name LIKE :search_name OR m.membership_no LIKE :search_no OR m.nic LIKE :search_nic OR m.phone LIKE :search_phone)";
+            $sql .= " AND (m.full_name LIKE :search_name OR m.member_no LIKE :search_no OR m.nic LIKE :search_nic OR m.phone LIKE :search_phone)";
             $params['search_name'] = '%' . $filters['search'] . '%';
             $params['search_no'] = '%' . $filters['search'] . '%';
             $params['search_nic'] = '%' . $filters['search'] . '%';
@@ -72,19 +72,33 @@ class MemberModel extends Model {
     }
 
     public function create(array $data): int {
-        $data['membership_no'] = $data['membership_no'] ?? $this->generateMembershipNumber();
+        $data['member_no'] = $data['member_no'] ?? $this->generateMembershipNumber();
+
+        if (empty($data['party_id'])) {
+            $pStmt = $this->db->prepare("INSERT INTO parties (party_code, party_type, name, phone, address, city, nic_reg_no, created_by) VALUES (:code, 'MEMBER', :name, :phone, :address, :city, :nic, :by)");
+            $pStmt->execute([
+                'code' => $data['member_no'],
+                'name' => $data['full_name'],
+                'phone' => $data['phone'] ?? '',
+                'address' => $data['address'] ?? '',
+                'city' => $data['city'] ?? '',
+                'nic' => $data['nic'] ?? '',
+                'by' => \Core\Auth::id() ?? 1
+            ]);
+            $data['party_id'] = $this->db->lastInsertId();
+        }
 
         $stmt = $this->db->prepare("
-            INSERT INTO members 
-            (membership_no, party_id, full_name, nic, dob, gender, occupation, phone, heir_name, heir_address, heir_nic, heir_contact_number, address, city, 
+            INSERT INTO coop_members 
+            (member_type, member_no, party_id, full_name, nic, dob, gender, occupation, phone, heir_name, heir_address, heir_nic, heir_contact_number, address, city, 
              registration_date, membership_type, status, registration_fee, shares_fee, payment_method, payment_status, notes, journal_entry_id)
             VALUES 
-            (:membership_no, :party_id, :full_name, :nic, :dob, :gender, :occupation, :phone, :heir_name, :heir_address, :heir_nic, :heir_contact_number, :address, :city, 
+            ('MEMBER', :member_no, :party_id, :full_name, :nic, :dob, :gender, :occupation, :phone, :heir_name, :heir_address, :heir_nic, :heir_contact_number, :address, :city, 
              :registration_date, :membership_type, :status, :registration_fee, :shares_fee, :payment_method, :payment_status, :notes, :journal_entry_id)
         ");
 
         $stmt->execute([
-            'membership_no' => $data['membership_no'],
+            'member_no' => $data['member_no'],
             'party_id' => $data['party_id'] ?? null,
             'full_name' => $data['full_name'],
             'nic' => $data['nic'],
@@ -114,12 +128,12 @@ class MemberModel extends Model {
 
     public function update(int $id, array $data): bool {
         $stmt = $this->db->prepare("
-            UPDATE members 
+            UPDATE coop_members 
             SET full_name = :full_name, nic = :nic, dob = :dob, gender = :gender, occupation = :occupation, phone = :phone, 
                 heir_name = :heir_name, heir_address = :heir_address, heir_nic = :heir_nic, heir_contact_number = :heir_contact_number, 
                 address = :address, city = :city, status = :status, notes = :notes, 
                 party_id = :party_id
-            WHERE id = :id
+            WHERE id = :id AND member_type = 'MEMBER'
         ");
 
         return $stmt->execute([
@@ -143,19 +157,16 @@ class MemberModel extends Model {
     }
 
     public function generateMembershipNumber(): string {
-        $prefix = 'MEM-' . date('Y') . '-';
-        $stmt = $this->db->prepare("SELECT membership_no FROM members WHERE membership_no LIKE :prefix ORDER BY id DESC LIMIT 1");
-        $stmt->execute(['prefix' => $prefix . '%']);
-        $lastNo = $stmt->fetchColumn();
+        $stmtMem = $this->db->query("SELECT MAX(CAST(SUBSTRING(member_no, 5) AS UNSIGNED)) FROM coop_members WHERE member_no LIKE 'AGC %' AND member_type = 'MEMBER'");
+        $maxMem = (int)$stmtMem->fetchColumn();
 
-        if ($lastNo) {
-            $seq = (int)substr($lastNo, -5);
-            $newSeq = str_pad($seq + 1, 5, '0', STR_PAD_LEFT);
-        } else {
-            $newSeq = '00001';
-        }
+        $stmtDir = $this->db->query("SELECT MAX(CAST(SUBSTRING(member_no, 5) AS UNSIGNED)) FROM coop_members WHERE member_no LIKE 'AGC %' AND member_type = 'DIRECTOR'");
+        $maxDir = (int)$stmtDir->fetchColumn();
 
-        return $prefix . $newSeq;
+        $maxVal = max($maxMem, $maxDir);
+        $newSeq = $maxVal + 1;
+
+        return 'AGC ' . str_pad($newSeq, 3, '0', STR_PAD_LEFT);
     }
 
     public function getFixedDepositsByMember(int $memberId): array {

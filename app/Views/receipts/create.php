@@ -1,3 +1,18 @@
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container .select2-selection--single {
+        height: 38px;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered {
+        line-height: 36px;
+    }
+    .select2-container--default .select2-selection--single .select2-selection__arrow {
+        height: 36px;
+    }
+</style>
+
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
         <a href="<?= \Core\Helper::baseUrl('receipts'); ?>" class="btn btn-sm btn-outline-secondary rounded-pill mb-2">
@@ -16,9 +31,9 @@
 
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
-                    <label for="party_id" class="form-label fw-semibold">Select Customer <span class="text-danger">*</span></label>
-                    <select class="form-select" id="party_id" name="party_id" required>
-                        <option value="">-- Select Customer Account --</option>
+                    <label for="party_id" class="form-label fw-semibold">Select Customer / Member <span class="text-danger">*</span></label>
+                    <select class="form-select select2" id="party_id" name="party_id" required>
+                        <option value="">-- Select Account --</option>
                         <?php foreach ($customers as $cust): ?>
                             <option value="<?= $cust['id']; ?>" <?= (!empty($selectedParty) && $selectedParty['id'] == $cust['id']) ? 'selected' : ''; ?>>
                                 <?= htmlspecialchars($cust['party_code']); ?> - <?= htmlspecialchars($cust['name']); ?>
@@ -26,11 +41,29 @@
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-6">
+                    <label for="income_account_id" class="form-label fw-semibold">Income Category <span class="text-danger">*</span></label>
+                    <select class="form-select" id="income_account_id" name="income_account_id" required>
+                        <?php foreach ($incomeAccounts as $acc): 
+                            $name = htmlspecialchars($acc['account_name']);
+                            if ($acc['id'] == 12) $name = "Customer Invoice Payment";
+                            elseif ($acc['id'] == 62) $name = "Member's Registration Fee";
+                            elseif ($acc['id'] == 25) $name = "Member's Share Capital";
+                            elseif ($acc['id'] == 37) $name = "Other Income";
+                        ?>
+                            <option value="<?= $acc['id']; ?>" <?= ($acc['id'] == 12) ? 'selected' : ''; ?>>
+                                <?= $name; ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
                     <label for="payment_date" class="form-label fw-semibold">Receipt Date <span class="text-danger">*</span></label>
                     <input type="date" class="form-control" id="payment_date" name="payment_date" value="<?= date('Y-m-d'); ?>" required>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-6">
                     <label for="amount" class="form-label fw-semibold">Collection Amount (LKR) <span class="text-danger">*</span></label>
                     <input type="number" step="0.01" min="0.01" class="form-control fw-bold text-success" id="amount" name="amount" placeholder="0.00" required>
                 </div>
@@ -41,9 +74,9 @@
                     <label for="payment_method" class="form-label fw-semibold">Payment Method <span class="text-danger">*</span></label>
                     <select class="form-select" id="payment_method" name="payment_method" required onchange="togglePaymentInputs()">
                         <option value="">-- Select Method --</option>
-                        <option value="Cash">Cash Drawer</option>
-                        <option value="Bank Transfer">Bank Deposit</option>
-                        <option value="Cheque">Received Cheque</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank Transfer">Bank</option>
+                        <option value="Cheque">Cheque</option>
                     </select>
                 </div>
 
@@ -121,16 +154,10 @@
                 <textarea class="form-control" id="notes" name="notes" rows="2" placeholder="e.g. Settlement of outstanding balance" required></textarea>
             </div>
 
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label for="reference_number" class="form-label fw-semibold">Reference / Slip Number</label>
-                    <input type="text" class="form-control" id="reference_number" name="reference_number" placeholder="e.g. Bank slip number, transaction reference">
-                </div>
-            </div>
+
 
             <div class="modal-footer bg-light p-3 rounded-3 mt-4 gap-2">
                 <a href="<?= \Core\Helper::baseUrl('receipts'); ?>" class="btn btn-secondary rounded-pill px-3">Cancel</a>
-                <button type="submit" name="action" value="draft" class="btn btn-outline-secondary rounded-pill px-3">Save as Draft</button>
                 <button type="submit" name="action" value="post" class="btn btn-success rounded-pill px-4" style="background-color: #1b4332; border-color: #1b4332;">Post Collection</button>
             </div>
         </form>
@@ -196,4 +223,14 @@ document.getElementById('cheque_id').addEventListener('change', function() {
         document.getElementById('amount').value = amount;
     }
 });
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.select2').select2({
+            placeholder: "-- Select Account --",
+            allowClear: true
+        });
+    });
 </script>

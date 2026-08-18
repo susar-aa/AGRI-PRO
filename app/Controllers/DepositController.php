@@ -76,15 +76,32 @@ class DepositController extends Controller {
         Auth::requirePermission('deposits.create');
 
         $bankAccounts = $this->expenseModel->getBankAccounts();
-        $cashAccounts = $this->expenseModel->getCashAccounts();
-        $undepositedCheques = $this->chequeModel->getUndepositedCheques();
+
+        // Calculate Cash In Hand Balance
+        $db = \Core\Database::getInstance();
+        $cashInHandAccount = $db->query("SELECT id FROM accounts WHERE account_code = '1110'")->fetchColumn();
+        
+        $cashReceived = (float)$db->query("
+            SELECT SUM(debit) 
+            FROM journal_lines jl
+            JOIN journal_entries je ON jl.journal_entry_id = je.id
+            WHERE jl.account_id = " . (int)$cashInHandAccount . " AND je.status = 'posted'
+        ")->fetchColumn();
+
+        $cashPayments = (float)$db->query("
+            SELECT SUM(credit) 
+            FROM journal_lines jl
+            JOIN journal_entries je ON jl.journal_entry_id = je.id
+            WHERE jl.account_id = " . (int)$cashInHandAccount . " AND je.status = 'posted'
+        ")->fetchColumn();
+
+        $cashBalance = $cashReceived - $cashPayments;
 
         $this->render('deposits/create', [
             'pageTitle' => 'New Bank Deposit',
             'activeNav' => 'deposits',
             'bankAccounts' => $bankAccounts,
-            'cashAccounts' => $cashAccounts,
-            'cheques' => $undepositedCheques
+            'cashBalance' => $cashBalance
         ]);
     }
 
@@ -96,9 +113,7 @@ class DepositController extends Controller {
             'bank_account_id' => !empty($_POST['bank_account_id']) ? (int)$_POST['bank_account_id'] : 0,
             'deposit_date' => $_POST['deposit_date'] ?? date('Y-m-d'),
             'description' => trim($_POST['description'] ?? 'Bank Deposit Entry'),
-            'cash_amount' => (float)($_POST['cash_amount'] ?? 0),
-            'cash_account_id' => !empty($_POST['cash_account_id']) ? (int)$_POST['cash_account_id'] : null,
-            'cheque_ids' => $_POST['cheque_ids'] ?? []
+            'cash_amount' => (float)($_POST['cash_amount'] ?? 0)
         ];
 
         try {

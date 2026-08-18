@@ -14,19 +14,19 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-        <h4 class="fw-bold mb-1 text-dark">Cost Centers Management</h4>
-        <p class="text-muted small mb-0">Manage operational profit & cost centers for individual business activities.</p>
+        <h4 class="fw-bold mb-1 text-dark">Operations Management</h4>
+        <p class="text-muted small mb-0">Manage operational categories for individual business activities.</p>
     </div>
     <div>
         <button class="btn btn-success rounded-pill px-4 shadow-sm" style="background-color: #1b4332; border-color: #1b4332;" data-bs-toggle="modal" data-bs-target="#addCcModal">
-            <i class="bi bi-plus-lg me-1"></i> Add Cost Center
+            <i class="bi bi-plus-lg me-1"></i> Add Operation
         </button>
     </div>
 </div>
 
 <div class="card border-0 shadow-sm rounded-4">
     <div class="card-header bg-white py-3 border-0">
-        <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-pie-chart-fill text-success me-2"></i> Registered Cost Centers</h6>
+        <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-pie-chart-fill text-success me-2"></i> Registered Operations</h6>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -34,8 +34,7 @@
                 <thead class="table-light">
                     <tr>
                         <th style="width: 120px;">Code</th>
-                        <th>Cost Center Name</th>
-                        <th>Description</th>
+                        <th>Operation Name</th>
                         <th class="text-center">Status</th>
                     </tr>
                 </thead>
@@ -45,7 +44,6 @@
                             <tr>
                                 <td class="fw-bold font-monospace text-dark"><?= htmlspecialchars($cc['code']); ?></td>
                                 <td class="fw-semibold text-dark"><?= htmlspecialchars($cc['name']); ?></td>
-                                <td class="text-muted small"><?= htmlspecialchars($cc['description'] ?? '-'); ?></td>
                                 <td class="text-center">
                                     <?php if ($cc['is_active']): ?>
                                         <span class="badge bg-success rounded-pill">Active</span>
@@ -57,7 +55,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="4" class="text-center text-muted py-4">No cost centers found.</td>
+                            <td colspan="3" class="text-center text-muted py-4">No operations found.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -71,25 +69,15 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow">
             <div class="modal-header text-white" style="background-color: #1b4332 !important;">
-                <h5 class="modal-title font-weight-bold"><i class="bi bi-plus-circle me-2"></i> Add Cost Center</h5>
+                <h5 class="modal-title font-weight-bold"><i class="bi bi-plus-circle me-2"></i> Add Operation</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form action="<?= \Core\Helper::baseUrl('cost-centers/store'); ?>" method="POST">
                 <?= \Core\CSRF::getFormField(); ?>
                 <div class="modal-body p-4">
                     <div class="mb-3">
-                        <label for="code" class="form-label fw-semibold">Cost Center Code <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="code" name="code" placeholder="e.g. CC-010" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="name" class="form-label fw-semibold">Cost Center Name <span class="text-danger">*</span></label>
+                        <label for="name" class="form-label fw-semibold">Operation Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Nursery & Seed Production" required>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="description" class="form-label fw-semibold">Description</label>
-                        <textarea class="form-control" id="description" name="description" rows="2" placeholder="Operational focus..."></textarea>
                     </div>
 
                     <div class="form-check form-switch">
@@ -99,7 +87,7 @@
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success rounded-pill px-4" style="background-color: #1b4332; border-color: #1b4332;">Save Cost Center</button>
+                    <button type="submit" class="btn btn-success rounded-pill px-4" style="background-color: #1b4332; border-color: #1b4332;">Save Operation</button>
                 </div>
             </form>
         </div>

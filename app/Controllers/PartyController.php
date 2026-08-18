@@ -198,7 +198,7 @@ class PartyController extends Controller {
 
         $activities = [];
         if ($type === 'CUSTOMER') {
-            $activities = (new \App\Models\CustomerActivityModel())->getAllActive();
+            $activities = (new \App\Models\CostCenter())->getAll();
         }
 
         $this->render($view, [
@@ -284,7 +284,7 @@ class PartyController extends Controller {
 
         $activities = [];
         if ($type === 'CUSTOMER' || $type === 'BOTH') {
-            $activities = (new \App\Models\CustomerActivityModel())->getAllActive();
+            $activities = (new \App\Models\CostCenter())->getAll();
         }
 
         $this->render($view, [

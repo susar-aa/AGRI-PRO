@@ -12,8 +12,8 @@
     <?= \Core\CSRF::getFormField(); ?>
 
     <div class="row g-4">
-        <!-- Personal Information Section -->
-        <div class="col-12 col-lg-8">
+        <!-- Main Form Column -->
+        <div class="col-12 col-lg-12">
             <div class="card border-0 shadow-sm rounded-4 mb-4">
                 <div class="card-header bg-white py-3 border-0">
                     <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-person-badge text-success me-2"></i> 1. Personal Information</h6>
@@ -109,55 +109,9 @@
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Registration Fee & Link Sidebar Column -->
-        <div class="col-12 col-lg-4">
-
-            <!-- Payments & Fees -->
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-header bg-white py-3 border-0">
-                    <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-wallet2 text-success me-2"></i> Registration & Share Fees</h6>
-                </div>
-                <div class="card-body pt-0 small">
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small">Registration Fee (LKR) <span class="text-danger">*</span></label>
-                        <input type="number" step="0.01" class="form-control form-control-sm font-monospace fw-bold text-success" name="registration_fee" value="500.00" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small">Shares Fee (LKR)</label>
-                        <input type="number" step="0.01" class="form-control form-control-sm font-monospace fw-bold text-success" name="shares_fee" value="0.00">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold small">Payment Status</label>
-                        <select class="form-select form-select-sm" name="payment_status" id="payStatus" onchange="togglePayInputs()" required>
-                            <option value="UNPAID">UNPAID (Pending)</option>
-                            <option value="PAID">PAID</option>
-                        </select>
-                    </div>
-                    <div class="mb-3" id="payMethodSection" style="display: none;">
-                        <label class="form-label fw-semibold small">Payment Method</label>
-                        <select class="form-select form-select-sm" name="payment_method" id="payMethod" onchange="toggleChequeFields()">
-                            <option value="Cash">Cash Drawer</option>
-                            <option value="Bank Transfer">Bank Transfer</option>
-                            <option value="Cheque">Customer Cheque</option>
-                        </select>
-                    </div>
-                    <div id="chequeDetailsSection" style="display: none;">
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold small">Cheque Number</label>
-                            <input type="text" class="form-control form-control-sm" name="cheque_number" placeholder="Cheque #">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold small">Bank Name</label>
-                            <input type="text" class="form-control form-control-sm" name="cheque_bank" placeholder="Cheque bank">
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Submit Panel -->
-            <div class="card border-0 shadow-sm rounded-4">
+            <div class="card border-0 shadow-sm rounded-4 mt-4">
                 <div class="card-body p-3 text-center">
                     <button type="submit" class="btn btn-success rounded-pill w-100" style="background-color: #1b4332; border-color: #1b4332;">
                         <i class="bi bi-save me-1"></i> Register director
@@ -167,25 +121,4 @@
         </div>
     </div>
 </form>
-
-<script>
-function togglePayInputs() {
-    const status = document.getElementById('payStatus').value;
-    if (status === 'PAID') {
-        document.getElementById('payMethodSection').style.display = 'block';
-    } else {
-        document.getElementById('payMethodSection').style.display = 'none';
-        document.getElementById('chequeDetailsSection').style.display = 'none';
-    }
-}
-
-function toggleChequeFields() {
-    const method = document.getElementById('payMethod').value;
-    if (method === 'Cheque') {
-        document.getElementById('chequeDetailsSection').style.display = 'block';
-    } else {
-        document.getElementById('chequeDetailsSection').style.display = 'none';
-    }
-}
-</script>
 

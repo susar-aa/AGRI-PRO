@@ -8,10 +8,10 @@ class FDModel extends Model {
 
     public function getById(int $id): ?array {
         $stmt = $this->db->prepare("
-            SELECT fd.*, m.full_name AS member_name, m.membership_no, m.nic, m.phone,
+            SELECT fd.*, m.full_name AS member_name, m.member_no, m.nic, m.phone,
                    je.journal_number AS payment_journal, mje.journal_number AS maturity_journal
             FROM member_fixed_deposits fd
-            JOIN members m ON fd.member_id = m.id
+            JOIN coop_members m ON fd.member_id = m.id
             LEFT JOIN journal_entries je ON fd.journal_entry_id = je.id
             LEFT JOIN journal_entries mje ON fd.maturity_journal_entry_id = mje.id
             WHERE fd.id = :id LIMIT 1
@@ -22,9 +22,9 @@ class FDModel extends Model {
 
     public function getAll(array $filters = [], int $limit = 50, int $offset = 0): array {
         $sql = "
-            SELECT fd.*, m.full_name AS member_name, m.membership_no, m.nic
+            SELECT fd.*, m.full_name AS member_name, m.member_no, m.nic
             FROM member_fixed_deposits fd
-            JOIN members m ON fd.member_id = m.id
+            JOIN coop_members m ON fd.member_id = m.id
             WHERE 1=1
         ";
         $params = [];

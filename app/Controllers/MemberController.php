@@ -84,7 +84,7 @@ class MemberController extends Controller {
         ];
 
         // Ensure no duplicate NIC exists
-        $nicExists = $db->prepare("SELECT id FROM members WHERE nic = :nic");
+        $nicExists = $db->prepare("SELECT id FROM coop_members WHERE nic = :nic AND member_type = 'MEMBER'");
         $nicExists->execute(['nic' => $memberData['nic']]);
         if ($nicExists->fetch()) {
             Session::setFlash('error', 'A member with this NIC is already registered.');
@@ -250,6 +250,82 @@ class MemberController extends Controller {
 
 
 
+    public function edit(): void {
+        Auth::requirePermission('parties.edit');
+
+        $id = !empty($_GET['id']) ? (int)$_GET['id'] : 0;
+        $member = $this->memberModel->getById($id);
+
+        if (!$member) {
+            Session::setFlash('error', 'Member not found.');
+            Helper::redirect('modules/members/directory');
+        }
+
+        $this->render('members/edit', [
+            'pageTitle' => 'Edit Member: ' . $member['full_name'],
+            'activeNav' => 'directory',
+            'member' => $member,
+            'customers' => []
+        ]);
+    }
+
+    public function update(): void {
+        Auth::requirePermission('parties.edit');
+        $this->validateCsrf();
+
+        $id = (int)$_POST['id'];
+        $member = $this->memberModel->getById($id);
+
+        if (!$member) {
+            Session::setFlash('error', 'Member not found.');
+            Helper::redirect('modules/members/directory');
+        }
+
+        $memberData = [
+            'full_name' => trim($_POST['full_name'] ?? ''),
+            'nic' => trim($_POST['nic'] ?? ''),
+            'dob' => $_POST['dob'] ?? '',
+            'gender' => $_POST['gender'] ?? 'Male',
+            'phone' => trim($_POST['phone'] ?? ''),
+            'heir_name' => trim($_POST['heir_name'] ?? ''),
+            'heir_address' => trim($_POST['heir_address'] ?? ''),
+            'heir_nic' => trim($_POST['heir_nic'] ?? ''),
+            'heir_contact_number' => trim($_POST['heir_contact_number'] ?? ''),
+            'address' => trim($_POST['address'] ?? ''),
+            'city' => trim($_POST['city'] ?? ''),
+            'status' => $_POST['status'] ?? $member['status'],
+            'notes' => trim($_POST['notes'] ?? ''),
+            'party_id' => !empty($_POST['party_id']) ? (int)$_POST['party_id'] : $member['party_id']
+        ];
+
+        try {
+            $this->memberModel->update($id, $memberData);
+            Session::setFlash('success', 'Member updated successfully!');
+            Helper::redirect('modules/members/view?id=' . $id);
+        } catch (\Exception $e) {
+            Session::setFlash('error', 'Update failed: ' . $e->getMessage());
+            Helper::redirect('modules/members/edit?id=' . $id);
+        }
+    }
+
+    public function delete(): void {
+        Auth::requirePermission('parties.delete');
+        $this->validateCsrf();
+
+        $id = (int)$_POST['id'];
+        $db = Database::getInstance();
+        
+        try {
+            $stmt = $db->prepare("UPDATE coop_members SET status = 'INACTIVE' WHERE id = :id AND member_type = 'MEMBER'");
+            $stmt->execute(['id' => $id]);
+            Session::setFlash('success', 'Member marked as inactive.');
+        } catch (\Exception $e) {
+            Session::setFlash('error', 'Deletion failed: ' . $e->getMessage());
+        }
+        
+        Helper::redirect('modules/members/directory');
+    }
+
     public function linkCustomer(): void {
         Auth::requirePermission('parties.edit');
         $this->validateCsrf();
@@ -280,7 +356,7 @@ class MemberController extends Controller {
                 $customerId = $this->partyModel->create($partyData);
             }
 
-            $db->prepare("UPDATE members SET party_id = :party_id WHERE id = :id")
+            $db->prepare("UPDATE coop_members SET party_id = :party_id WHERE id = :id AND member_type = 'MEMBER'")
                ->execute(['party_id' => $customerId, 'id' => $memberId]);
 
             Session::setFlash('success', 'Member linked to Customer profile successfully.');

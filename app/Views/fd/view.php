@@ -47,7 +47,7 @@
                 <div class="row g-3">
                     <div class="col-6 col-md-4">
                         <small class="text-muted d-block">Cooperative Member</small>
-                        <span class="fw-bold text-dark"><?= htmlspecialchars($fd['member_name']); ?> (<?= htmlspecialchars($fd['membership_no']); ?>)</span>
+                        <span class="fw-bold text-dark"><?= htmlspecialchars($fd['member_name']); ?> (<?= htmlspecialchars($fd['member_no']); ?>)</span>
                     </div>
                     <div class="col-6 col-md-4">
                         <small class="text-muted d-block">Principal Amount</small>

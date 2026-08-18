@@ -165,7 +165,6 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" name="action" value="draft" class="btn btn-outline-secondary rounded-pill">Save as Draft</button>
                         <button type="submit" name="action" value="post" class="btn btn-success rounded-pill" style="background-color: #1b4332; border-color: #1b4332;" onclick="return validateStockBeforeSubmit(event)">Post & Dispatch</button>
                     </div>
                 </div>

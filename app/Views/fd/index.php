@@ -85,7 +85,7 @@
                 <select class="form-select form-select-sm" name="member_id">
                     <option value="">-- All Members --</option>
                     <?php foreach ($members as $m): ?>
-                        <option value="<?= $m['id']; ?>" <?= ($filters['member_id'] == $m['id']) ? 'selected' : ''; ?>><?= htmlspecialchars($m['full_name']); ?> (<?= htmlspecialchars($m['membership_no']); ?>)</option>
+                        <option value="<?= $m['id']; ?>" <?= ($filters['member_id'] == $m['id']) ? 'selected' : ''; ?>><?= htmlspecialchars($m['full_name']); ?> (<?= htmlspecialchars($m['member_no']); ?>)</option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -131,7 +131,7 @@
                                 <td class="fw-bold font-monospace text-success"><?= htmlspecialchars($fd['deposit_number']); ?></td>
                                 <td>
                                     <div class="fw-bold text-dark"><?= htmlspecialchars($fd['member_name']); ?></div>
-                                    <small class="text-muted font-monospace"><?= htmlspecialchars($fd['membership_no']); ?></small>
+                                    <small class="text-muted font-monospace"><?= htmlspecialchars($fd['member_no']); ?></small>
                                 </td>
                                 <td><?= htmlspecialchars($fd['start_date']); ?></td>
                                 <td class="<?= $fd['status'] === 'MATURED' ? 'fw-bold text-danger' : ''; ?>"><?= htmlspecialchars($fd['maturity_date']); ?></td>

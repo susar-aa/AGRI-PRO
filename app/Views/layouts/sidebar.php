@@ -2,11 +2,11 @@
 $activeNav = $activeNav ?? 'dashboard'; 
 
 // Determine which accordion groups should be open based on active nav
-$openSales    = in_array($activeNav, ['invoices', 'expenses', 'coa', 'journal_entries', 'general_ledger', 'trial_balance']);
 $openParties  = in_array($activeNav, ['directory', 'customers', 'suppliers']);
 $openInventory= in_array($activeNav, ['marketplace_products', 'products']);
 $openOps      = in_array($activeNav, ['marketplace', 'ops_plantation', 'ops_machinery', 'ops_fruit_packing', 'ops_brick_manufacturing', 'ops_construction', 'ops_grinding_mill', 'services', 'fixed_deposits']);
-$openFinance  = in_array($activeNav, ['cash_bank_overview', 'cash_accounts', 'bank_accounts', 'cheques', 'deposits']);
+$openSales    = in_array($activeNav, ['invoices', 'receipts', 'expenses', 'grn', 'coa', 'journal_entries', 'general_ledger', 'trial_balance']);
+$openFinance  = in_array($activeNav, ['cash_bank_overview', 'cash_accounts', 'bank_accounts', 'cheques', 'deposits', 'payments']);
 $openSystem   = in_array($activeNav, ['cost_centers', 'users', 'company_settings', 'audit_logs', 'customer_activities']);
 ?>
 <aside class="sidebar-wrapper">
@@ -44,18 +44,6 @@ $openSystem   = in_array($activeNav, ['cost_centers', 'users', 'company_settings
             </div>
         </li>
 
-        <!-- INVENTORY GROUP -->
-        <li class="menu-item">
-            <a href="#inventoryGroup" class="menu-link menu-group-toggle <?= $openInventory ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" aria-expanded="<?= $openInventory ? 'true' : 'false'; ?>">
-                <i class="bi bi-box-seam"></i> <span>Inventory</span>
-                <i class="bi bi-chevron-down ms-auto toggle-icon"></i>
-            </a>
-            <div id="inventoryGroup" class="collapse <?= $openInventory ? 'show' : ''; ?>">
-                <ul class="submenu-list">
-                    <li><a href="<?= \Core\Helper::baseUrl('modules/marketplace/products'); ?>" class="submenu-link <?= ($activeNav === 'marketplace_products' || $activeNav === 'products') ? 'active' : ''; ?>"><i class="bi bi-archive"></i> Products</a></li>
-                </ul>
-            </div>
-        </li>
 
         <!-- SALES & FINANCE GROUP -->
         <li class="menu-item">
@@ -66,8 +54,10 @@ $openSystem   = in_array($activeNav, ['cost_centers', 'users', 'company_settings
             <div id="salesGroup" class="collapse <?= $openSales ? 'show' : ''; ?>">
                 <ul class="submenu-list">
                     <li><a href="<?= \Core\Helper::baseUrl('modules/invoices'); ?>" class="submenu-link <?= $activeNav === 'invoices' ? 'active' : ''; ?>"><i class="bi bi-file-earmark-text"></i> Invoices</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('receipts'); ?>" class="submenu-link <?= $activeNav === 'receipts' ? 'active' : ''; ?>"><i class="bi bi-cash-coin"></i> Receipts</a></li>
                     <li><a href="<?= \Core\Helper::baseUrl('expenses'); ?>" class="submenu-link <?= $activeNav === 'expenses' ? 'active' : ''; ?>"><i class="bi bi-wallet2"></i> Expenses</a></li>
-                    <li><a href="<?= \Core\Helper::baseUrl('accounting/coa'); ?>" class="submenu-link <?= in_array($activeNav, ['coa', 'journal_entries', 'general_ledger', 'trial_balance']) ? 'active' : ''; ?>"><i class="bi bi-diagram-3"></i> Accounting</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('grn'); ?>" class="submenu-link <?= $activeNav === 'grn' ? 'active' : ''; ?>"><i class="bi bi-box-arrow-in-down"></i> Goods Receipt (GRN)</a></li>
+                    <li style="display: none;"><a href="<?= \Core\Helper::baseUrl('accounting/coa'); ?>" class="submenu-link <?= in_array($activeNav, ['coa', 'journal_entries', 'general_ledger', 'trial_balance']) ? 'active' : ''; ?>"><i class="bi bi-diagram-3"></i> Accounting</a></li>
                 </ul>
             </div>
         </li>
@@ -80,14 +70,15 @@ $openSystem   = in_array($activeNav, ['cost_centers', 'users', 'company_settings
             </a>
             <div id="opsGroup" class="collapse <?= $openOps ? 'show' : ''; ?>">
                 <ul class="submenu-list">
+                    <li><a href="<?= \Core\Helper::baseUrl('modules/marketplace/products'); ?>" class="submenu-link <?= ($activeNav === 'marketplace_products' || $activeNav === 'products') ? 'active' : ''; ?>"><i class="bi bi-archive"></i> Products</a></li>
                     <li><a href="<?= \Core\Helper::baseUrl('modules/services'); ?>" class="submenu-link <?= $activeNav === 'services' ? 'active' : ''; ?>"><i class="bi bi-briefcase"></i> Services</a></li>
-                    <li><a href="<?= \Core\Helper::baseUrl('modules/fixed-deposits'); ?>" class="submenu-link <?= $activeNav === 'fixed_deposits' ? 'active' : ''; ?>"><i class="bi bi-safe2"></i> Fixed Deposits</a></li>
-                    <li style="display: none;"><a href="<?= \Core\Helper::baseUrl('operations/plantation'); ?>" class="submenu-link <?= $activeNav === 'ops_plantation' ? 'active' : ''; ?>"><i class="bi bi-flower2"></i> Plantation</a></li>
                     <li><a href="<?= \Core\Helper::baseUrl('modules/machinery'); ?>" class="submenu-link <?= ($activeNav === 'machinery' || $activeNav === 'ops_machinery') ? 'active' : ''; ?>"><i class="bi bi-truck-flatbed"></i> Machinery Renting</a></li>
+                    <li style="display: none;"><a href="<?= \Core\Helper::baseUrl('operations/plantation'); ?>" class="submenu-link <?= $activeNav === 'ops_plantation' ? 'active' : ''; ?>"><i class="bi bi-flower2"></i> Plantation</a></li>
                     <li style="display: none;"><a href="<?= \Core\Helper::baseUrl('operations/fruit-packing'); ?>" class="submenu-link <?= $activeNav === 'ops_fruit_packing' ? 'active' : ''; ?>"><i class="bi bi-basket"></i> Fruit Packing</a></li>
                     <li style="display: none;"><a href="<?= \Core\Helper::baseUrl('operations/brick-manufacturing'); ?>" class="submenu-link <?= $activeNav === 'ops_brick_manufacturing' ? 'active' : ''; ?>"><i class="bi bi-bricks"></i> Brick Manufacturing</a></li>
                     <li style="display: none;"><a href="<?= \Core\Helper::baseUrl('operations/construction'); ?>" class="submenu-link <?= $activeNav === 'ops_construction' ? 'active' : ''; ?>"><i class="bi bi-building"></i> Construction</a></li>
                     <li style="display: none;"><a href="<?= \Core\Helper::baseUrl('operations/grinding-mill'); ?>" class="submenu-link <?= $activeNav === 'ops_grinding_mill' ? 'active' : ''; ?>"><i class="bi bi-gear-wide-connected"></i> Grinding Mill</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('modules/fixed-deposits'); ?>" class="submenu-link <?= $activeNav === 'fixed_deposits' ? 'active' : ''; ?>"><i class="bi bi-safe2"></i> Fixed Deposits</a></li>
                 </ul>
             </div>
         </li>
@@ -100,14 +91,11 @@ $openSystem   = in_array($activeNav, ['cost_centers', 'users', 'company_settings
             </a>
             <div id="financeGroup" class="collapse <?= $openFinance ? 'show' : ''; ?>">
                 <ul class="submenu-list">
-                    <li><a href="<?= \Core\Helper::baseUrl('modules/cash-bank-overview'); ?>" class="submenu-link <?= $activeNav === 'cash_bank_overview' ? 'active' : ''; ?>"><i class="bi bi-speedometer2"></i> Cash & Bank Overview</a></li>
-                    <li><a href="<?= \Core\Helper::baseUrl('modules/cash-accounts'); ?>" class="submenu-link <?= $activeNav === 'cash_accounts' ? 'active' : ''; ?>"><i class="bi bi-cash-stack"></i> Cash Accounts</a></li>
-                    <li><a href="<?= \Core\Helper::baseUrl('modules/bank-accounts'); ?>" class="submenu-link <?= $activeNav === 'bank_accounts' ? 'active' : ''; ?>"><i class="bi bi-bank"></i> Bank Accounts</a></li>
+                    <li style="display: none;"><a href="<?= \Core\Helper::baseUrl('modules/cash-bank-overview'); ?>" class="submenu-link <?= $activeNav === 'cash_bank_overview' ? 'active' : ''; ?>"><i class="bi bi-speedometer2"></i> Cash & Bank Overview</a></li>
+                    <li style="display: none;"><a href="<?= \Core\Helper::baseUrl('modules/cash-accounts'); ?>" class="submenu-link <?= $activeNav === 'cash_accounts' ? 'active' : ''; ?>"><i class="bi bi-cash-stack"></i> Cash Accounts</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('modules/bank-accounts'); ?>" class="submenu-link <?= $activeNav === 'bank_accounts' ? 'active' : ''; ?>"><i class="bi bi-bank"></i> Cash & Bank Accounts</a></li>
                     <?php if (\Core\Auth::hasPermission('cheques.view')): ?>
                     <li><a href="<?= \Core\Helper::baseUrl('cheques'); ?>" class="submenu-link <?= $activeNav === 'cheques' ? 'active' : ''; ?>"><i class="bi bi-wallet"></i> Cheques</a></li>
-                    <?php endif; ?>
-                    <?php if (\Core\Auth::hasPermission('deposits.view')): ?>
-                    <li><a href="<?= \Core\Helper::baseUrl('deposits'); ?>" class="submenu-link <?= $activeNav === 'deposits' ? 'active' : ''; ?>"><i class="bi bi-box-arrow-in-down-right"></i> Bank Deposits</a></li>
                     <?php endif; ?>
                 </ul>
             </div>
@@ -121,9 +109,8 @@ $openSystem   = in_array($activeNav, ['cost_centers', 'users', 'company_settings
             </a>
             <div id="systemGroup" class="collapse <?= $openSystem ? 'show' : ''; ?>">
                 <ul class="submenu-list">
-                    <li><a href="<?= \Core\Helper::baseUrl('cost-centers'); ?>" class="submenu-link <?= $activeNav === 'cost_centers' ? 'active' : ''; ?>"><i class="bi bi-pie-chart-fill"></i> Cost Centers</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('cost-centers'); ?>" class="submenu-link <?= $activeNav === 'cost_centers' ? 'active' : ''; ?>"><i class="bi bi-pie-chart-fill"></i> Operations</a></li>
                     <li><a href="<?= \Core\Helper::baseUrl('modules/users'); ?>" class="submenu-link <?= $activeNav === 'users' ? 'active' : ''; ?>"><i class="bi bi-person-gear"></i> Users & Roles</a></li>
-                    <li><a href="<?= \Core\Helper::baseUrl('system/customer-activities'); ?>" class="submenu-link <?= $activeNav === 'customer_activities' ? 'active' : ''; ?>"><i class="bi bi-list-stars"></i> Customer Activities</a></li>
                     <li><a href="<?= \Core\Helper::baseUrl('admin/company'); ?>" class="submenu-link <?= $activeNav === 'company_settings' ? 'active' : ''; ?>"><i class="bi bi-sliders"></i> Company Settings</a></li>
                     <li><a href="<?= \Core\Helper::baseUrl('modules/audit-logs'); ?>" class="submenu-link <?= $activeNav === 'audit_logs' ? 'active' : ''; ?>"><i class="bi bi-shield-check"></i> Audit Logs</a></li>
                 </ul>

@@ -105,7 +105,7 @@ class InvoiceController extends Controller {
         $customers = $db->query("SELECT id, party_code, name FROM parties WHERE party_type IN ('CUSTOMER', 'BOTH') AND status = 'active' ORDER BY name ASC")->fetchAll();
         
         // 1.5 Fetch active members
-        $members = $db->query("SELECT id, membership_no, full_name, party_id FROM members WHERE status = 'ACTIVE' ORDER BY full_name ASC")->fetchAll();
+        $members = $db->query("SELECT id, member_no, full_name, party_id FROM coop_members WHERE status = 'ACTIVE' AND member_type = 'MEMBER' ORDER BY full_name ASC")->fetchAll();
 
         // 2. Fetch active warehouses (or just resolve the single warehouse system-wide)
         $warehouses = $db->query("SELECT id, code, name FROM inventory_locations WHERE is_active = 1 OR 1=1 ORDER BY name ASC")->fetchAll();
@@ -219,7 +219,7 @@ class InvoiceController extends Controller {
         } elseif (strpos($customerIdInput, 'M_') === 0) {
             // It's a member
             $memberId = (int)substr($customerIdInput, 2);
-            $member = $db->query("SELECT * FROM members WHERE id = " . $memberId)->fetch();
+            $member = $db->query("SELECT * FROM coop_members WHERE id = " . $memberId . " AND member_type = 'MEMBER'")->fetch();
             if (!$member) {
                 throw new \Exception("Selected member not found.");
             }
@@ -240,7 +240,7 @@ class InvoiceController extends Controller {
                 ]);
                 $customerId = (int)$db->lastInsertId();
                 // Link party back to member
-                $db->prepare("UPDATE members SET party_id = :pid WHERE id = :mid")->execute(['pid' => $customerId, 'mid' => $memberId]);
+                $db->prepare("UPDATE coop_members SET party_id = :pid WHERE id = :mid AND member_type = 'MEMBER'")->execute(['pid' => $customerId, 'mid' => $memberId]);
             }
         } else {
             $customerId = (int)$customerIdInput;

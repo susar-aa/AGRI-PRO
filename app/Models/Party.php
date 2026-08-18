@@ -11,7 +11,7 @@ class Party extends Model {
             SELECT p.*, u.full_name AS creator_name, ca.name AS customer_activity_name
             FROM parties p
             LEFT JOIN users u ON p.created_by = u.id
-            LEFT JOIN customer_activities ca ON p.customer_activity_id = ca.id
+            LEFT JOIN cost_centers ca ON p.customer_activity_id = ca.id
             WHERE p.id = :id LIMIT 1
         ");
         $stmt->execute(['id' => $id]);
@@ -25,7 +25,7 @@ class Party extends Model {
     }
 
     public function getAll(array $filters = [], int $limit = 50, int $offset = 0): array {
-        $sql = "SELECT p.*, u.full_name AS creator_name, ca.name AS customer_activity_name FROM parties p LEFT JOIN users u ON p.created_by = u.id LEFT JOIN customer_activities ca ON p.customer_activity_id = ca.id WHERE 1=1";
+        $sql = "SELECT p.*, u.full_name AS creator_name, ca.name AS customer_activity_name FROM parties p LEFT JOIN users u ON p.created_by = u.id LEFT JOIN cost_centers ca ON p.customer_activity_id = ca.id WHERE 1=1";
         $params = [];
 
         if (!empty($filters['search'])) {

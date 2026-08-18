@@ -64,7 +64,7 @@
                                     <tr>
                                         <td>
                                             <div class="fw-bold text-dark"><?= htmlspecialchars($m['full_name']); ?></div>
-                                            <small class="text-success font-monospace fw-semibold"><?= htmlspecialchars($m['membership_no']); ?></small>
+                                            <small class="text-success font-monospace fw-semibold"><?= htmlspecialchars($m['member_no']); ?></small>
                                         </td>
                                         <td>
                                             <div class="fw-medium"><?= htmlspecialchars($m['nic']); ?></div>

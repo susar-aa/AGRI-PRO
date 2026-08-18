@@ -82,7 +82,6 @@
 
             <div class="modal-footer bg-light p-3 rounded-3 mt-4 gap-2">
                 <a href="<?= \Core\Helper::baseUrl('supplier-payments'); ?>" class="btn btn-secondary rounded-pill px-3">Cancel</a>
-                <button type="submit" name="action" value="draft" class="btn btn-outline-secondary rounded-pill px-3">Save as Draft</button>
                 <button type="submit" name="action" value="post" class="btn btn-success rounded-pill px-4" style="background-color: #1b4332; border-color: #1b4332;">Post Payment</button>
             </div>
         </form>

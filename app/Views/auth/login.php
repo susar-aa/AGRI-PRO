@@ -92,7 +92,7 @@
                 <label for="username" class="form-label font-weight-medium">Username</label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
-                    <input type="text" class="form-control border-start-0" id="username" name="username" placeholder="Enter username" required autofocus value="admin">
+                    <input type="text" class="form-control border-start-0" id="username" name="username" placeholder="Enter username" required autofocus>
                 </div>
             </div>
 
@@ -100,7 +100,7 @@
                 <label for="password" class="form-label font-weight-medium">Password</label>
                 <div class="input-group">
                     <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
-                    <input type="password" class="form-control border-start-0" id="password" name="password" placeholder="Enter password" required value="admin123">
+                    <input type="password" class="form-control border-start-0" id="password" name="password" placeholder="Enter password" required>
                 </div>
             </div>
 
@@ -109,10 +109,7 @@
             </button>
         </form>
 
-        <div class="mt-4 pt-3 border-top text-center text-muted" style="font-size: 0.8rem;">
-            Default Admin Login: <strong>admin</strong> / <strong>admin123</strong><br>
-            Default Accountant: <strong>accountant</strong> / <strong>admin123</strong>
-        </div>
+
     </div>
 </div>
 

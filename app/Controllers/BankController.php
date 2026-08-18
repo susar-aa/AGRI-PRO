@@ -29,6 +29,25 @@ class BankController extends Controller {
         // Chart of Accounts Bank category Accounts
         $bankAccountsGL = $db->query("SELECT id, account_code, account_name FROM accounts WHERE category = 'Asset' AND account_code LIKE '1120%' AND allow_manual_posting = 1")->fetchAll();
 
+        // Calculate Cash In Hand Balance
+        $cashInHandAccount = $db->query("SELECT id FROM accounts WHERE account_code = '1110'")->fetchColumn();
+        
+        $cashReceived = (float)$db->query("
+            SELECT SUM(debit) 
+            FROM journal_lines jl
+            JOIN journal_entries je ON jl.journal_entry_id = je.id
+            WHERE jl.account_id = " . (int)$cashInHandAccount . " AND je.status = 'posted'
+        ")->fetchColumn();
+
+        $cashPayments = (float)$db->query("
+            SELECT SUM(credit) 
+            FROM journal_lines jl
+            JOIN journal_entries je ON jl.journal_entry_id = je.id
+            WHERE jl.account_id = " . (int)$cashInHandAccount . " AND je.status = 'posted'
+        ")->fetchColumn();
+
+        $cashBalance = $cashReceived - $cashPayments;
+
         // Fetch recent bank transactions from General Ledger
         $recentTransactions = $db->query("
             SELECT jl.*, je.journal_number, je.transaction_date, je.description AS entry_desc, ba.bank_name, ba.account_number
@@ -40,12 +59,13 @@ class BankController extends Controller {
         ")->fetchAll();
 
         $this->render('bank/index', [
-            'pageTitle' => 'Bank Accounts Registry',
+            'pageTitle' => 'Cash & Bank Accounts',
             'activeNav' => 'bank_accounts',
             'bankAccounts' => $bankAccounts,
             'cashAccounts' => $cashAccounts,
             'bankAccountsGL' => $bankAccountsGL,
-            'recentTransactions' => $recentTransactions
+            'recentTransactions' => $recentTransactions,
+            'cashBalance' => $cashBalance
         ]);
     }
 

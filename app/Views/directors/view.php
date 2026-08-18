@@ -18,7 +18,7 @@
             <i class="bi bi-arrow-left me-1"></i> Back to Directory
         </a>
         <h4 class="fw-bold mb-1 text-dark">Director Profile: <?= htmlspecialchars($director['full_name']); ?></h4>
-        <p class="text-muted small mb-0">Registered on: <strong><?= htmlspecialchars($director['registration_date']); ?></strong> | Director No: <strong class="text-success font-monospace"><?= htmlspecialchars($director['director_no']); ?></strong></p>
+        <p class="text-muted small mb-0">Registered on: <strong><?= htmlspecialchars($director['registration_date']); ?></strong> | Director No: <strong class="text-success font-monospace"><?= htmlspecialchars($director['member_no']); ?></strong></p>
     </div>
     
     <div class="d-flex gap-2">

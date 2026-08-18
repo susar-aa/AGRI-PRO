@@ -83,7 +83,7 @@ class DirectorController extends Controller {
         ];
 
         // Ensure no duplicate NIC exists
-        $nicExists = $db->prepare("SELECT id FROM directors WHERE nic = :nic");
+        $nicExists = $db->prepare("SELECT id FROM coop_members WHERE nic = :nic AND member_type = 'DIRECTOR'");
         $nicExists->execute(['nic' => $directorData['nic']]);
         if ($nicExists->fetch()) {
             Session::setFlash('error', 'A director with this NIC is already registered.');
@@ -276,7 +276,7 @@ class DirectorController extends Controller {
                 $customerId = $this->partyModel->create($partyData);
             }
 
-            $db->prepare("UPDATE directors SET party_id = :party_id WHERE id = :id")
+            $db->prepare("UPDATE coop_members SET party_id = :party_id WHERE id = :id AND member_type = 'DIRECTOR'")
                ->execute(['party_id' => $customerId, 'id' => $directorId]);
 
             Session::setFlash('success', 'Director linked to Customer profile successfully.');

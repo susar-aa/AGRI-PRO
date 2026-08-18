@@ -18,7 +18,7 @@
             <i class="bi bi-arrow-left me-1"></i> Back to Directory
         </a>
         <h4 class="fw-bold mb-1 text-dark">Member Profile: <?= htmlspecialchars($member['full_name']); ?></h4>
-        <p class="text-muted small mb-0">Registered on: <strong><?= htmlspecialchars($member['registration_date']); ?></strong> | Membership No: <strong class="text-success font-monospace"><?= htmlspecialchars($member['membership_no']); ?></strong></p>
+        <p class="text-muted small mb-0">Registered on: <strong><?= htmlspecialchars($member['registration_date']); ?></strong> | Membership No: <strong class="text-success font-monospace"><?= htmlspecialchars($member['member_no']); ?></strong></p>
     </div>
     
     <div class="d-flex gap-2">

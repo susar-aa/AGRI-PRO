@@ -44,9 +44,9 @@ class ChequeDepositEngine {
 
         $stmt = $db->prepare("
             INSERT INTO cheques 
-            (cheque_number, cheque_type, party_id, bank_name, cheque_date, amount, received_issued_date, status, reference_number, notes, created_by)
+            (cheque_number, cheque_type, party_id, bank_name, cheque_date, amount, received_issued_date, status, created_by)
             VALUES 
-            (:cheque_number, 'RECEIVED', :party_id, :bank_name, :cheque_date, :amount, :received_issued_date, 'RECEIVED', :reference_number, :notes, :created_by)
+            (:cheque_number, 'RECEIVED', :party_id, :bank_name, :cheque_date, :amount, :received_issued_date, 'RECEIVED', :created_by)
         ");
 
         $stmt->execute([
@@ -56,8 +56,6 @@ class ChequeDepositEngine {
             'cheque_date' => $chequeDate,
             'amount' => $amount,
             'received_issued_date' => $receivedDate,
-            'reference_number' => $data['reference_number'] ?? null,
-            'notes' => $data['notes'] ?? null,
             'created_by' => $createdBy
         ]);
 
@@ -77,13 +75,31 @@ class ChequeDepositEngine {
         $depositDate = $data['deposit_date'] ?? date('Y-m-d');
         $description = $data['description'] ?? "Bank Deposit Entry";
         $cashAmount = round((float)($data['cash_amount'] ?? 0), 2);
-        $cashAccountId = !empty($data['cash_account_id']) ? (int)$data['cash_account_id'] : null;
 
         if ($cashAmount < 0) {
             throw new Exception("Cash deposit amount cannot be negative.");
         }
-        if ($cashAmount > 0 && !$cashAccountId) {
-            throw new Exception("Source cash drawer account is required for cash deposits.");
+
+        // Validate against available cash balance
+        if ($cashAmount > 0) {
+            $cashInHandAccount = $db->query("SELECT id FROM accounts WHERE account_code = '1110'")->fetchColumn();
+            $cashReceived = (float)$db->query("
+                SELECT SUM(debit) 
+                FROM journal_lines jl
+                JOIN journal_entries je ON jl.journal_entry_id = je.id
+                WHERE jl.account_id = " . (int)$cashInHandAccount . " AND je.status = 'posted'
+            ")->fetchColumn();
+            $cashPayments = (float)$db->query("
+                SELECT SUM(credit) 
+                FROM journal_lines jl
+                JOIN journal_entries je ON jl.journal_entry_id = je.id
+                WHERE jl.account_id = " . (int)$cashInHandAccount . " AND je.status = 'posted'
+            ")->fetchColumn();
+            $cashBalance = $cashReceived - $cashPayments;
+
+            if ($cashAmount > $cashBalance) {
+                throw new Exception("Deposit amount exceeds available Cash in Hand balance (LKR " . number_format($cashBalance, 2) . ").");
+            }
         }
 
         $chequeIds = $data['cheque_ids'] ?? [];
@@ -247,21 +263,12 @@ class ChequeDepositEngine {
         // Credits:
         // Cash: credit Cash Drawer ledger ID
         if ($totalCash > 0) {
-            // Find cash drawer to credit
-            // Wait, we need to know which cash drawer was used. Since cash drawer wasn't stored directly on the cash item row,
-            // we will fetch the first active cash account drawer or link it to the first. Let's make sure we query if any exists,
-            // or let the deposit form provide it (we will retrieve it).
-            // Actually, let's query the cash drawer associated with the deposit. Since we didn't store cash drawer in deposit_items,
-            // we can retrieve it or add a column to bank_deposits. In bank_deposits, we can save `cash_account_id`!
-            // Wait, does bank_deposits have cash_account_id?
-            // In the description we ran: it did not have it. Let's look at the cash drawer ID in deposit_items: it has no cash drawer ID either!
-            // Ah! We can fetch the first active cash account from database, or specify it. To make it precise, let's select the first active cash account.
-            $cashAccount = $db->query("SELECT * FROM cash_accounts WHERE status = 'active' LIMIT 1")->fetch();
-            if (!$cashAccount) {
-                throw new Exception("No active cash accounts found to draw cash from.");
+            $cashAccountGL = $db->query("SELECT id FROM accounts WHERE account_code = '1110'")->fetchColumn();
+            if (!$cashAccountGL) {
+                throw new Exception("Main Cash in Hand account (1110) not found.");
             }
             $journalLines[] = [
-                'account_id' => (int)$cashAccount['account_id'],
+                'account_id' => (int)$cashAccountGL,
                 'debit' => 0.00,
                 'credit' => $totalCash,
                 'description' => "Cash Deposit components"

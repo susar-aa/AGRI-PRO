@@ -124,13 +124,13 @@ class ProductModel extends Model {
     public function create(array $data): int {
         $stmt = $this->db->prepare("
             INSERT INTO products (
-                sku, product_code, name_en, category_id, product_type, 
+                sku, product_code, name_en, category_id, supplier_id, product_type, 
                 base_unit_id, purchase_unit_id, sales_unit_id, 
                 default_purchase_price, default_selling_price, 
                 inventory_account_id, cogs_account_id, sales_revenue_account_id, 
                 is_active, is_marketplace, source_module, created_by, created_at, updated_at
             ) VALUES (
-                :sku, :product_code, :name_en, :category_id, :product_type,
+                :sku, :product_code, :name_en, :category_id, :supplier_id, :product_type,
                 :base_unit_id, :purchase_unit_id, :sales_unit_id,
                 :default_purchase_price, :default_selling_price,
                 :inventory_account_id, :cogs_account_id, :sales_revenue_account_id,
@@ -142,6 +142,7 @@ class ProductModel extends Model {
             'product_code' => $data['product_code'],
             'name_en' => $data['name_en'],
             'category_id' => $data['category_id'] ?? null,
+            'supplier_id' => !empty($data['supplier_id']) ? (int)$data['supplier_id'] : null,
             'product_type' => $data['product_type'] ?? 'TRADING',
             'base_unit_id' => (int)$data['base_unit_id'],
             'purchase_unit_id' => (int)$data['base_unit_id'],
