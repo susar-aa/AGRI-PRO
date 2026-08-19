@@ -10,5 +10,19 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css" rel="stylesheet">
     <!-- Custom ERP CSS -->
     <link href="<?= \Core\Helper::assetUrl('css/custom.css'); ?>" rel="stylesheet">
+    
+    <!-- PWA Setup -->
+    <link rel="manifest" href="<?= \Core\Helper::baseUrl('manifest.json'); ?>">
+    <meta name="theme-color" content="#16a34a">
+    <link rel="apple-touch-icon" href="<?= \Core\Helper::assetUrl('images/icons/icon.svg'); ?>">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('<?= \Core\Helper::baseUrl('sw.js'); ?>')
+            .then(reg => console.log('ServiceWorker registered:', reg.scope))
+            .catch(err => console.log('ServiceWorker registration failed:', err));
+        });
+      }
+    </script>
 </head>
 <body>

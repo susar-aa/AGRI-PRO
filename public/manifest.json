@@ -1,0 +1,17 @@
+{
+  "name": "Agri Co-Op ERP",
+  "short_name": "Agri ERP",
+  "description": "Agricultural Cooperative ERP System",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "assets/images/icons/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
