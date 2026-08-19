@@ -1045,3 +1045,5 @@ Stack trace:
 [18-Aug-2026 21:33:29 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 291
 [18-Aug-2026 21:33:30 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 291
 [18-Aug-2026 21:33:30 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 291
+[19-Aug-2026 06:15:19 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 262
+[19-Aug-2026 06:15:19 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 262

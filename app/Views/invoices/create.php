@@ -5,155 +5,214 @@
 ?>
 
 <style>
-/* ─── Invoice Composer Styles ─────────────────────────────────── */
-.inv-header-bar {
-    background: linear-gradient(135deg, #0f4c2a 0%, #1b6b3a 60%, #2d9249 100%);
-    border-radius: 16px;
-    padding: 1.5rem 2rem;
-    color: #fff;
-    margin-bottom: 1.75rem;
-    display: flex;
-    align-items: center;
-    gap: 1.25rem;
-    box-shadow: 0 6px 30px rgba(15,76,42,.22);
-}
-.inv-header-bar .inv-icon-wrap {
-    width: 52px; height: 52px;
-    background: rgba(255,255,255,.15);
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem; flex-shrink: 0;
-}
-.inv-header-bar h4 { margin: 0; font-weight: 700; font-size: 1.2rem; }
-.inv-header-bar p  { margin: 0; opacity: .75; font-size: .82rem; }
-.inv-back-btn {
-    margin-left: auto;
-    background: rgba(255,255,255,.12);
-    border: 1px solid rgba(255,255,255,.25);
-    color: #fff; border-radius: 50px;
-    padding: .4rem 1.1rem; font-size: .82rem;
-    text-decoration: none;
-    display: flex; align-items: center; gap: .4rem;
-    transition: background .2s; flex-shrink: 0;
-}
-.inv-back-btn:hover { background: rgba(255,255,255,.22); color: #fff; }
+/* ═══════════════════════════════════════════════════════════
+   AGRI PRO — Create Invoice  (Premium Redesign)
+   ═══════════════════════════════════════════════════════════ */
 
-.inv-card {
-    background: #fff; border-radius: 14px;
-    box-shadow: 0 2px 16px rgba(0,0,0,.06);
-    border: 1px solid #eef0f2;
+/* ── Page Header ─────────────────────────────────────────── */
+.inv-page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, #0f4c2a 0%, #166534 55%, #15803d 100%);
+    border-radius: 18px; color: #fff; margin-bottom: 1.75rem;
+    box-shadow: 0 8px 32px rgba(15,76,42,.25);
+}
+.inv-page-header .header-left { display: flex; align-items: center; gap: 1rem; }
+.inv-page-header .inv-icon {
+    width: 54px; height: 54px;
+    background: rgba(255,255,255,.15); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.6rem; flex-shrink: 0;
+}
+.inv-page-header h4 { margin: 0; font-weight: 800; font-size: 1.25rem; letter-spacing: -.01em; }
+.inv-page-header p  { margin: 0; opacity: .72; font-size: .83rem; }
+.inv-back-btn {
+    background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.28);
+    color: #fff; border-radius: 50px; padding: .45rem 1.2rem;
+    font-size: .82rem; text-decoration: none;
+    display: flex; align-items: center; gap: .4rem; transition: background .2s;
+}
+.inv-back-btn:hover { background: rgba(255,255,255,.24); color: #fff; }
+
+/* ── Section Cards ──────────────────────────────────────── */
+.inv-section {
+    background: #fff; border-radius: 16px;
+    border: 1px solid #e8edf2;
+    box-shadow: 0 2px 12px rgba(0,0,0,.05);
     margin-bottom: 1.25rem; overflow: hidden;
 }
-.inv-card-head {
-    display: flex; align-items: center; gap: .6rem;
-    padding: .85rem 1.25rem;
-    background: #f8fafb; border-bottom: 1px solid #eef0f2;
-    font-size: .82rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .04em; color: #4a5568;
+.inv-section-head {
+    display: flex; align-items: center; gap: .65rem;
+    padding: .9rem 1.4rem;
+    background: #f8fafb; border-bottom: 1px solid #e8edf2;
+    font-size: .78rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em; color: #475569;
 }
-.inv-card-head i { font-size: 1rem; }
-.inv-card-body { padding: 1.25rem; }
+.inv-section-head i { font-size: 1rem; flex-shrink: 0; }
+.inv-section-head .ms-auto { font-size: .75rem; }
+.inv-section-body { padding: 1.4rem; }
+.inv-section-body.p-0 { padding: 0; }
 
+/* ── Step Numbers ────────────────────────────────────────── */
+.step-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: .72rem; font-weight: 800; flex-shrink: 0;
+    background: #16a34a; color: #fff;
+}
+
+/* ── Customer & Date row ─────────────────────────────────── */
 .cust-badge {
-    display: inline-flex; align-items: center;
-    background: #e6f4ec; color: #1a6334;
-    border-radius: 50px; padding: .2rem .75rem;
-    font-size: .78rem; font-weight: 600;
-    border: 1px solid #b7dfc9; gap: .3rem;
+    display: inline-flex; align-items: center; gap: .3rem;
+    background: #fefce8; color: #854d0e; border: 1px solid #fde68a;
+    border-radius: 50px; padding: .18rem .7rem; font-size: .73rem; font-weight: 600;
 }
-.cust-badge.walkin { background: #fff3cd; color: #856404; border-color: #ffc107; }
+.cust-badge.linked { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
 
-.add-item-btn {
+/* ── Add Items Buttons ───────────────────────────────────── */
+.add-item-strip {
+    display: flex; flex-wrap: wrap; gap: .75rem;
+}
+.add-item-tile {
+    flex: 1; min-width: 130px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: .35rem; padding: .9rem 1.5rem; border-radius: 12px;
-    font-size: .8rem; font-weight: 600; border: 2px dashed;
-    transition: all .2s; cursor: pointer; background: transparent; min-width: 120px;
+    gap: .4rem; padding: 1rem 1.2rem;
+    border-radius: 14px; border: 2px dashed;
+    font-size: .8rem; font-weight: 700; cursor: pointer;
+    background: transparent; transition: all .2s;
 }
-.add-item-btn i { font-size: 1.4rem; }
-.add-item-btn.product  { border-color: #4f46e5; color: #4f46e5; }
-.add-item-btn.product:hover  { background: #4f46e5; color: #fff; }
-.add-item-btn.service  { border-color: #d97706; color: #d97706; }
-.add-item-btn.service:hover  { background: #d97706; color: #fff; }
-.add-item-btn.rental   { border-color: #059669; color: #059669; }
-.add-item-btn.rental:hover   { background: #059669; color: #fff; }
+.add-item-tile .tile-icon { font-size: 1.6rem; }
+.add-item-tile.product  { border-color: #6366f1; color: #4f46e5; }
+.add-item-tile.product:hover  { background: #6366f1; color: #fff; border-style: solid; }
+.add-item-tile.service  { border-color: #d97706; color: #b45309; }
+.add-item-tile.service:hover  { background: #d97706; color: #fff; border-style: solid; }
+.add-item-tile.rental   { border-color: #0d9488; color: #0f766e; }
+.add-item-tile.rental:hover   { background: #0d9488; color: #fff; border-style: solid; }
 
-#itemsTable { font-size: .82rem; }
-#itemsTable thead th {
+/* ── Line Items Table ────────────────────────────────────── */
+#lineItemsTable { font-size: .81rem; width: 100%; border-collapse: collapse; }
+#lineItemsTable thead th {
     background: #f1f5f9; border-bottom: 2px solid #e2e8f0;
-    color: #64748b; font-weight: 600; font-size: .75rem;
-    text-transform: uppercase; letter-spacing: .04em;
-    padding: .6rem .75rem; white-space: nowrap;
+    color: #64748b; font-weight: 700; font-size: .7rem;
+    text-transform: uppercase; letter-spacing: .05em;
+    padding: .65rem .9rem; white-space: nowrap;
 }
-#itemsTable tbody tr { transition: background .15s; }
-#itemsTable tbody tr:hover { background: #f8fafc; }
-#itemsTable td { padding: .55rem .75rem; vertical-align: middle; }
-.item-type-badge { font-size: .7rem; font-weight: 700; padding: .2rem .55rem; border-radius: 50px; }
-.empty-cart {
-    padding: 3rem 1rem; text-align: center; color: #94a3b8;
-    display: flex; flex-direction: column; align-items: center; gap: .6rem;
+#lineItemsTable tbody tr { border-bottom: 1px solid #f1f5f9; transition: background .12s; }
+#lineItemsTable tbody tr:last-child { border-bottom: none; }
+#lineItemsTable tbody tr:hover { background: #fafcff; }
+#lineItemsTable td { padding: .6rem .9rem; vertical-align: middle; }
+.type-pill {
+    display: inline-block; font-size: .66rem; font-weight: 800;
+    padding: .2rem .6rem; border-radius: 50px; white-space: nowrap;
 }
-.empty-cart i { font-size: 2.5rem; opacity: .4; }
+.type-pill.product { background: #ede9fe; color: #4f46e5; }
+.type-pill.service { background: #fef3c7; color: #b45309; }
+.type-pill.rental  { background: #d1fae5; color: #065f46; }
 
-.summary-panel { position: sticky; top: 80px; }
-.total-row { display: flex; justify-content: space-between; align-items: center; }
-.total-row .label { color: #64748b; font-size: .82rem; }
-.total-row .val { font-family: 'Courier New', monospace; font-weight: 600; color: #1e293b; font-size: .85rem; }
-.grand-total-row .label { font-size: 1rem; font-weight: 700; color: #1e293b; }
-.grand-total-row .val { font-size: 1.25rem; color: #059669; font-weight: 800; }
+.empty-items {
+    padding: 3.5rem 1rem; text-align: center; color: #94a3b8;
+    display: flex; flex-direction: column; align-items: center; gap: .75rem;
+}
+.empty-items .empty-icon { font-size: 3rem; opacity: .35; }
+.empty-items p { margin: 0; font-size: .85rem; max-width: 280px; }
+
+/* ── Right Summary Panel ─────────────────────────────────── */
+.inv-summary-sticky { position: sticky; top: 75px; }
+
+.summary-line {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: .45rem 0; font-size: .83rem;
+}
+.summary-line .s-label { color: #64748b; }
+.summary-line .s-val   { font-family: 'Courier New', monospace; font-weight: 600; color: #1e293b; }
+.summary-line.grand {
+    padding: .75rem 0; margin-top: .25rem;
+    border-top: 2px solid #e2e8f0;
+}
+.summary-line.grand .s-label { font-weight: 700; color: #1e293b; font-size: .95rem; }
+.summary-line.grand .s-val   { font-size: 1.2rem; color: #16a34a; font-weight: 800; }
+
 .post-btn {
-    background: linear-gradient(135deg, #0f4c2a, #1b6b3a);
-    color: #fff; border: none; border-radius: 10px;
-    padding: .8rem; font-weight: 700; font-size: .95rem;
+    background: linear-gradient(135deg, #14532d, #16a34a);
+    color: #fff; border: none; border-radius: 12px;
+    padding: .85rem 1rem; font-weight: 700; font-size: .95rem;
     width: 100%; cursor: pointer; transition: opacity .2s;
-    box-shadow: 0 4px 14px rgba(15,76,42,.3);
+    box-shadow: 0 4px 16px rgba(22,163,74,.35); display: flex;
+    align-items: center; justify-content: center; gap: .5rem;
 }
 .post-btn:hover { opacity: .9; }
 .draft-btn {
     background: transparent; color: #64748b;
-    border: 2px solid #cbd5e1; border-radius: 10px;
-    padding: .65rem; font-weight: 600; font-size: .85rem;
+    border: 2px solid #e2e8f0; border-radius: 12px;
+    padding: .7rem 1rem; font-weight: 600; font-size: .85rem;
     width: 100%; cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
 }
 .draft-btn:hover { border-color: #94a3b8; color: #1e293b; }
 
-.modal-content { border-radius: 16px !important; border: 0 !important; }
-.modal-header  { border-radius: 16px 16px 0 0 !important; border-bottom: 0 !important; padding: 1.25rem 1.5rem !important; }
-.modal-body    { padding: 1.25rem 1.5rem !important; }
-.modal-search input {
-    border-radius: 50px; background: #f1f5f9;
-    border: 1px solid #e2e8f0; padding: .55rem 1rem;
-    font-size: .85rem; width: 100%; outline: none; transition: border .2s;
+/* ── Payment method toggle tabs ─────────────────────────── */
+.pay-tabs { display: flex; gap: .5rem; flex-wrap: wrap; }
+.pay-tab {
+    flex: 1; min-width: 70px;
+    border: 2px solid #e2e8f0; border-radius: 10px;
+    background: #fff; cursor: pointer; padding: .6rem .5rem;
+    display: flex; flex-direction: column; align-items: center; gap: .2rem;
+    font-size: .7rem; font-weight: 700; color: #64748b; transition: all .2s;
 }
-.modal-search input:focus { box-shadow: 0 0 0 3px rgba(5,150,105,.15); border-color: #059669; }
-.modal-table { font-size: .8rem; }
-.modal-table thead th {
-    background: #f8fafc; color: #64748b;
-    font-size: .72rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .04em;
-    padding: .5rem .75rem; border-bottom: 2px solid #e2e8f0;
+.pay-tab i { font-size: 1.1rem; }
+.pay-tab.active { border-color: #16a34a; background: #f0fdf4; color: #15803d; }
+.pay-tab:hover:not(.active) { border-color: #94a3b8; color: #334155; }
+
+/* ── Modals ─────────────────────────────────────────────── */
+.modal-content { border-radius: 18px !important; border: 0 !important; overflow: hidden; }
+.modal-header  { border-bottom: 0 !important; padding: 1.25rem 1.5rem !important; }
+.modal-body    { padding: 1.1rem 1.5rem 1.5rem !important; }
+.modal-search-wrap {
+    position: relative; margin-bottom: .9rem;
 }
-.modal-table tbody tr:hover td { background: #f0fdf4; }
-.modal-table td { padding: .5rem .75rem; vertical-align: middle; }
-.add-row-btn {
-    width: 30px; height: 30px; border-radius: 50%;
+.modal-search-wrap .search-icon {
+    position: absolute; left: .85rem; top: 50%; transform: translateY(-50%);
+    color: #94a3b8; font-size: .9rem; pointer-events: none;
+}
+.modal-search-wrap input {
+    width: 100%; border: 1.5px solid #e2e8f0; border-radius: 50px;
+    padding: .55rem .9rem .55rem 2.2rem;
+    background: #f8fafc; font-size: .85rem; outline: none; transition: all .2s;
+}
+.modal-search-wrap input:focus { border-color: #16a34a; background: #fff; box-shadow: 0 0 0 3px rgba(22,163,74,.1); }
+.modal-tbl { font-size: .8rem; width: 100%; border-collapse: collapse; }
+.modal-tbl thead th {
+    background: #f8fafc; color: #64748b; font-weight: 700;
+    font-size: .7rem; text-transform: uppercase; letter-spacing: .05em;
+    padding: .55rem .8rem; border-bottom: 2px solid #e2e8f0;
+}
+.modal-tbl tbody tr { border-bottom: 1px solid #f1f5f9; transition: background .1s; }
+.modal-tbl tbody tr:hover td { background: #f0fdf4; }
+.modal-tbl td { padding: .55rem .8rem; vertical-align: middle; }
+.modal-add-btn {
+    width: 32px; height: 32px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: .85rem; border: 0; cursor: pointer; transition: opacity .15s;
+    border: none; cursor: pointer; font-size: .85rem; transition: transform .15s;
 }
-.add-row-btn:hover { opacity: .8; }
+.modal-add-btn:hover { transform: scale(1.1); }
 </style>
 
-<!-- HEADER -->
-<div class="inv-header-bar">
-    <div class="inv-icon-wrap"><i class="bi bi-receipt-cutoff"></i></div>
-    <div>
-        <h4>Compose Central Invoice</h4>
-        <p>Record a new sales invoice — mix products, services and machinery rentals.</p>
+<!-- ═══ PAGE HEADER ════════════════════════════════════════ -->
+<div class="inv-page-header">
+    <div class="header-left">
+        <div class="inv-icon"><i class="bi bi-receipt-cutoff"></i></div>
+        <div>
+            <h4>Create New Invoice</h4>
+            <p>Compose a sales invoice — mix products, services and machinery rentals.</p>
+        </div>
     </div>
     <a href="<?= \Core\Helper::baseUrl('modules/invoices'); ?>" class="inv-back-btn">
-        <i class="bi bi-arrow-left"></i> Back to Logs
+        <i class="bi bi-arrow-left"></i> Invoice Log
     </a>
 </div>
 
+<!-- ═══ FORM ═══════════════════════════════════════════════ -->
 <form action="<?= \Core\Helper::baseUrl('modules/invoices/store'); ?>" method="POST" id="invoiceForm">
     <?= \Core\CSRF::getFormField(); ?>
     <input type="hidden" name="service_job_id"      id="service_job_id"      value="<?= htmlspecialchars($prefilled['service_job_id'] ?? ''); ?>">
@@ -162,95 +221,25 @@
 
     <div class="row g-4">
 
-        <!-- LEFT COLUMN -->
+        <!-- ════ LEFT COLUMN (main content) ════════════════ -->
         <div class="col-12 col-xl-8">
 
-
-
-            <!-- Add Items Toolbar -->
-            <div class="inv-card">
-                <div class="inv-card-head">
-                    <i class="bi bi-cart-plus text-success"></i> Add Items to Invoice
+            <!-- ── STEP 1: Invoice Details ───────────────── -->
+            <div class="inv-section">
+                <div class="inv-section-head">
+                    <span class="step-num">1</span>
+                    <i class="bi bi-person-lines-fill text-primary"></i>
+                    Invoice Details
                 </div>
-                <div class="inv-card-body">
-                    <div class="d-flex flex-wrap gap-3">
-                        <button type="button" class="add-item-btn product" data-bs-toggle="modal" data-bs-target="#productModal">
-                            <i class="bi bi-box-seam"></i>
-                            Add Product
-                        </button>
-                        <button type="button" class="add-item-btn service" data-bs-toggle="modal" data-bs-target="#serviceModal">
-                            <i class="bi bi-gear-wide-connected"></i>
-                            Add Service
-                        </button>
-                        <button type="button" class="add-item-btn rental" data-bs-toggle="modal" data-bs-target="#rentalModal">
-                            <i class="bi bi-truck-flatbed"></i>
-                            Add Rental
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Invoice Items Table -->
-            <div class="inv-card">
-                <div class="inv-card-head">
-                    <i class="bi bi-table text-info"></i> Invoice Line Items
-                    <span class="ms-auto badge bg-secondary rounded-pill" id="itemCountBadge">0 items</span>
-                </div>
-                <div class="table-responsive">
-                    <table class="table align-middle mb-0" id="itemsTable">
-                        <thead>
-                            <tr>
-                                <th style="width:90px;">Type</th>
-                                <th>Item / Description</th>
-                                <th style="width:80px;" class="text-center">Stock</th>
-                                <th style="width:130px;">Qty &amp; Unit</th>
-                                <th style="width:130px;">Unit Price</th>
-                                <th style="width:130px;" class="text-end">Total (LKR)</th>
-                                <th style="width:44px;"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="itemsTableBody">
-                            <!-- rows injected by JS -->
-                        </tbody>
-                    </table>
-                    <div class="empty-cart" id="emptyCartMsg">
-                        <i class="bi bi-cart3"></i>
-                        <span>No items added yet. Use the buttons above to add products, services or rentals.</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Notes -->
-            <div class="inv-card">
-                <div class="inv-card-head">
-                    <i class="bi bi-chat-left-text text-secondary"></i> Notes &amp; Remarks
-                </div>
-                <div class="inv-card-body">
-                    <textarea class="form-control form-control-sm" id="notes" name="notes" rows="2"
-                        placeholder="Describe specific terms, machinery rented, plowing sites, etc…"></textarea>
-                </div>
-            </div>
-
-        </div><!-- /col-xl-8 -->
-
-        <!-- RIGHT COLUMN -->
-        <div class="col-12 col-xl-4">
-            <div class="summary-panel">
-
-                <!-- Invoice Details -->
-                <div class="inv-card">
-                    <div class="inv-card-head">
-                        <i class="bi bi-info-circle text-primary"></i> Invoice Details
-                    </div>
-                    <div class="inv-card-body">
-                        <div class="mb-3">
-                            <label for="customer_id" class="form-label fw-semibold small">
-                                Customer
-                                <span id="walkinIndicator" class="cust-badge walkin ms-2">
+                <div class="inv-section-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label for="customer_id" class="form-label fw-semibold small text-muted text-uppercase mb-1">
+                                Customer / Party
+                                <span id="walkinIndicator" class="cust-badge ms-2">
                                     <i class="bi bi-person-walking"></i> Walk-in
                                 </span>
                             </label>
-                            <!-- NO "required" attr — controller maps empty value to PTY-WALKIN -->
                             <select class="form-select form-select-sm" id="customer_id" name="customer_id" onchange="handleCustomerChange()">
                                 <option value="">-- Walk-in Customer (No Account) --</option>
                                 <optgroup label="Registered Customers">
@@ -268,32 +257,118 @@
                                     <?php endforeach; ?>
                                 </optgroup>
                             </select>
-                            <div class="form-text text-warning-emphasis small" id="creditWarning" style="display:none;">
+                            <div class="form-text text-warning-emphasis small d-none" id="creditWarning">
                                 <i class="bi bi-exclamation-triangle-fill"></i> Credit sales require a registered customer.
                             </div>
                         </div>
-                        <div>
-                            <label for="invoice_date" class="form-label fw-semibold small">Invoice Date <span class="text-danger">*</span></label>
+                        <div class="col-12 col-md-3">
+                            <label for="invoice_date" class="form-label fw-semibold small text-muted text-uppercase mb-1">Invoice Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control form-control-sm" id="invoice_date" name="invoice_date" value="<?= date('Y-m-d'); ?>" required>
+                        </div>
+                        <div class="col-12 col-md-3">
+                            <label class="form-label fw-semibold small text-muted text-uppercase mb-1">Reference</label>
+                            <input type="text" class="form-control form-control-sm" name="reference" placeholder="PO / Job Ref (optional)">
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Payment Method -->
-                <div class="inv-card">
-                    <div class="inv-card-head">
-                        <i class="bi bi-credit-card text-success"></i> Payment Method
+            <!-- ── STEP 2: Add Items ─────────────────────── -->
+            <div class="inv-section">
+                <div class="inv-section-head">
+                    <span class="step-num">2</span>
+                    <i class="bi bi-cart-plus text-success"></i>
+                    Add Line Items
+                    <span class="ms-auto badge bg-secondary rounded-pill" id="itemCountBadge">0 items</span>
+                </div>
+                <div class="inv-section-body">
+                    <!-- Add Item Tiles -->
+                    <div class="add-item-strip mb-4">
+                        <button type="button" class="add-item-tile product" data-bs-toggle="modal" data-bs-target="#productModal">
+                            <span class="tile-icon"><i class="bi bi-box-seam"></i></span>
+                            Add Product
+                        </button>
+                        <button type="button" class="add-item-tile service" data-bs-toggle="modal" data-bs-target="#serviceModal">
+                            <span class="tile-icon"><i class="bi bi-gear-wide-connected"></i></span>
+                            Add Service
+                        </button>
+                        <button type="button" class="add-item-tile rental" data-bs-toggle="modal" data-bs-target="#rentalModal">
+                            <span class="tile-icon"><i class="bi bi-truck-flatbed"></i></span>
+                            Add Rental
+                        </button>
                     </div>
-                    <div class="inv-card-body">
-                        <select class="form-select form-select-sm mb-3" id="payment_type" name="payment_type" required onchange="togglePaymentFields()">
-                            <option value="CASH">&#128181; Cash Drawer</option>
-                            <option value="BANK">&#127974; Bank Deposit</option>
-                            <option value="CHEQUE">&#128196; Received Cheque</option>
-                            <option value="CREDIT" id="payment_credit_option">&#128220; On Credit (Ledger)</option>
-                        </select>
 
+                    <!-- Line Items Table -->
+                    <div class="table-responsive">
+                        <table id="lineItemsTable">
+                            <thead>
+                                <tr>
+                                    <th style="width:90px;">Type</th>
+                                    <th>Description</th>
+                                    <th style="width:75px;" class="text-center">Stock</th>
+                                    <th style="width:140px;">Qty &amp; Unit</th>
+                                    <th style="width:130px;">Unit Price</th>
+                                    <th style="width:115px;" class="text-end">Total (LKR)</th>
+                                    <th style="width:40px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="itemsTableBody">
+                                <!-- JS-injected rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="empty-items" id="emptyCartMsg">
+                        <div class="empty-icon"><i class="bi bi-cart3"></i></div>
+                        <p>No items added yet. Click the buttons above to start adding Products, Services or Rentals.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Notes ────────────────────────────────── -->
+            <div class="inv-section">
+                <div class="inv-section-head">
+                    <i class="bi bi-chat-left-text text-secondary"></i>
+                    Notes &amp; Remarks
+                </div>
+                <div class="inv-section-body">
+                    <textarea class="form-control form-control-sm" id="notes" name="notes" rows="2"
+                        placeholder="Specific terms, delivery instructions, or remarks..."></textarea>
+                </div>
+            </div>
+
+        </div><!-- /col-xl-8 -->
+
+        <!-- ════ RIGHT COLUMN (sticky summary) ════════════ -->
+        <div class="col-12 col-xl-4">
+            <div class="inv-summary-sticky">
+
+                <!-- ── Payment Method ────────────────────── -->
+                <div class="inv-section">
+                    <div class="inv-section-head">
+                        <i class="bi bi-credit-card-2-front text-success"></i>
+                        Payment Method
+                    </div>
+                    <div class="inv-section-body">
+                        <!-- Stylish toggle tabs -->
+                        <div class="pay-tabs mb-3" id="payTabs">
+                            <button type="button" class="pay-tab active" data-value="CASH" onclick="selectPayTab(this)">
+                                <i class="bi bi-cash-coin"></i> Cash
+                            </button>
+                            <button type="button" class="pay-tab" data-value="BANK" onclick="selectPayTab(this)">
+                                <i class="bi bi-bank2"></i> Bank
+                            </button>
+                            <button type="button" class="pay-tab" data-value="CHEQUE" onclick="selectPayTab(this)">
+                                <i class="bi bi-journal-check"></i> Cheque
+                            </button>
+                            <button type="button" class="pay-tab" data-value="CREDIT" id="creditTab" onclick="selectPayTab(this)">
+                                <i class="bi bi-clock-history"></i> Credit
+                            </button>
+                        </div>
+                        <input type="hidden" id="payment_type" name="payment_type" value="CASH">
+
+                        <!-- Bank Section -->
                         <div id="bankAccountSection" style="display:none;">
-                            <label for="bank_account_id" class="form-label fw-semibold small">Bank Account <span class="text-danger">*</span></label>
+                            <label for="bank_account_id" class="form-label fw-semibold small text-muted text-uppercase mb-1">Bank Account <span class="text-danger">*</span></label>
                             <select class="form-select form-select-sm" id="bank_account_id" name="bank_account_id">
                                 <?php foreach ($bankAccounts as $ba): ?>
                                     <option value="<?= $ba['id']; ?>"><?= htmlspecialchars($ba['bank_name']); ?> &mdash; <?= htmlspecialchars($ba['account_number']); ?></option>
@@ -301,6 +376,7 @@
                             </select>
                         </div>
 
+                        <!-- Cheque Section -->
                         <div id="chequeDetailsSection" style="display:none;">
                             <div class="row g-2">
                                 <div class="col-12">
@@ -309,7 +385,7 @@
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label fw-semibold small mb-1">Bank Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control form-control-sm" id="cheque_bank" name="cheque_bank" placeholder="e.g. BOC">
+                                    <input type="text" class="form-control form-control-sm" id="cheque_bank" name="cheque_bank" placeholder="e.g. BOC, Sampath">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label fw-semibold small mb-1">Cheque Date <span class="text-danger">*</span></label>
@@ -320,38 +396,51 @@
                     </div>
                 </div>
 
-                <!-- Financial Summary -->
-                <div class="inv-card">
-                    <div class="inv-card-head">
-                        <i class="bi bi-calculator text-primary"></i> Invoice Summary
+                <!-- ── Invoice Summary ───────────────────── -->
+                <div class="inv-section">
+                    <div class="inv-section-head">
+                        <i class="bi bi-calculator text-primary"></i>
+                        Invoice Summary
                     </div>
-                    <div class="inv-card-body">
-                        <div class="total-row mb-2">
-                            <span class="label">Subtotal</span>
-                            <span class="val" id="summarySubtotal">LKR 0.00</span>
+                    <div class="inv-section-body">
+                        <div class="summary-line">
+                            <span class="s-label">Subtotal</span>
+                            <span class="s-val" id="summarySubtotal">LKR 0.00</span>
                         </div>
-                        <div class="row g-2 mb-3">
+
+                        <div class="row g-2 my-2">
                             <div class="col-6">
-                                <label for="discount_percent" class="form-label small fw-semibold text-muted mb-1">Discount (%)</label>
-                                <input type="number" step="0.01" min="0" max="100" class="form-control form-control-sm text-end font-monospace"
+                                <label class="form-label small fw-semibold text-muted mb-1">Discount (%)</label>
+                                <input type="number" step="0.01" min="0" max="100"
+                                       class="form-control form-control-sm text-end font-monospace"
                                        id="discount_percent" value="0.00" oninput="calculateDiscountAmount()">
                             </div>
                             <div class="col-6">
-                                <label for="discount" class="form-label small fw-semibold text-muted mb-1">Discount (LKR)</label>
-                                <input type="number" step="0.01" min="0" class="form-control form-control-sm text-end font-monospace"
+                                <label class="form-label small fw-semibold text-muted mb-1">Discount (LKR)</label>
+                                <input type="number" step="0.01" min="0"
+                                       class="form-control form-control-sm text-end font-monospace"
                                        id="discount" name="discount" value="0.00" oninput="clearDiscountPercent(); calculateInvoiceTotal()">
                             </div>
                         </div>
-                        <hr class="my-2">
-                        <div class="total-row grand-total-row mb-4">
-                            <span class="label">Grand Total</span>
-                            <span class="val" id="summaryTotal">LKR 0.00</span>
+
+                        <div class="summary-line grand">
+                            <span class="s-label">Grand Total</span>
+                            <span class="s-val" id="summaryTotal">LKR 0.00</span>
                         </div>
-                        <div class="d-grid gap-2">
+
+                        <div class="d-grid gap-2 mt-3">
                             <button type="submit" name="action" value="post" class="post-btn" onclick="return validateInvoiceForm(event)">
-                                <i class="bi bi-send-check me-1"></i> Post Invoice
+                                <i class="bi bi-send-check-fill"></i> Post Invoice
+                            </button>
+                            <button type="submit" name="action" value="draft" class="draft-btn">
+                                <i class="bi bi-cloud-arrow-up"></i> Save as Draft
                             </button>
                         </div>
+
+                        <p class="text-muted small text-center mt-3 mb-0">
+                            <i class="bi bi-shield-check text-success me-1"></i>
+                            All amounts are recorded in <strong>LKR</strong>
+                        </p>
                     </div>
                 </div>
 
@@ -361,43 +450,49 @@
     </div>
 </form>
 
-<!-- MODAL: ADD PRODUCT -->
+
+<!-- ═══════════════════════════════════════════════════════
+     MODAL: ADD PRODUCT
+     ═══════════════════════════════════════════════════════ -->
 <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content shadow-lg">
-            <div class="modal-header" style="background:linear-gradient(135deg,#4338ca,#6366f1);color:#fff;">
-                <h5 class="modal-title fw-bold" id="productModalLabel"><i class="bi bi-box-seam me-2"></i>Add Product from Marketplace</h5>
+            <div class="modal-header" style="background:linear-gradient(135deg,#312e81,#4f46e5);color:#fff;">
+                <h5 class="modal-title fw-bold" id="productModalLabel">
+                    <i class="bi bi-box-seam me-2"></i>Select Product
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="modal-search mb-3">
-                    <input type="text" id="prodSearchInput" placeholder="Search by product name or SKU..." oninput="filterModalItems('PRODUCT', this.value)">
+                <div class="modal-search-wrap">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" id="prodSearchInput" placeholder="Search by product name, SKU or category..." oninput="filterModalItems('PRODUCT', this.value)">
                 </div>
-                <div class="table-responsive" style="max-height:380px;overflow-y:auto;">
-                    <table class="table modal-table align-middle mb-0">
+                <div class="table-responsive" style="max-height:400px;overflow-y:auto;">
+                    <table class="modal-tbl align-middle mb-0">
                         <thead>
                             <tr>
                                 <th>Product</th>
-                                <th class="text-center">Stock</th>
+                                <th class="text-center">In Stock</th>
                                 <th class="text-end">Base Price</th>
                                 <th style="width:90px;">Qty</th>
-                                <th style="width:110px;">Price (LKR)</th>
-                                <th style="width:44px;"></th>
+                                <th style="width:120px;">Unit Price (LKR)</th>
+                                <th style="width:50px;"></th>
                             </tr>
                         </thead>
                         <tbody id="prodModalTableBody">
                             <?php foreach ($products as $p): ?>
-                                <tr class="prod-row" data-search="<?= htmlspecialchars(strtolower($p['name_en'] . ' ' . ($p['sku'] ?? ''))); ?>">
+                                <tr class="prod-row" data-search="<?= htmlspecialchars(strtolower($p['name_en'] . ' ' . ($p['sku'] ?? '') . ' ' . ($p['category_name'] ?? ''))); ?>">
                                     <td>
                                         <div class="fw-bold text-dark"><?= htmlspecialchars($p['name_en']); ?></div>
                                         <small class="text-muted font-monospace">SKU: <?= htmlspecialchars($p['sku'] ?? '-'); ?> &bull; <?= htmlspecialchars($p['category_name'] ?? 'General'); ?></small>
                                     </td>
                                     <td class="text-center fw-semibold font-monospace text-muted"><?= number_format($p['stocks'][$defaultWarehouseId] ?? 0, 2); ?></td>
-                                    <td class="text-end font-monospace">LKR <?= number_format($p['default_selling_price'], 2); ?></td>
+                                    <td class="text-end font-monospace text-muted">LKR <?= number_format($p['default_selling_price'], 2); ?></td>
                                     <td><input type="number" step="1" min="1" class="form-control form-control-sm font-monospace modal-qty-input" value="1"></td>
                                     <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace modal-price-input" value="<?= number_format($p['default_selling_price'], 2, '.', ''); ?>"></td>
                                     <td class="text-center">
-                                        <button type="button" class="add-row-btn" style="background:#4f46e5;color:#fff;" onclick="addProductRowFromModal(<?= htmlspecialchars(json_encode($p)); ?>, this)">
+                                        <button type="button" class="modal-add-btn" style="background:#4f46e5;color:#fff;" onclick="addProductRowFromModal(<?= htmlspecialchars(json_encode($p)); ?>, this)">
                                             <i class="bi bi-plus-lg"></i>
                                         </button>
                                     </td>
@@ -411,28 +506,33 @@
     </div>
 </div>
 
-<!-- MODAL: ADD SERVICE -->
+<!-- ═══════════════════════════════════════════════════════
+     MODAL: ADD SERVICE
+     ═══════════════════════════════════════════════════════ -->
 <div class="modal fade" id="serviceModal" tabindex="-1" aria-labelledby="serviceModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content shadow-lg">
-            <div class="modal-header" style="background:linear-gradient(135deg,#b45309,#d97706);color:#fff;">
-                <h5 class="modal-title fw-bold" id="serviceModalLabel"><i class="bi bi-gear-wide-connected me-2"></i>Add Service</h5>
+            <div class="modal-header" style="background:linear-gradient(135deg,#92400e,#d97706);color:#fff;">
+                <h5 class="modal-title fw-bold" id="serviceModalLabel">
+                    <i class="bi bi-gear-wide-connected me-2"></i>Select Service
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="modal-search mb-3">
+                <div class="modal-search-wrap">
+                    <i class="bi bi-search search-icon"></i>
                     <input type="text" id="srvSearchInput" placeholder="Search by service name or code..." oninput="filterModalItems('SERVICE', this.value)">
                 </div>
-                <div class="table-responsive" style="max-height:380px;overflow-y:auto;">
-                    <table class="table modal-table align-middle mb-0">
+                <div class="table-responsive" style="max-height:400px;overflow-y:auto;">
+                    <table class="modal-tbl align-middle mb-0">
                         <thead>
                             <tr>
                                 <th>Service</th>
                                 <th>Unit</th>
                                 <th class="text-end">Base Price</th>
                                 <th style="width:90px;">Qty</th>
-                                <th style="width:110px;">Price (LKR)</th>
-                                <th style="width:44px;"></th>
+                                <th style="width:120px;">Unit Price (LKR)</th>
+                                <th style="width:50px;"></th>
                             </tr>
                         </thead>
                         <tbody id="srvModalTableBody">
@@ -440,14 +540,14 @@
                                 <tr class="srv-row" data-search="<?= htmlspecialchars(strtolower($s['service_name'] . ' ' . $s['service_code'])); ?>">
                                     <td>
                                         <div class="fw-bold text-dark"><?= htmlspecialchars($s['service_name']); ?></div>
-                                        <small class="text-muted">Code: <strong class="text-dark font-monospace"><?= htmlspecialchars($s['service_code']); ?></strong></small>
+                                        <small class="text-muted font-monospace">Code: <?= htmlspecialchars($s['service_code']); ?></small>
                                     </td>
                                     <td><?= htmlspecialchars($s['unit']); ?></td>
-                                    <td class="text-end font-monospace">LKR <?= number_format($s['default_price'], 2); ?></td>
+                                    <td class="text-end font-monospace text-muted">LKR <?= number_format($s['default_price'], 2); ?></td>
                                     <td><input type="number" step="1" min="1" class="form-control form-control-sm font-monospace modal-qty-input" value="1"></td>
                                     <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace modal-price-input" value="<?= number_format($s['default_price'], 2, '.', ''); ?>"></td>
                                     <td class="text-center">
-                                        <button type="button" class="add-row-btn" style="background:#d97706;color:#fff;" onclick="addServiceRowFromModal(<?= htmlspecialchars(json_encode($s)); ?>, this)">
+                                        <button type="button" class="modal-add-btn" style="background:#d97706;color:#fff;" onclick="addServiceRowFromModal(<?= htmlspecialchars(json_encode($s)); ?>, this)">
                                             <i class="bi bi-plus-lg"></i>
                                         </button>
                                     </td>
@@ -461,28 +561,33 @@
     </div>
 </div>
 
-<!-- MODAL: ADD RENTAL -->
+<!-- ═══════════════════════════════════════════════════════
+     MODAL: ADD RENTAL / MACHINERY
+     ═══════════════════════════════════════════════════════ -->
 <div class="modal fade" id="rentalModal" tabindex="-1" aria-labelledby="rentalModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content shadow-lg">
-            <div class="modal-header" style="background:linear-gradient(135deg,#065f46,#059669);color:#fff;">
-                <h5 class="modal-title fw-bold" id="rentalModalLabel"><i class="bi bi-truck-flatbed me-2"></i>Add Machinery / Rental Asset</h5>
+            <div class="modal-header" style="background:linear-gradient(135deg,#064e3b,#0d9488);color:#fff;">
+                <h5 class="modal-title fw-bold" id="rentalModalLabel">
+                    <i class="bi bi-truck-flatbed me-2"></i>Select Machinery / Rental Asset
+                </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="modal-search mb-3">
-                    <input type="text" id="rentalSearchInput" placeholder="Search machinery by name, code or category..." oninput="filterModalItems('RENTAL', this.value)">
+                <div class="modal-search-wrap">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" id="rentalSearchInput" placeholder="Search by machine name, code or category..." oninput="filterModalItems('RENTAL', this.value)">
                 </div>
-                <div class="table-responsive" style="max-height:380px;overflow-y:auto;">
-                    <table class="table modal-table align-middle mb-0">
+                <div class="table-responsive" style="max-height:400px;overflow-y:auto;">
+                    <table class="modal-tbl align-middle mb-0">
                         <thead>
                             <tr>
                                 <th>Machine Details</th>
                                 <th>Status</th>
                                 <th class="text-end">Default Rate</th>
                                 <th style="width:90px;">Qty</th>
-                                <th style="width:110px;">Price (LKR)</th>
-                                <th style="width:44px;"></th>
+                                <th style="width:120px;">Total Price (LKR)</th>
+                                <th style="width:50px;"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -497,11 +602,11 @@
                                             <?= htmlspecialchars($m['status']); ?>
                                         </span>
                                     </td>
-                                    <td class="text-end font-monospace">LKR <?= number_format($m['default_rental_rate'], 2); ?> / <?= htmlspecialchars($m['rental_unit']); ?></td>
+                                    <td class="text-end font-monospace text-muted">LKR <?= number_format($m['default_rental_rate'], 2); ?> / <?= htmlspecialchars($m['rental_unit']); ?></td>
                                     <td><input type="number" step="1" min="1" class="form-control form-control-sm font-monospace modal-machine-qty-input" value="1"></td>
                                     <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace modal-machine-price-input" value="<?= number_format($m['default_rental_rate'], 2, '.', ''); ?>"></td>
                                     <td class="text-center">
-                                        <button type="button" class="add-row-btn" style="background:#059669;color:#fff;" onclick="addMachineRowFromDirectory(<?= htmlspecialchars(json_encode($m)); ?>, this)">
+                                        <button type="button" class="modal-add-btn" style="background:#0d9488;color:#fff;" onclick="addMachineRowFromDirectory(<?= htmlspecialchars(json_encode($m)); ?>, this)">
                                             <i class="bi bi-plus-lg"></i>
                                         </button>
                                     </td>
@@ -515,271 +620,24 @@
     </div>
 </div>
 
+
 <script>
 const availableProducts  = <?= json_encode($products); ?>;
 let rowCount = 0;
 const defaultWarehouseId = <?= json_encode($defaultWarehouseId); ?>;
-const defaultServiceId = <?= !empty($services) ? $services[0]['id'] : '0'; ?>;
+const defaultServiceId   = <?= !empty($services) ? $services[0]['id'] : '0'; ?>;
 
-function handleCustomerChange() {
-    const customerSelect    = document.getElementById('customer_id');
-    const paymentTypeSelect = document.getElementById('payment_type');
-    const creditOption      = document.getElementById('payment_credit_option');
-    const walkinIndicator   = document.getElementById('walkinIndicator');
-
-    const isWalkin = (customerSelect.value === "");
-    walkinIndicator.style.display = isWalkin ? '' : 'none';
-
-    if (isWalkin) {
-        if (paymentTypeSelect.value === "CREDIT") {
-            paymentTypeSelect.value = "CASH";
-            togglePaymentFields();
-        }
-        creditOption.disabled = true;
-    } else {
-        creditOption.disabled = false;
-    }
-
-    // Handle Member Discount
-    const selectedOption = customerSelect.options[customerSelect.selectedIndex];
-    if (selectedOption && selectedOption.getAttribute('data-is-member') === "1") {
-        if (confirm("This person is a member. Do you want to add a 10% member discount automatically?")) {
-            document.getElementById('discount_percent').value = "10.00";
-            calculateDiscountAmount();
-        } else {
-            clearDiscountPercent();
-            calculateInvoiceTotal();
-        }
-    }
+/* ── Payment Tabs ──────────────────────────────────────── */
+function selectPayTab(btn) {
+    document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    const val = btn.getAttribute('data-value');
+    document.getElementById('payment_type').value = val;
+    togglePaymentFields(val);
 }
 
-function filterModalItems(type, query) {
-    query = query.toLowerCase();
-    let selector = '';
-    if (type === 'PRODUCT') selector = '.prod-row';
-    else if (type === 'SERVICE') selector = '.srv-row';
-    else if (type === 'RENTAL')  selector = '.rental-row';
-    document.querySelectorAll(selector).forEach(row => {
-        const text = row.getAttribute('data-search') || '';
-        row.style.setProperty('display', text.includes(query) ? '' : 'none', 'important');
-    });
-}
-
-function updateItemCount() {
-    const rows = document.querySelectorAll('#itemsTableBody tr');
-    document.getElementById('itemCountBadge').textContent = rows.length + ' item' + (rows.length === 1 ? '' : 's');
-    document.getElementById('emptyCartMsg').style.display = rows.length ? 'none' : '';
-}
-
-function addProductRowFromModal(prod, btn) {
-    const row   = btn.closest('tr');
-    const qty   = parseInt(row.querySelector('.modal-qty-input').value) || 1;
-    const price = parseFloat(row.querySelector('.modal-price-input').value) || parseFloat(prod.default_selling_price);
-    rowCount++;
-    const tbody = document.getElementById('itemsTableBody');
-    const tr    = document.createElement('tr');
-    tr.id = `row_${rowCount}`;
-    const stock = prod.stocks && prod.stocks[defaultWarehouseId] !== undefined ? parseFloat(prod.stocks[defaultWarehouseId]) : 0;
-    const total = (qty * price).toFixed(2);
-    tr.innerHTML = `
-        <td>
-            <span class="item-type-badge" style="background:#ede9fe;color:#4f46e5;">PRODUCT</span>
-            <input type="hidden" name="items[${rowCount}][item_type]" value="PRODUCT">
-            <input type="hidden" name="items[${rowCount}][product_id]" value="${prod.id}">
-        </td>
-        <td>
-            <div class="fw-semibold text-dark small">${htmlspecialchars(prod.name_en)}</div>
-            <div class="text-muted" style="font-size:.72rem;font-family:monospace;">SKU: ${htmlspecialchars(prod.sku || '-')}</div>
-            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" placeholder="Optional remarks" style="font-size:.75rem;">
-        </td>
-        <td class="font-monospace fw-semibold text-center text-muted" id="available_${rowCount}">${stock.toFixed(2)}</td>
-        <td>
-            <div class="input-group input-group-sm">
-                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
-                <span class="input-group-text bg-light text-muted" style="font-size:.75rem;">${htmlspecialchars(prod.unit_code || 'Units')}</span>
-            </div>
-        </td>
-        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
-        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total}</td>
-        <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="removeRow(${rowCount})"><i class="bi bi-trash"></i></button></td>
-    `;
-    tbody.appendChild(tr);
-    calculateInvoiceTotal(); updateItemCount();
-    bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
-    row.querySelector('.modal-qty-input').value = "1";
-    row.querySelector('.modal-price-input').value = parseFloat(prod.default_selling_price).toFixed(2);
-    document.getElementById('prodSearchInput').value = "";
-    filterModalItems('PRODUCT', '');
-}
-
-function addServiceRowFromModal(srv, btn) {
-    const row   = btn.closest('tr');
-    const qty   = parseInt(row.querySelector('.modal-qty-input').value) || 1;
-    const price = parseFloat(row.querySelector('.modal-price-input').value) || parseFloat(srv.default_price);
-    rowCount++;
-    const tbody = document.getElementById('itemsTableBody');
-    const tr    = document.createElement('tr');
-    tr.id = `row_${rowCount}`;
-    const total = (qty * price).toFixed(2);
-    
-    // Set the hidden service_job_id so that the backend knows which job this invoice links to!
-    document.getElementById('service_job_id').value = srv.service_job_id || srv.id;
-
-    tr.innerHTML = `
-        <td>
-            <span class="item-type-badge" style="background:#fef3c7;color:#b45309;">SERVICE</span>
-            <input type="hidden" name="items[${rowCount}][item_type]" value="SERVICE">
-            <input type="hidden" name="items[${rowCount}][service_id]" value="${srv.id}">
-        </td>
-        <td>
-            <div class="fw-semibold text-dark small">${htmlspecialchars(srv.service_name)} (Code: ${htmlspecialchars(srv.service_code)})</div>
-            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" value="${htmlspecialchars(srv.description || '')}" placeholder="Optional remarks" style="font-size:.75rem;">
-        </td>
-        <td class="text-center text-muted" id="available_${rowCount}">-</td>
-        <td>
-            <div class="input-group input-group-sm">
-                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
-                <span class="input-group-text bg-light text-muted" style="font-size:.75rem;">${htmlspecialchars(srv.unit || 'Job')}</span>
-            </div>
-        </td>
-        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
-        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total}</td>
-        <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="removeRow(${rowCount})"><i class="bi bi-trash"></i></button></td>
-    `;
-    tbody.appendChild(tr);
-    calculateInvoiceTotal(); updateItemCount();
-    bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
-    row.querySelector('.modal-qty-input').value = "1";
-    row.querySelector('.modal-price-input').value = parseFloat(srv.default_price).toFixed(2);
-    document.getElementById('srvSearchInput').value = "";
-    filterModalItems('SERVICE', '');
-}
-
-function addRentalRowFromModal(rental, btn) {
-    const row        = btn.closest('tr');
-    const totalCharge = parseFloat(row.querySelector('.modal-price-input').value) || parseFloat(rental.total_charge);
-    const qty        = parseInt(rental.quantity) || 1;
-    const rate       = (totalCharge / qty);
-    rowCount++;
-    const tbody = document.getElementById('itemsTableBody');
-    const tr    = document.createElement('tr');
-    tr.id = `row_${rowCount}`;
-    let linkedServiceId = defaultServiceId;
-    document.getElementById('machinery_rental_id').value = rental.id;
-    tr.innerHTML = `
-        <td>
-            <span class="item-type-badge" style="background:#d1fae5;color:#065f46;">RENTAL</span>
-            <input type="hidden" name="items[${rowCount}][item_type]" value="SERVICE">
-            <input type="hidden" name="items[${rowCount}][service_id]" value="${linkedServiceId}">
-        </td>
-        <td>
-            <div class="fw-semibold text-dark small">${htmlspecialchars(rental.rental_number)}: Rental of ${htmlspecialchars(rental.machinery_name)}</div>
-            <div class="text-muted" style="font-size:.72rem;font-family:monospace;">Serial: ${htmlspecialchars(rental.serial_number || '-')}</div>
-            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" value="Machinery Rental Invoice Link" placeholder="Optional remarks" style="font-size:.75rem;">
-        </td>
-        <td class="text-center text-muted" id="available_${rowCount}">-</td>
-        <td>
-            <div class="input-group input-group-sm">
-                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
-                <span class="input-group-text bg-light text-muted" style="font-size:.75rem;">${htmlspecialchars(rental.rental_unit || 'Hour')}</span>
-            </div>
-        </td>
-        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${rate.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
-        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${totalCharge.toFixed(2)}</td>
-        <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="removeRow(${rowCount})"><i class="bi bi-trash"></i></button></td>
-    `;
-    tbody.appendChild(tr);
-    calculateInvoiceTotal(); updateItemCount();
-    bootstrap.Modal.getInstance(document.getElementById('rentalModal')).hide();
-    document.getElementById('rentalSearchInput').value = "";
-    filterModalItems('RENTAL', '');
-}
-
-function addMachineRowFromDirectory(machine, btn) {
-    const row   = btn.closest('tr');
-    const qty   = parseInt(row.querySelector('.modal-machine-qty-input').value) || 1;
-    const price = parseFloat(row.querySelector('.modal-machine-price-input').value) || parseFloat(machine.default_rental_rate);
-    rowCount++;
-    const tbody = document.getElementById('itemsTableBody');
-    const tr    = document.createElement('tr');
-    tr.id = `row_${rowCount}`;
-    let linkedServiceId = defaultServiceId;
-    const total = (qty * price).toFixed(2);
-    tr.innerHTML = `
-        <td>
-            <span class="item-type-badge" style="background:#d1fae5;color:#065f46;">RENTAL</span>
-            <input type="hidden" name="items[${rowCount}][item_type]" value="SERVICE">
-            <input type="hidden" name="items[${rowCount}][service_id]" value="${linkedServiceId}">
-        </td>
-        <td>
-            <div class="fw-semibold text-dark small">Rental: ${htmlspecialchars(machine.machinery_name)}</div>
-            <div class="text-muted" style="font-size:.72rem;font-family:monospace;">Code: ${htmlspecialchars(machine.machinery_code)} | Serial: ${htmlspecialchars(machine.serial_number || '-')}</div>
-            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" value="Direct Machinery Asset Billing" placeholder="Optional remarks" style="font-size:.75rem;">
-        </td>
-        <td class="text-center text-muted" id="available_${rowCount}">-</td>
-        <td>
-            <div class="input-group input-group-sm">
-                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
-                <span class="input-group-text bg-light text-muted" style="font-size:.75rem;">${htmlspecialchars(machine.rental_unit || 'Hour')}</span>
-            </div>
-        </td>
-        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
-        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total}</td>
-        <td class="text-center"><button type="button" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="removeRow(${rowCount})"><i class="bi bi-trash"></i></button></td>
-    `;
-    tbody.appendChild(tr);
-    calculateInvoiceTotal(); updateItemCount();
-    bootstrap.Modal.getInstance(document.getElementById('rentalModal')).hide();
-    row.querySelector('.modal-machine-qty-input').value = "1";
-    row.querySelector('.modal-machine-price-input').value = parseFloat(machine.default_rental_rate).toFixed(2);
-    document.getElementById('rentalSearchInput').value = "";
-    filterModalItems('RENTAL', '');
-}
-
-function removeRow(id) {
-    const row = document.getElementById(`row_${id}`);
-    if (row) { row.remove(); calculateInvoiceTotal(); updateItemCount(); }
-}
-
-function calculateRowTotal(id) {
-    const row   = document.getElementById(`row_${id}`);
-    const qty   = parseFloat(row.querySelector('.qty-input').value) || 0;
-    const price = parseFloat(row.querySelector('.price-input').value) || 0;
-    const total = (qty * price);
-    document.getElementById(`rowtotal_${id}`).textContent = total.toFixed(2);
-}
-
-function calculateDiscountAmount() {
-    let subtotal = 0;
-    document.querySelectorAll('.row-total').forEach(el => { subtotal += parseFloat(el.textContent) || 0; });
-    const percent = parseFloat(document.getElementById('discount_percent').value) || 0;
-    const discountAmt = (subtotal * (percent / 100));
-    document.getElementById('discount').value = discountAmt.toFixed(2);
-    calculateInvoiceTotal();
-}
-
-function clearDiscountPercent() {
-    document.getElementById('discount_percent').value = "0.00";
-}
-
-function calculateInvoiceTotal() {
-    let subtotal = 0;
-    document.querySelectorAll('.row-total').forEach(el => { subtotal += parseFloat(el.textContent) || 0; });
-    
-    const percent = parseFloat(document.getElementById('discount_percent').value) || 0;
-    if (percent > 0) {
-        const discountAmt = (subtotal * (percent / 100));
-        document.getElementById('discount').value = discountAmt.toFixed(2);
-    }
-    
-    const discount = parseFloat(document.getElementById('discount').value) || 0;
-    const total    = Math.max(0, subtotal - discount);
-    document.getElementById('summarySubtotal').textContent = 'LKR ' + subtotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    document.getElementById('summaryTotal').textContent    = 'LKR ' + total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-}
-
-function togglePaymentFields() {
-    const method     = document.getElementById('payment_type').value;
+function togglePaymentFields(method) {
+    if (!method) method = document.getElementById('payment_type').value;
     const bankSect   = document.getElementById('bankAccountSection');
     const chequeSect = document.getElementById('chequeDetailsSection');
     document.getElementById('bank_account_id').required = false;
@@ -797,19 +655,264 @@ function togglePaymentFields() {
     }
 }
 
+/* ── Customer Change ───────────────────────────────────── */
+function handleCustomerChange() {
+    const sel             = document.getElementById('customer_id');
+    const creditTab       = document.getElementById('creditTab');
+    const walkinIndicator = document.getElementById('walkinIndicator');
+    const isWalkin = (sel.value === '');
+
+    walkinIndicator.style.display = isWalkin ? '' : 'none';
+
+    if (isWalkin) {
+        if (document.getElementById('payment_type').value === 'CREDIT') {
+            document.querySelector('.pay-tab[data-value="CASH"]').click();
+        }
+        creditTab.disabled = true;
+        creditTab.classList.remove('active');
+    } else {
+        creditTab.disabled = false;
+    }
+
+    const selected = sel.options[sel.selectedIndex];
+    if (selected && selected.getAttribute('data-is-member') === '1') {
+        if (confirm('This person is a society member. Apply 10% member discount?')) {
+            document.getElementById('discount_percent').value = '10.00';
+            calculateDiscountAmount();
+        }
+    }
+}
+
+/* ── Modal Search ──────────────────────────────────────── */
+function filterModalItems(type, query) {
+    query = query.toLowerCase();
+    const map = { PRODUCT: '.prod-row', SERVICE: '.srv-row', RENTAL: '.rental-row' };
+    document.querySelectorAll(map[type] || '').forEach(row => {
+        const text = row.getAttribute('data-search') || '';
+        row.style.setProperty('display', text.includes(query) ? '' : 'none', 'important');
+    });
+}
+
+/* ── Item Counter ──────────────────────────────────────── */
+function updateItemCount() {
+    const rows = document.querySelectorAll('#itemsTableBody tr');
+    document.getElementById('itemCountBadge').textContent = rows.length + ' item' + (rows.length === 1 ? '' : 's');
+    document.getElementById('emptyCartMsg').style.display = rows.length ? 'none' : '';
+}
+
+/* ── Add Product ───────────────────────────────────────── */
+function addProductRowFromModal(prod, btn) {
+    const row   = btn.closest('tr');
+    const qty   = parseInt(row.querySelector('.modal-qty-input').value) || 1;
+    const price = parseFloat(row.querySelector('.modal-price-input').value) || parseFloat(prod.default_selling_price);
+    rowCount++;
+    const tbody = document.getElementById('itemsTableBody');
+    const tr    = document.createElement('tr');
+    tr.id = `row_${rowCount}`;
+    const stock = prod.stocks && prod.stocks[defaultWarehouseId] !== undefined ? parseFloat(prod.stocks[defaultWarehouseId]) : 0;
+    const total = (qty * price).toFixed(2);
+    tr.innerHTML = `
+        <td>
+            <span class="type-pill product">PRODUCT</span>
+            <input type="hidden" name="items[${rowCount}][item_type]" value="PRODUCT">
+            <input type="hidden" name="items[${rowCount}][product_id]" value="${prod.id}">
+        </td>
+        <td>
+            <div class="fw-semibold text-dark small">${htmlspecialchars(prod.name_en)}</div>
+            <div class="text-muted" style="font-size:.71rem;font-family:monospace;">SKU: ${htmlspecialchars(prod.sku || '-')}</div>
+            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" placeholder="Remarks (optional)" style="font-size:.74rem;">
+        </td>
+        <td class="text-center font-monospace fw-semibold text-muted" id="available_${rowCount}">${stock.toFixed(2)}</td>
+        <td>
+            <div class="input-group input-group-sm">
+                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
+                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">${htmlspecialchars(prod.unit_code || 'Units')}</span>
+            </div>
+        </td>
+        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
+        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total}</td>
+        <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
+    `;
+    tbody.appendChild(tr);
+    calculateInvoiceTotal(); updateItemCount();
+    bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+    row.querySelector('.modal-qty-input').value = '1';
+    row.querySelector('.modal-price-input').value = parseFloat(prod.default_selling_price).toFixed(2);
+    document.getElementById('prodSearchInput').value = '';
+    filterModalItems('PRODUCT', '');
+}
+
+/* ── Add Service ───────────────────────────────────────── */
+function addServiceRowFromModal(srv, btn) {
+    const row   = btn.closest('tr');
+    const qty   = parseInt(row.querySelector('.modal-qty-input').value) || 1;
+    const price = parseFloat(row.querySelector('.modal-price-input').value) || parseFloat(srv.default_price);
+    rowCount++;
+    const tbody = document.getElementById('itemsTableBody');
+    const tr    = document.createElement('tr');
+    tr.id = `row_${rowCount}`;
+    const total = (qty * price).toFixed(2);
+    document.getElementById('service_job_id').value = srv.service_job_id || srv.id;
+    tr.innerHTML = `
+        <td>
+            <span class="type-pill service">SERVICE</span>
+            <input type="hidden" name="items[${rowCount}][item_type]" value="SERVICE">
+            <input type="hidden" name="items[${rowCount}][service_id]" value="${srv.id}">
+        </td>
+        <td>
+            <div class="fw-semibold text-dark small">${htmlspecialchars(srv.service_name)} <span class="font-monospace text-muted">(${htmlspecialchars(srv.service_code)})</span></div>
+            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" value="${htmlspecialchars(srv.description || '')}" placeholder="Remarks (optional)" style="font-size:.74rem;">
+        </td>
+        <td class="text-center text-muted" id="available_${rowCount}">—</td>
+        <td>
+            <div class="input-group input-group-sm">
+                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
+                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">${htmlspecialchars(srv.unit || 'Job')}</span>
+            </div>
+        </td>
+        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
+        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total}</td>
+        <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
+    `;
+    tbody.appendChild(tr);
+    calculateInvoiceTotal(); updateItemCount();
+    bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
+    row.querySelector('.modal-qty-input').value = '1';
+    row.querySelector('.modal-price-input').value = parseFloat(srv.default_price).toFixed(2);
+    document.getElementById('srvSearchInput').value = '';
+    filterModalItems('SERVICE', '');
+}
+
+/* ── Add Machine (from rental modal) ──────────────────── */
+function addMachineRowFromDirectory(machine, btn) {
+    const row   = btn.closest('tr');
+    const qty   = parseInt(row.querySelector('.modal-machine-qty-input').value) || 1;
+    const price = parseFloat(row.querySelector('.modal-machine-price-input').value) || parseFloat(machine.default_rental_rate);
+    rowCount++;
+    const tbody = document.getElementById('itemsTableBody');
+    const tr    = document.createElement('tr');
+    tr.id = `row_${rowCount}`;
+    const total = (qty * price).toFixed(2);
+    tr.innerHTML = `
+        <td>
+            <span class="type-pill rental">RENTAL</span>
+            <input type="hidden" name="items[${rowCount}][item_type]" value="SERVICE">
+            <input type="hidden" name="items[${rowCount}][service_id]" value="${defaultServiceId}">
+        </td>
+        <td>
+            <div class="fw-semibold text-dark small">Rental: ${htmlspecialchars(machine.machinery_name)}</div>
+            <div class="text-muted font-monospace" style="font-size:.71rem;">Code: ${htmlspecialchars(machine.machinery_code)} | Serial: ${htmlspecialchars(machine.serial_number || '-')}</div>
+            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" value="Machinery Rental Billing" placeholder="Remarks (optional)" style="font-size:.74rem;">
+        </td>
+        <td class="text-center text-muted" id="available_${rowCount}">—</td>
+        <td>
+            <div class="input-group input-group-sm">
+                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
+                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">${htmlspecialchars(machine.rental_unit || 'Hour')}</span>
+            </div>
+        </td>
+        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
+        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total}</td>
+        <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
+    `;
+    tbody.appendChild(tr);
+    calculateInvoiceTotal(); updateItemCount();
+    bootstrap.Modal.getInstance(document.getElementById('rentalModal')).hide();
+    row.querySelector('.modal-machine-qty-input').value = '1';
+    row.querySelector('.modal-machine-price-input').value = parseFloat(machine.default_rental_rate).toFixed(2);
+    document.getElementById('rentalSearchInput').value = '';
+    filterModalItems('RENTAL', '');
+}
+
+/* ── Legacy rental (from job) ──────────────────────────── */
+function addRentalRowFromModal(rental, btn) {
+    const row         = btn.closest('tr');
+    const totalCharge = parseFloat(row.querySelector('.modal-price-input').value) || parseFloat(rental.total_charge);
+    const qty         = parseInt(rental.quantity) || 1;
+    const rate        = (totalCharge / qty);
+    rowCount++;
+    const tbody = document.getElementById('itemsTableBody');
+    const tr    = document.createElement('tr');
+    tr.id = `row_${rowCount}`;
+    document.getElementById('machinery_rental_id').value = rental.id;
+    tr.innerHTML = `
+        <td>
+            <span class="type-pill rental">RENTAL</span>
+            <input type="hidden" name="items[${rowCount}][item_type]" value="SERVICE">
+            <input type="hidden" name="items[${rowCount}][service_id]" value="${defaultServiceId}">
+        </td>
+        <td>
+            <div class="fw-semibold text-dark small">${htmlspecialchars(rental.rental_number)}: Rental — ${htmlspecialchars(rental.machinery_name)}</div>
+            <div class="text-muted font-monospace" style="font-size:.71rem;">Serial: ${htmlspecialchars(rental.serial_number || '-')}</div>
+            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" value="Machinery Rental Invoice" placeholder="Remarks" style="font-size:.74rem;">
+        </td>
+        <td class="text-center text-muted" id="available_${rowCount}">—</td>
+        <td>
+            <div class="input-group input-group-sm">
+                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
+                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">${htmlspecialchars(rental.rental_unit || 'Hour')}</span>
+            </div>
+        </td>
+        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${rate.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
+        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${totalCharge.toFixed(2)}</td>
+        <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
+    `;
+    tbody.appendChild(tr);
+    calculateInvoiceTotal(); updateItemCount();
+    bootstrap.Modal.getInstance(document.getElementById('rentalModal')).hide();
+    document.getElementById('rentalSearchInput').value = '';
+    filterModalItems('RENTAL', '');
+}
+
+/* ── Calculations ──────────────────────────────────────── */
+function removeRow(id) {
+    const row = document.getElementById(`row_${id}`);
+    if (row) { row.remove(); calculateInvoiceTotal(); updateItemCount(); }
+}
+
+function calculateRowTotal(id) {
+    const row   = document.getElementById(`row_${id}`);
+    const qty   = parseFloat(row.querySelector('.qty-input').value) || 0;
+    const price = parseFloat(row.querySelector('.price-input').value) || 0;
+    document.getElementById(`rowtotal_${id}`).textContent = (qty * price).toFixed(2);
+}
+
+function calculateDiscountAmount() {
+    let subtotal = 0;
+    document.querySelectorAll('.row-total').forEach(el => { subtotal += parseFloat(el.textContent) || 0; });
+    const pct = parseFloat(document.getElementById('discount_percent').value) || 0;
+    document.getElementById('discount').value = (subtotal * (pct / 100)).toFixed(2);
+    calculateInvoiceTotal();
+}
+
+function clearDiscountPercent() {
+    document.getElementById('discount_percent').value = '0.00';
+}
+
+function calculateInvoiceTotal() {
+    let subtotal = 0;
+    document.querySelectorAll('.row-total').forEach(el => { subtotal += parseFloat(el.textContent) || 0; });
+    const pct = parseFloat(document.getElementById('discount_percent').value) || 0;
+    if (pct > 0) document.getElementById('discount').value = (subtotal * (pct / 100)).toFixed(2);
+    const discount = parseFloat(document.getElementById('discount').value) || 0;
+    const total    = Math.max(0, subtotal - discount);
+    const fmt = n => 'LKR ' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    document.getElementById('summarySubtotal').textContent = fmt(subtotal);
+    document.getElementById('summaryTotal').textContent    = fmt(total);
+}
+
+/* ── Validation ────────────────────────────────────────── */
 function validateInvoiceForm(event) {
-    const customerSelect    = document.getElementById('customer_id');
-    const paymentTypeSelect = document.getElementById('payment_type');
-    if (customerSelect.value === "" && paymentTypeSelect.value === "CREDIT") {
-        alert("Walk-in Customer is NOT allowed to make purchases on Credit.\nPlease select a registered Customer.");
-        event.preventDefault();
-        return false;
+    const sel    = document.getElementById('customer_id');
+    const method = document.getElementById('payment_type').value;
+    if (sel.value === '' && method === 'CREDIT') {
+        alert('Walk-in Customer cannot purchase on Credit.\nPlease select a registered Customer.');
+        event.preventDefault(); return false;
     }
     const rows = document.querySelectorAll('#itemsTableBody tr');
     if (rows.length === 0) {
-        alert("Please add at least one item to the invoice before posting.");
-        event.preventDefault();
-        return false;
+        alert('Please add at least one item to the invoice before posting.');
+        event.preventDefault(); return false;
     }
     let valid = true;
     rows.forEach(row => {
@@ -827,6 +930,7 @@ function validateInvoiceForm(event) {
     return true;
 }
 
+/* ── Utility ───────────────────────────────────────────── */
 function htmlspecialchars(str) {
     if (typeof str !== 'string') return '';
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
