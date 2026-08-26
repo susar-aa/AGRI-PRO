@@ -225,6 +225,22 @@ class ExpenseController extends Controller {
         }
 
         try {
+            $chequeId = null;
+            if ($expenseData['payment_method'] === 'Cheque') {
+                $chequeData = [
+                    'cheque_number' => trim($_POST['cheque_number_input'] ?? ''),
+                    'party_id' => !empty($_POST['supplier_id']) ? (int)$_POST['supplier_id'] : 0, // 0 for general payees not in parties table
+                    'bank_name' => trim($_POST['cheque_bank_name'] ?? ''),
+                    'cheque_date' => $_POST['cheque_date'] ?? date('Y-m-d'),
+                    'amount' => $expenseData['amount'],
+                    'received_issued_date' => $expenseData['expense_date'],
+                    'reference_number' => $expenseData['reference_number'],
+                    'notes' => 'General Expense Cheque for Payee: ' . $expenseData['payee']
+                ];
+                $chequeId = \App\Services\ChequeDepositEngine::issueCheque($chequeData);
+                $expenseData['cheque_id'] = $chequeId;
+            }
+
             if ($action === 'post') {
                 $expenseId = ExpenseEngine::createExpense($expenseData);
                 ExpenseEngine::postExpense($expenseId);
@@ -370,5 +386,64 @@ class ExpenseController extends Controller {
             'filters' => $filters,
             'report' => $reportData
         ]);
+    }
+    public function apiAddCategory(): void {
+        header('Content-Type: application/json');
+        Auth::requirePermission('expenses.create');
+        
+        $name = trim($_POST['name'] ?? '');
+        if (empty($name)) {
+            echo json_encode(['success' => false, 'message' => 'Category name is required.']);
+            return;
+        }
+
+        try {
+            $db = \Core\Database::getInstance();
+            $stmt = $db->prepare("INSERT INTO expense_categories (name, is_active) VALUES (:name, 1)");
+            $stmt->execute(['name' => $name]);
+            $id = $db->lastInsertId();
+            
+            echo json_encode([
+                'success' => true,
+                'id' => $id,
+                'name' => $name
+            ]);
+        } catch (\Exception $e) {
+            echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+        }
+    }
+
+    public function apiSearchPayees(): void {
+        header('Content-Type: application/json');
+        Auth::requirePermission('expenses.create');
+
+        $search = trim($_GET['q'] ?? '');
+        $db = \Core\Database::getInstance();
+
+        $query = "SELECT id, name, party_type FROM parties WHERE status = 'active'";
+        $params = [];
+        if (!empty($search)) {
+            $query .= " AND name LIKE :search";
+            $params['search'] = '%' . $search . '%';
+        }
+        $query .= " ORDER BY name ASC LIMIT 50";
+
+        try {
+            $stmt = $db->prepare($query);
+            $stmt->execute($params);
+            $parties = $stmt->fetchAll();
+
+            $results = [];
+            foreach ($parties as $p) {
+                $results[] = [
+                    'id' => $p['name'], // We want the name text as ID for Payee, because expenses.payee is a varchar
+                    'text' => $p['name'] . ' (' . ucfirst(strtolower($p['party_type'])) . ')'
+                ];
+            }
+
+            echo json_encode(['results' => $results]);
+        } catch (\Exception $e) {
+            echo json_encode(['results' => []]);
+        }
     }
 }

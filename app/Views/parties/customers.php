@@ -52,51 +52,46 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th>Customer Code</th>
-                        <th>Customer Name</th>
-                        <th>Customer Type</th>
-                        <th>Contact Phone</th>
-                        <th>Credit Limit</th>
-                        <th>Credit Days</th>
+                        <th>Customer Details</th>
+                        <th>Contact</th>
                         <th class="text-center">Status</th>
-                        <th class="text-center">Actions</th>
+                        <th class="text-end">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (!empty($customers)): ?>
                         <?php foreach ($customers as $cust): ?>
                             <tr>
-                                <td class="fw-bold font-monospace">
-                                    <a href="<?= \Core\Helper::baseUrl('parties/view?id=' . $cust['id']); ?>" class="text-success text-decoration-none">
-                                        <?= htmlspecialchars($cust['party_code']); ?>
-                                    </a>
+                                <td>
+                                    <div class="fw-bold text-dark"><?= htmlspecialchars($cust['name']); ?></div>
+                                    <small class="text-success font-monospace fw-semibold">
+                                        <a href="<?= \Core\Helper::baseUrl('parties/view?id=' . $cust['id']); ?>" class="text-success text-decoration-none">
+                                            <?= htmlspecialchars($cust['party_code']); ?>
+                                        </a>
+                                    </small>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold text-dark"><?= htmlspecialchars($cust['name']); ?></div>
-                                    <small class="text-muted"><?= htmlspecialchars($cust['city'] ?? ''); ?><?= !empty($cust['district']) ? ', ' . htmlspecialchars($cust['district']) : ''; ?></small>
+                                    <div class="fw-medium text-dark"><?= htmlspecialchars($cust['phone'] ?: '-'); ?></div>
                                 </td>
-                                <td>
-                                    <span class="badge bg-light text-dark border"><?= htmlspecialchars($cust['customer_type'] ?: 'Other'); ?></span>
-                                </td>
-                                <td><?= htmlspecialchars($cust['phone'] ?: '-'); ?></td>
-                                <td class="fw-bold text-dark"><?= \Core\Helper::formatCurrency($cust['credit_limit']); ?></td>
-                                <td><?= (int)$cust['credit_days']; ?> Days</td>
                                 <td class="text-center">
                                     <?php if ($cust['status'] === 'active'): ?>
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1">Active</span>
+                                        <span class="badge bg-success-subtle text-success">Active</span>
                                     <?php else: ?>
-                                        <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle px-3 py-1">Inactive</span>
+                                        <span class="badge bg-secondary-subtle text-secondary">Inactive</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-center">
-                                    <div class="btn-group gap-1">
-                                        <a href="<?= \Core\Helper::baseUrl('parties/view?id=' . $cust['id']); ?>" class="btn btn-sm btn-outline-success rounded-pill px-3">
-                                            <i class="bi bi-eye"></i> View
-                                        </a>
+                                <td class="text-end">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="<?= \Core\Helper::baseUrl('parties/view?id=' . $cust['id']); ?>" class="btn btn-outline-success px-3" title="Profile"><i class="bi bi-person-fill"></i> Profile</a>
                                         <?php if (\Core\Auth::hasPermission('parties.edit')): ?>
-                                            <a href="<?= \Core\Helper::baseUrl('parties/edit?id=' . $cust['id']); ?>" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
-                                                <i class="bi bi-pencil"></i> Edit
-                                            </a>
+                                            <a href="<?= \Core\Helper::baseUrl('parties/edit?id=' . $cust['id']); ?>" class="btn btn-outline-primary px-3" title="Edit"><i class="bi bi-pencil-square"></i></a>
+                                        <?php endif; ?>
+                                        <?php if (\Core\Auth::hasPermission('parties.delete')): ?>
+                                            <form action="<?= \Core\Helper::baseUrl('parties/delete'); ?>" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this customer?');">
+                                                <?= \Core\CSRF::getFormField(); ?>
+                                                <input type="hidden" name="id" value="<?= $cust['id']; ?>">
+                                                <button type="submit" class="btn btn-outline-danger px-3" title="Delete"><i class="bi bi-trash"></i></button>
+                                            </form>
                                         <?php endif; ?>
                                     </div>
                                 </td>
@@ -104,7 +99,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">No customers registered.</td>
+                            <td colspan="4" class="text-center text-muted py-4">No customers registered.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

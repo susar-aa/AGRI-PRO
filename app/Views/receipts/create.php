@@ -13,6 +13,20 @@
     }
 </style>
 
+<?php if ($flashSuccess = \Core\Session::getFlash('success')): ?>
+    <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i> <?= htmlspecialchars($flashSuccess, ENT_QUOTES, 'UTF-8'); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
+<?php if ($flashError = \Core\Session::getFlash('error')): ?>
+    <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i> <?= htmlspecialchars($flashError, ENT_QUOTES, 'UTF-8'); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
         <a href="<?= \Core\Helper::baseUrl('receipts'); ?>" class="btn btn-sm btn-outline-secondary rounded-pill mb-2">
@@ -32,6 +46,7 @@
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
                     <label for="party_id" class="form-label fw-semibold">Select Customer / Member <span class="text-danger">*</span></label>
+                    <span id="customer_balance_display" class="float-end fw-bold text-primary small" style="display: none;"></span>
                     <select class="form-select select2" id="party_id" name="party_id" required>
                         <option value="">-- Select Account --</option>
                         <?php foreach ($customers as $cust): ?>
@@ -80,16 +95,8 @@
                     </select>
                 </div>
 
-                <!-- Dynamic input fields -->
-                <div class="col-md-8" id="cashAccountSection" style="display: none;">
-                    <label for="cash_account_id" class="form-label fw-semibold">Select Cash Account Drawer <span class="text-danger">*</span></label>
-                    <select class="form-select" id="cash_account_id" name="cash_account_id">
-                        <option value="">-- Select Cash Drawer --</option>
-                        <?php foreach ($cashAccounts as $ca): ?>
-                            <option value="<?= $ca['id']; ?>"><?= htmlspecialchars($ca['name']); ?> (Balance: LKR <?= number_format($ca['current_balance'], 2); ?>)</option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                <!-- Hidden cash account since there's only one -->
+                <input type="hidden" id="cash_account_id" name="cash_account_id" value="<?= $cashAccounts[0]['id'] ?? 1; ?>">
 
                 <div class="col-md-8" id="bankAccountSection" style="display: none;">
                     <label for="bank_account_id" class="form-label fw-semibold">Select Destination Bank Account <span class="text-danger">*</span></label>
@@ -150,8 +157,8 @@
             </div>
 
             <div class="mb-3">
-                <label for="notes" class="form-label fw-semibold">Notes / Description <span class="text-danger">*</span></label>
-                <textarea class="form-control" id="notes" name="notes" rows="2" placeholder="e.g. Settlement of outstanding balance" required></textarea>
+                <label for="notes" class="form-label fw-semibold">Notes / Description</label>
+                <textarea class="form-control" id="notes" name="notes" rows="2" placeholder="e.g. Settlement of customer invoice"></textarea>
             </div>
 
 
@@ -167,24 +174,20 @@
 <script>
 function togglePaymentInputs() {
     const paymentMethod = document.getElementById('payment_method').value;
-    const cashSection = document.getElementById('cashAccountSection');
     const bankSection = document.getElementById('bankAccountSection');
     const chequeSection = document.getElementById('chequeSection');
 
     // Reset required states
-    document.getElementById('cash_account_id').required = false;
     document.getElementById('bank_account_id').required = false;
+    document.getElementById('cheque_id').required = false;
     document.getElementById('cheque_number_input').required = false;
     document.getElementById('cheque_bank_name').required = false;
-    document.getElementById('cheque_id').required = false;
 
-    cashSection.style.display = 'none';
     bankSection.style.display = 'none';
-    chequeSection.style.display = 'none';
+    if(chequeSection) chequeSection.style.display = 'none';
 
     if (paymentMethod === 'Cash') {
-        cashSection.style.display = 'block';
-        document.getElementById('cash_account_id').required = true;
+        // Handled silently by hidden input
     } else if (paymentMethod === 'Bank Transfer') {
         bankSection.style.display = 'block';
         document.getElementById('bank_account_id').required = true;
@@ -232,5 +235,39 @@ document.getElementById('cheque_id').addEventListener('change', function() {
             placeholder: "-- Select Account --",
             allowClear: true
         });
+
+        $('#party_id').on('change', function() {
+            var partyId = $(this).val();
+            var balanceDisplay = $('#customer_balance_display');
+            
+            if (partyId) {
+                $.ajax({
+                    url: '<?= \Core\Helper::baseUrl('parties/api/balance') ?>',
+                    type: 'GET',
+                    data: { id: partyId },
+                    success: function(response) {
+                        var bal = parseFloat(response.balance);
+                        balanceDisplay.show();
+                        if (bal > 0) {
+                            balanceDisplay.html('Outstanding: <span class="text-danger">LKR ' + bal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</span>');
+                        } else if (bal < 0) {
+                            balanceDisplay.html('Advance: <span class="text-success">LKR ' + Math.abs(bal).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) + '</span>');
+                        } else {
+                            balanceDisplay.html('Balance: <span class="text-secondary">LKR 0.00</span>');
+                        }
+                    },
+                    error: function() {
+                        balanceDisplay.hide();
+                    }
+                });
+            } else {
+                balanceDisplay.hide();
+            }
+        });
+        
+        // Trigger if already selected
+        if ($('#party_id').val()) {
+            $('#party_id').trigger('change');
+        }
     });
 </script>

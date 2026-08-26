@@ -51,9 +51,6 @@ class PaymentEngine {
             if (!in_array($party['party_type'], ['SUPPLIER', 'BOTH'])) {
                 throw new Exception("Payments can only be recorded for supplier profiles.");
             }
-            if ($method === 'Cheque') {
-                throw new Exception("Issued Cheques are not supported in this stage.");
-            }
         }
 
         $cashAccountId = null;
@@ -82,11 +79,26 @@ class PaymentEngine {
             // Cheque
             $chequeId = !empty($data['cheque_id']) ? (int)$data['cheque_id'] : null;
             if (!$chequeId) {
-                throw new Exception("Linked customer cheque ID is required.");
+                throw new Exception("Linked cheque ID is required.");
             }
             $ch = $db->query("SELECT status FROM cheques WHERE id = " . $chequeId)->fetchColumn();
-            if ($ch !== 'RECEIVED') {
-                throw new Exception("Selected cheque must be in RECEIVED status.");
+            
+            if ($type === 'RECEIPT') {
+                if ($ch !== 'RECEIVED') {
+                    throw new Exception("Selected cheque must be in RECEIVED status.");
+                }
+            } else {
+                if ($ch !== 'ISSUED') {
+                    throw new Exception("Selected cheque must be in ISSUED status.");
+                }
+                $bankAccountId = !empty($data['bank_account_id']) ? (int)$data['bank_account_id'] : null;
+                if (!$bankAccountId) {
+                    throw new Exception("Bank account is required for issued cheques.");
+                }
+                $ba = $db->query("SELECT status FROM bank_accounts WHERE id = " . $bankAccountId)->fetchColumn();
+                if ($ba !== 'active') {
+                    throw new Exception("Selected bank account is inactive.");
+                }
             }
         }
 
@@ -151,10 +163,18 @@ class PaymentEngine {
         $creditAccountId = null;
 
         if ($method === 'Cheque') {
-            // Resolve Undeposited Cheques account ID (1115)
-            $assetAccountId = (int)$db->query("SELECT id FROM accounts WHERE account_code = '1115'")->fetchColumn();
-            if (!$assetAccountId) {
-                throw new Exception("Undeposited Cheques account (1115) is missing in Chart of Accounts.");
+            if ($type === 'RECEIPT') {
+                // Resolve Undeposited Cheques account ID (1115)
+                $assetAccountId = (int)$db->query("SELECT id FROM accounts WHERE account_code = '1115'")->fetchColumn();
+                if (!$assetAccountId) {
+                    throw new Exception("Undeposited Cheques account (1115) is missing in Chart of Accounts.");
+                }
+            } else {
+                // Issued Cheque - Credit Pending Issued Cheques account (Liability)
+                $assetAccountId = (int)$db->query("SELECT id FROM accounts WHERE account_code = '2115'")->fetchColumn();
+                if (!$assetAccountId) {
+                    throw new Exception("Pending Issued Cheques account (2115) is missing in Chart of Accounts.");
+                }
             }
         } else {
             // Fetch Cash or Bank asset account code

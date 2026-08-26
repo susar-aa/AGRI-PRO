@@ -37,9 +37,12 @@
             <div class="card-body d-flex justify-content-between align-items-center">
                 <div>
                     <h6 class="text-white-50 mb-1">Cash in Hand Balance</h6>
-                    <h3 class="fw-bold mb-0">LKR <?= number_format($cashBalance, 2); ?></h3>
+                    <h3 class="fw-bold mb-2">LKR <?= number_format($cashBalance, 2); ?></h3>
+                    <a href="<?= \Core\Helper::baseUrl('modules/bank-accounts/transactions?account_id=' . $cashInHandAccount); ?>" class="btn btn-sm btn-light text-success fw-bold rounded-pill px-3 mt-1">
+                        <i class="bi bi-card-list me-1"></i> View Transactions
+                    </a>
                 </div>
-                <div class="fs-1"><i class="bi bi-cash-stack"></i></div>
+                <div class="fs-1 opacity-50"><i class="bi bi-cash-stack"></i></div>
             </div>
         </div>
     </div>
@@ -69,9 +72,14 @@
                     <div>
                         <div class="<?= $ba['status'] === 'active' ? 'text-secondary' : 'text-white-50'; ?> small mb-1"><?= htmlspecialchars($ba['account_name']); ?></div>
                         <div class="<?= $ba['status'] === 'active' ? 'text-success' : 'text-white'; ?> font-monospace mb-2"><?= htmlspecialchars($ba['account_number']); ?></div>
-                        <h4 class="fw-bold <?= $ba['status'] === 'active' ? ($ba['current_balance'] >= 0 ? 'text-dark' : 'text-danger') : 'text-white'; ?> mb-0">
+                        <h4 class="fw-bold <?= $ba['status'] === 'active' ? ($ba['current_balance'] >= 0 ? 'text-dark' : 'text-danger') : 'text-white'; ?> mb-3">
                             LKR <?= number_format($ba['current_balance'], 2); ?>
                         </h4>
+                        <?php if($ba['account_id']): ?>
+                            <a href="<?= \Core\Helper::baseUrl('modules/bank-accounts/transactions?account_id=' . $ba['account_id']); ?>" class="btn btn-sm <?= $ba['status'] === 'active' ? 'btn-outline-primary' : 'btn-outline-light'; ?> rounded-pill px-3">
+                                <i class="bi bi-card-list me-1"></i> View Transactions
+                            </a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -82,7 +90,7 @@
 <!-- Recent Transactions -->
 <div class="card border-0 shadow-sm rounded-4">
     <div class="card-header bg-white py-3 border-0">
-        <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history text-success me-2"></i> Recent Bank Transactions</h6>
+        <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history text-success me-2"></i> Recent Transactions</h6>
     </div>
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -91,7 +99,7 @@
                     <tr>
                         <th>Journal #</th>
                         <th>Transaction Date</th>
-                        <th>Bank Account</th>
+                        <th>Account</th>
                         <th>Description</th>
                         <th class="text-end">Debit (Deposit)</th>
                         <th class="text-end">Credit (Withdrawal)</th>
@@ -104,8 +112,12 @@
                                 <td class="fw-bold font-monospace"><?= htmlspecialchars($tx['journal_number']); ?></td>
                                 <td><?= htmlspecialchars($tx['transaction_date']); ?></td>
                                 <td>
-                                    <div class="fw-bold small text-dark"><?= htmlspecialchars($tx['bank_name']); ?></div>
-                                    <small class="text-muted font-monospace"><?= htmlspecialchars($tx['account_number']); ?></small>
+                                    <?php if (!empty($tx['bank_name'])): ?>
+                                        <div class="fw-bold small text-dark"><i class="bi bi-bank me-1 text-primary"></i> <?= htmlspecialchars($tx['bank_name']); ?></div>
+                                        <small class="text-muted font-monospace"><?= htmlspecialchars($tx['account_number']); ?></small>
+                                    <?php else: ?>
+                                        <div class="fw-bold small text-dark"><i class="bi bi-cash-stack me-1 text-success"></i> <?= htmlspecialchars($tx['cash_account_name']); ?></div>
+                                    <?php endif; ?>
                                 </td>
                                 <td><?= htmlspecialchars($tx['entry_desc']); ?></td>
                                 <td class="text-end font-monospace text-success fw-semibold"><?= $tx['debit'] > 0 ? 'LKR ' . number_format($tx['debit'], 2) : '-'; ?></td>
@@ -201,7 +213,6 @@
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Transaction Type</label>
                         <select class="form-select" name="type" id="txType" onchange="toggleTxFields()" required>
-                            <option value="deposit">Cash → Bank Deposit</option>
                             <option value="withdrawal">Bank → Cash Withdrawal</option>
                             <option value="transfer">Bank → Bank Transfer</option>
                         </select>

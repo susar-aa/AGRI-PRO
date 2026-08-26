@@ -24,13 +24,9 @@
             <h6 class="fw-bold mb-3"><i class="bi bi-info-square me-2"></i> Document Header</h6>
             <div class="row g-4">
                 <div class="col-md-4">
-                    <label for="location_id" class="form-label fw-semibold">Receiving Warehouse <span class="text-danger">*</span></label>
-                    <select class="form-select" id="location_id" name="location_id" required>
-                        <option value="">-- Select Location --</option>
-                        <?php foreach ($warehouses as $wh): ?>
-                            <option value="<?= $wh['id']; ?>"><?= htmlspecialchars($wh['name']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
+                    <label for="grn_date" class="form-label fw-semibold">GRN Date <span class="text-danger">*</span></label>
+                    <input type="date" class="form-control" id="grn_date" name="grn_date" value="<?= date('Y-m-d') ?>" required>
+                    <input type="hidden" name="location_id" value="<?= !empty($warehouses[0]['id']) ? $warehouses[0]['id'] : 1; ?>">
                 </div>
                 <div class="col-md-4">
                     <label for="supplier_id" class="form-label fw-semibold">Supplier (Optional)</label>

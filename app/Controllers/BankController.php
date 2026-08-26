@@ -48,13 +48,16 @@ class BankController extends Controller {
 
         $cashBalance = $cashReceived - $cashPayments;
 
-        // Fetch recent bank transactions from General Ledger
+        // Fetch recent bank and cash transactions from General Ledger
         $recentTransactions = $db->query("
-            SELECT jl.*, je.journal_number, je.transaction_date, je.description AS entry_desc, ba.bank_name, ba.account_number
+            SELECT jl.*, je.journal_number, je.transaction_date, je.description AS entry_desc, 
+                   ba.bank_name, ba.account_number, ca.name AS cash_account_name
             FROM journal_lines jl
             JOIN journal_entries je ON jl.journal_entry_id = je.id
-            JOIN bank_accounts ba ON jl.account_id = ba.account_id
-            WHERE je.status = 'posted'
+            LEFT JOIN bank_accounts ba ON jl.account_id = ba.account_id
+            LEFT JOIN cash_accounts ca ON jl.account_id = ca.account_id
+            WHERE je.status = 'posted' AND (ba.id IS NOT NULL OR ca.id IS NOT NULL)
+            GROUP BY jl.id
             ORDER BY je.transaction_date DESC, je.id DESC LIMIT 10
         ")->fetchAll();
 
@@ -65,7 +68,8 @@ class BankController extends Controller {
             'cashAccounts' => $cashAccounts,
             'bankAccountsGL' => $bankAccountsGL,
             'recentTransactions' => $recentTransactions,
-            'cashBalance' => $cashBalance
+            'cashBalance' => $cashBalance,
+            'cashInHandAccount' => $cashInHandAccount
         ]);
     }
 
@@ -111,6 +115,11 @@ class BankController extends Controller {
         $bankAccount = $this->bankModel->getById($bankAccountId);
         if (!$bankAccount) {
             Session::setFlash('error', 'Bank account not found.');
+            Helper::redirect('modules/bank-accounts');
+        }
+
+        if (in_array($type, ['withdrawal', 'transfer']) && $amount > (float)$bankAccount['current_balance']) {
+            Session::setFlash('error', 'Insufficient funds. The available bank balance is LKR ' . number_format($bankAccount['current_balance'], 2));
             Helper::redirect('modules/bank-accounts');
         }
 
@@ -316,7 +325,38 @@ class BankController extends Controller {
             }
             Session::setFlash('error', 'Reconciliation failed: ' . $e->getMessage());
         }
-
+        
         Helper::redirect('modules/bank-accounts');
+    }
+
+    public function transactions(): void {
+        Auth::requirePermission('dashboard.view');
+
+        $accountId = !empty($_GET['account_id']) ? (int)$_GET['account_id'] : 0;
+        if ($accountId <= 0) {
+            Helper::redirect('modules/bank-accounts');
+        }
+
+        $db = Database::getInstance();
+        $accountName = $db->query("SELECT account_name FROM accounts WHERE id = $accountId")->fetchColumn();
+        if (!$accountName) {
+            Helper::redirect('modules/bank-accounts');
+        }
+
+        $recentTransactions = $db->query("
+            SELECT jl.*, je.journal_number, je.transaction_date, je.description AS entry_desc
+            FROM journal_lines jl
+            JOIN journal_entries je ON jl.journal_entry_id = je.id
+            WHERE jl.account_id = $accountId AND je.status = 'posted'
+            GROUP BY jl.id
+            ORDER BY je.transaction_date DESC, je.id DESC LIMIT 100
+        ")->fetchAll();
+
+        $this->render('bank/transactions', [
+            'pageTitle' => $accountName . ' - Transactions',
+            'activeNav' => 'bank_accounts',
+            'accountName' => $accountName,
+            'recentTransactions' => $recentTransactions
+        ]);
     }
 }

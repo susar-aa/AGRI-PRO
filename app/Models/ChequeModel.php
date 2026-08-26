@@ -7,7 +7,7 @@ class ChequeModel extends Model {
 
     public function getById(int $id): ?array {
         $stmt = $this->db->prepare("
-            SELECT c.*, p.name AS customer_name, p.party_code,
+            SELECT c.*, p.name AS party_name, p.party_code,
                    u.full_name AS creator_name
             FROM cheques c
             JOIN parties p ON c.party_id = p.id
@@ -20,7 +20,7 @@ class ChequeModel extends Model {
 
     public function getAll(array $filters = [], int $limit = 50, int $offset = 0): array {
         $sql = "
-            SELECT c.*, p.name AS customer_name, p.party_code 
+            SELECT c.*, p.name AS party_name, p.party_code 
             FROM cheques c
             JOIN parties p ON c.party_id = p.id
             WHERE 1=1
@@ -30,6 +30,10 @@ class ChequeModel extends Model {
         if (!empty($filters['status'])) {
             $sql .= " AND c.status = :status";
             $params['status'] = $filters['status'];
+        }
+        if (!empty($filters['cheque_type'])) {
+            $sql .= " AND c.cheque_type = :cheque_type";
+            $params['cheque_type'] = $filters['cheque_type'];
         }
         if (!empty($filters['party_id'])) {
             $sql .= " AND c.party_id = :party_id";
@@ -67,6 +71,10 @@ class ChequeModel extends Model {
         if (!empty($filters['status'])) {
             $sql .= " AND c.status = :status";
             $params['status'] = $filters['status'];
+        }
+        if (!empty($filters['cheque_type'])) {
+            $sql .= " AND c.cheque_type = :cheque_type";
+            $params['cheque_type'] = $filters['cheque_type'];
         }
         if (!empty($filters['party_id'])) {
             $sql .= " AND c.party_id = :party_id";

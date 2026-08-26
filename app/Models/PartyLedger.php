@@ -31,16 +31,52 @@ class PartyLedger extends Model {
         $stmt->execute(['party_id' => $partyId]);
         $prRows = $stmt->fetchAll();
 
-        // 3. Fetch posted/cancelled marketplace credit invoices (Stage 6B)
+        // 3. Fetch all marketplace invoices (Cash/Bank/Credit) (Stage 6B)
         $stmt = $this->db->prepare("
             SELECT i.*, je.journal_number, rje.journal_number AS reversal_journal_number
             FROM invoices i
             LEFT JOIN journal_entries je ON i.journal_entry_id = je.id
             LEFT JOIN journal_entries rje ON i.reversal_journal_entry_id = rje.id
-            WHERE i.customer_id = :party_id AND i.payment_type = 'CREDIT' AND i.status IN ('POSTED', 'CANCELLED')
+            WHERE i.customer_id = :party_id AND i.status IN ('POSTED', 'CANCELLED')
         ");
         $stmt->execute(['party_id' => $partyId]);
         $saleRows = $stmt->fetchAll();
+
+        // 4. Fetch Member Fees
+        $stmt = $this->db->prepare("
+            SELECT m.*, je.journal_number 
+            FROM coop_members m 
+            LEFT JOIN journal_entries je ON m.journal_entry_id = je.id 
+            WHERE m.party_id = :party_id AND (m.registration_fee > 0 OR m.shares_fee > 0)
+        ");
+        $stmt->execute(['party_id' => $partyId]);
+        $memberRows = $stmt->fetchAll();
+
+        // 5. Fetch Fixed Deposits
+        $stmt = $this->db->prepare("
+            SELECT fd.*, je.journal_number 
+            FROM member_fixed_deposits fd 
+            JOIN coop_members m ON fd.member_id = m.id 
+            LEFT JOIN journal_entries je ON fd.journal_entry_id = je.id 
+            WHERE m.party_id = :party_id AND fd.status = 'ACTIVE'
+        ");
+        $stmt->execute(['party_id' => $partyId]);
+        $fdRows = $stmt->fetchAll();
+
+        // 6. Fetch GRNs for Suppliers
+        $grnRows = [];
+        if (in_array($partyType, ['SUPPLIER', 'BOTH'])) {
+            $stmt = $this->db->prepare("
+                SELECT sl.*, p.name_en AS product_name
+                FROM stock_ledger sl
+                LEFT JOIN products p ON sl.product_id = p.id
+                WHERE sl.movement_type = 'GRN' 
+                AND sl.source_module = 'marketplace'
+                AND sl.source_transaction_id = :party_id
+            ");
+            $stmt->execute(['party_id' => $partyId]);
+            $grnRows = $stmt->fetchAll();
+        }
 
         $entries = [];
 
@@ -103,15 +139,17 @@ class PartyLedger extends Model {
             }
         }
 
-        // Map Credit Invoices (Stage 6B)
+        // Map Invoices (Stage 6B)
         foreach ($saleRows as $row) {
+            $isCredit = ($row['payment_type'] === 'CREDIT');
+
             $entries[] = [
                 'date' => $row['invoice_date'],
                 'reference' => $row['journal_number'] ?: $row['invoice_number'],
-                'tx_type' => 'Invoice',
-                'description' => $row['notes'] ?: 'Marketplace Credit Invoice',
+                'tx_type' => 'Invoice (' . $row['payment_type'] . ')',
+                'description' => $row['notes'] ?: 'Marketplace Invoice',
                 'debit' => (float)$row['total'],
-                'credit' => 0.00,
+                'credit' => $isCredit ? 0.00 : (float)$row['total'],
                 'timestamp' => strtotime($row['invoice_date'] . ' 00:00:00') * 10 + $row['id'] + 20000
             ];
 
@@ -121,11 +159,53 @@ class PartyLedger extends Model {
                     'reference' => $row['reversal_journal_number'] ?: 'REV-' . $row['invoice_number'],
                     'tx_type' => 'Reversal',
                     'description' => 'Reversal: ' . ($row['reversal_reason'] ?: 'Invoice Cancelled'),
-                    'debit' => 0.00,
+                    'debit' => $isCredit ? 0.00 : (float)$row['total'],
                     'credit' => (float)$row['total'],
                     'timestamp' => strtotime($row['updated_at'] ?? $row['invoice_date']) * 10 + $row['id'] + 20001
                 ];
             }
+        }
+
+        // Map GRNs
+        foreach ($grnRows as $row) {
+            $total = (float)$row['quantity_in'] * (float)$row['unit_cost'];
+            $entries[] = [
+                'date' => date('Y-m-d', strtotime($row['movement_date'])),
+                'reference' => $row['reference_number'] ?: 'GRN-' . $row['id'],
+                'tx_type' => 'Goods Receipt',
+                'description' => 'Received stock: ' . $row['product_name'],
+                'debit' => 0.00,
+                'credit' => $total,
+                'timestamp' => strtotime($row['movement_date'] . ' 00:00:00') * 10 + $row['id'] + 25000
+            ];
+        }
+
+        // Map Member Fees
+        foreach ($memberRows as $row) {
+            $totalFee = (float)$row['registration_fee'] + (float)$row['shares_fee'];
+            $entries[] = [
+                'date' => $row['registration_date'],
+                'reference' => $row['journal_number'] ?: 'MEM-REG-' . $row['id'],
+                'tx_type' => 'Registration & Shares',
+                'description' => 'Member Registration and Share Fees',
+                'debit' => $totalFee,
+                'credit' => $totalFee,
+                'timestamp' => strtotime($row['registration_date'] . ' 00:00:00') * 10 + $row['id'] + 30000
+            ];
+        }
+
+        // Map Fixed Deposits
+        foreach ($fdRows as $row) {
+            $principal = (float)$row['maturity_amount'] - (float)$row['expected_interest'];
+            $entries[] = [
+                'date' => $row['start_date'],
+                'reference' => $row['journal_number'] ?: $row['deposit_number'],
+                'tx_type' => 'Fixed Deposit',
+                'description' => 'FD Principal Deposit',
+                'debit' => $principal,
+                'credit' => $principal,
+                'timestamp' => strtotime($row['start_date'] . ' 00:00:00') * 10 + $row['id'] + 40000
+            ];
         }
 
         // Sort entries chronologically by timestamp

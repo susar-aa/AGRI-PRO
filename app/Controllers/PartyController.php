@@ -169,6 +169,45 @@ class PartyController extends Controller {
         $obStmt->execute(['party_id' => $id]);
         $postedOpeningBalance = $obStmt->fetch() ?: null;
 
+        // Fetch Invoices
+        $invoices = [];
+        if (in_array($party['party_type'], ['CUSTOMER', 'BOTH'])) {
+            $invStmt = $db->prepare("SELECT * FROM invoices WHERE customer_id = :id ORDER BY invoice_date DESC, id DESC");
+            $invStmt->execute(['id' => $id]);
+            $invoices = $invStmt->fetchAll();
+        }
+
+        // Fetch GRNs and Payments for Suppliers
+        $grns = [];
+        $payments = [];
+        if (in_array($party['party_type'], ['SUPPLIER', 'BOTH'])) {
+            // Fetch GRNs
+            $grnStmt = $db->prepare("
+                SELECT sl.*, p.name_en AS product_name, loc.name AS location_name
+                FROM stock_ledger sl
+                LEFT JOIN products p ON sl.product_id = p.id
+                LEFT JOIN inventory_locations loc ON sl.location_id = loc.id
+                WHERE sl.movement_type = 'GRN' 
+                AND sl.source_module = 'marketplace'
+                AND sl.source_transaction_id = :id
+                ORDER BY sl.id DESC
+            ");
+            $grnStmt->execute(['id' => $id]);
+            $grns = $grnStmt->fetchAll();
+
+            // Fetch Payments
+            $payStmt = $db->prepare("
+                SELECT pr.*, ca.name as cash_account_name, ba.bank_name as bank_account_name, ba.account_number
+                FROM payment_receipts pr
+                LEFT JOIN cash_accounts ca ON pr.cash_account_id = ca.id
+                LEFT JOIN bank_accounts ba ON pr.bank_account_id = ba.id
+                WHERE pr.party_id = :id AND pr.payment_type = 'PAYMENT'
+                ORDER BY pr.payment_date DESC, pr.id DESC
+            ");
+            $payStmt->execute(['id' => $id]);
+            $payments = $payStmt->fetchAll();
+        }
+
         $this->render('parties/view', [
             'pageTitle' => 'Party Profile: ' . $party['name'],
             'activeNav' => 'parties',
@@ -177,7 +216,10 @@ class PartyController extends Controller {
             'ledgerEntries' => $ledgerEntries,
             'currentBalance' => $currentBalance,
             'openingBalanceVal' => $openingBalanceVal,
-            'postedOpeningBalance' => $postedOpeningBalance
+            'postedOpeningBalance' => $postedOpeningBalance,
+            'invoices' => $invoices,
+            'grns' => $grns,
+            'payments' => $payments
         ]);
     }
 
@@ -375,6 +417,53 @@ class PartyController extends Controller {
         Helper::redirect('parties/view?id=' . $id);
     }
 
+    public function delete(): void {
+        Auth::requirePermission('parties.delete');
+        $this->validateCsrf();
+
+        $id = !empty($_POST['id']) ? (int)$_POST['id'] : 0;
+        $party = $this->partyModel->getById($id);
+
+        if (!$party) {
+            Session::setFlash('error', 'Business party not found.');
+            Helper::redirect('parties');
+        }
+
+        try {
+            $hasData = false;
+            
+            $stmt = $this->partyModel->db->prepare("SELECT COUNT(*) FROM invoices WHERE customer_id = ?");
+            $stmt->execute([$id]);
+            if ($stmt->fetchColumn() > 0) $hasData = true;
+
+            $stmt = $this->partyModel->db->prepare("SELECT COUNT(*) FROM payment_receipts WHERE party_id = ?");
+            $stmt->execute([$id]);
+            if ($stmt->fetchColumn() > 0) $hasData = true;
+
+            $stmt = $this->partyModel->db->prepare("SELECT COUNT(*) FROM coop_members WHERE party_id = ?");
+            $stmt->execute([$id]);
+            if ($stmt->fetchColumn() > 0) $hasData = true;
+
+            if ($hasData) {
+                Session::setFlash('error', 'Cannot delete party. Linked records (invoices/payments/members) exist.');
+                Helper::redirect('parties/view?id=' . $id);
+            }
+
+            $stmt = $this->partyModel->db->prepare("DELETE FROM parties WHERE id = ?");
+            if ($stmt->execute([$id])) {
+                AuditService::log('delete_party', 'parties', $id, null, ['party_code' => $party['party_code']]);
+                Session::setFlash('success', 'Customer successfully deleted.');
+                Helper::redirect('parties/customers');
+            } else {
+                Session::setFlash('error', 'Deletion failed.');
+                Helper::redirect('parties/view?id=' . $id);
+            }
+        } catch (\Exception $e) {
+            Session::setFlash('error', 'Error: ' . $e->getMessage());
+            Helper::redirect('parties/view?id=' . $id);
+        }
+    }
+
     public function openingBalance(): void {
         $id = !empty($_GET['party_id']) ? (int)$_GET['party_id'] : 0;
         $party = $this->partyModel->getById($id);
@@ -473,5 +562,23 @@ class PartyController extends Controller {
         }
 
         Helper::redirect('parties/view?id=' . $partyId);
+    }
+    
+    public function getBalanceApi(): void {
+        header('Content-Type: application/json');
+        $id = !empty($_GET['id']) ? (int)$_GET['id'] : 0;
+        if (!$id) {
+            echo json_encode(['balance' => 0.00]);
+            return;
+        }
+        $db = \Core\Database::getInstance();
+        $party = $db->query("SELECT party_type FROM parties WHERE id = " . $id)->fetch();
+        if (!$party) {
+            echo json_encode(['balance' => 0.00]);
+            return;
+        }
+        
+        $balance = $this->partyLedgerModel->calculateBalance($id, $party['party_type']);
+        echo json_encode(['balance' => $balance]);
     }
 }

@@ -137,7 +137,8 @@ class InventoryEngine {
         string $movementType,
         string $sourceModule,
         int $sourceTransactionId,
-        string $refNumber
+        string $refNumber,
+        ?string $movementDate = null
     ): void {
         $db = Database::getInstance();
 
@@ -201,15 +202,17 @@ class InventoryEngine {
             }
 
             // 2. Add entry to stock ledger
+            $dateToUse = $movementDate ? $movementDate : date('Y-m-d');
             $stmt = $db->prepare("
                 INSERT INTO stock_ledger 
                 (product_id, location_id, movement_date, reference_number, movement_type, source_module, source_type, source_transaction_id, quantity_in, quantity_out, unit_cost, total_cost, balance_quantity, balance_value, created_by)
                 VALUES 
-                (:pid, :loc, CURDATE(), :ref, :mov_type, :src_mod, 'STOCK_IN', :src_id, :qty, 0.00, :unit_cost, :total_cost, :bal_qty, :bal_val, :created_by)
+                (:pid, :loc, :mov_date, :ref, :mov_type, :src_mod, 'STOCK_IN', :src_id, :qty, 0.00, :unit_cost, :total_cost, :bal_qty, :bal_val, :created_by)
             ");
             $stmt->execute([
                 'pid' => $productId,
                 'loc' => $locationId,
+                'mov_date' => $dateToUse,
                 'ref' => $refNumber,
                 'mov_type' => $movementType,
                 'src_mod' => $sourceModule,

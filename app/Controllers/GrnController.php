@@ -58,9 +58,10 @@ class GrnController extends Controller {
         $this->validateCsrf();
 
         try {
-            $locationId = (int)$_POST['location_id'];
+            $locationId = !empty($_POST['location_id']) ? (int)$_POST['location_id'] : 1; // Default to Main Store if removed from UI
             $refNumber = trim($_POST['reference_number'] ?? '');
             $supplierId = !empty($_POST['supplier_id']) ? (int)$_POST['supplier_id'] : null;
+            $grnDate = $_POST['grn_date'] ?? date('Y-m-d');
             
             $productIds = $_POST['products'] ?? [];
             $quantities = $_POST['quantities'] ?? [];
@@ -97,7 +98,8 @@ class GrnController extends Controller {
                     'GRN',
                     'marketplace', // module
                     $supplierId ?? 0, // transaction/party id
-                    $refNumber
+                    $refNumber,
+                    $grnDate
                 );
 
                 // Update product's default purchase price

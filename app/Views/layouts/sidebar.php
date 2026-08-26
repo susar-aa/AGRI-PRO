@@ -55,6 +55,7 @@ $openSystem   = in_array($activeNav, ['cost_centers', 'users', 'company_settings
                 <ul class="submenu-list">
                     <li><a href="<?= \Core\Helper::baseUrl('modules/invoices'); ?>" class="submenu-link <?= $activeNav === 'invoices' ? 'active' : ''; ?>"><i class="bi bi-file-earmark-text"></i> Invoices</a></li>
                     <li><a href="<?= \Core\Helper::baseUrl('receipts'); ?>" class="submenu-link <?= $activeNav === 'receipts' ? 'active' : ''; ?>"><i class="bi bi-cash-coin"></i> Receipts</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('supplier-payments'); ?>" class="submenu-link <?= $activeNav === 'payments' ? 'active' : ''; ?>"><i class="bi bi-credit-card"></i> Supplier Payments</a></li>
                     <li><a href="<?= \Core\Helper::baseUrl('expenses'); ?>" class="submenu-link <?= $activeNav === 'expenses' ? 'active' : ''; ?>"><i class="bi bi-wallet2"></i> Expenses</a></li>
                     <li><a href="<?= \Core\Helper::baseUrl('grn'); ?>" class="submenu-link <?= $activeNav === 'grn' ? 'active' : ''; ?>"><i class="bi bi-box-arrow-in-down"></i> Goods Receipt (GRN)</a></li>
                     <li style="display: none;"><a href="<?= \Core\Helper::baseUrl('accounting/coa'); ?>" class="submenu-link <?= in_array($activeNav, ['coa', 'journal_entries', 'general_ledger', 'trial_balance']) ? 'active' : ''; ?>"><i class="bi bi-diagram-3"></i> Accounting</a></li>

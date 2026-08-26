@@ -14,7 +14,15 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <div>
-        <a href="<?= \Core\Helper::baseUrl('parties'); ?>" class="btn btn-sm btn-outline-secondary rounded-pill mb-2">
+        <?php
+        $backLink = \Core\Helper::baseUrl('parties');
+        if (in_array($party['party_type'], ['CUSTOMER', 'BOTH'])) {
+            $backLink = \Core\Helper::baseUrl('parties/customers');
+        } elseif ($party['party_type'] === 'SUPPLIER') {
+            $backLink = \Core\Helper::baseUrl('parties/suppliers');
+        }
+        ?>
+        <a href="<?= $backLink; ?>" class="btn btn-sm btn-outline-secondary rounded-pill mb-2">
             <i class="bi bi-arrow-left me-1"></i> Back to Directory
         </a>
         <h4 class="fw-bold mb-1 text-dark">Business Partner Profile: <?= htmlspecialchars($party['name']); ?></h4>
@@ -39,9 +47,39 @@
     </div>
 </div>
 
-<div class="row g-4">
-    <!-- Summary Cards -->
-    <div class="col-12 col-lg-8">
+<style>
+.nav-tabs-custom { border-bottom: 2px solid #e2e8f0; }
+.nav-tabs-custom .nav-link { color: #64748b; font-weight: 500; border: none; padding: 0.75rem 1.5rem; margin-bottom: -2px; }
+.nav-tabs-custom .nav-link:hover { color: #0f172a; border-bottom: 2px solid #cbd5e1; }
+.nav-tabs-custom .nav-link.active { color: #0f172a; border-bottom: 2px solid #16a34a; background: transparent; }
+</style>
+
+<ul class="nav nav-tabs nav-tabs-custom mb-4" id="partyTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
+    </li>
+    <?php if (in_array($party['party_type'], ['CUSTOMER', 'BOTH'])): ?>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button" role="tab">Sales Invoices</button>
+    </li>
+    <?php endif; ?>
+    <?php if (in_array($party['party_type'], ['SUPPLIER', 'BOTH'])): ?>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="grns-tab" data-bs-toggle="tab" data-bs-target="#grns" type="button" role="tab">Goods Receipt Notes</button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">Payments History</button>
+    </li>
+    <?php endif; ?>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="ledger-tab" data-bs-toggle="tab" data-bs-target="#ledger" type="button" role="tab">Account Ledger</button>
+    </li>
+</ul>
+
+<div class="tab-content" id="partyTabsContent">
+    <div class="tab-pane fade show active" id="overview" role="tabpanel" tabindex="0">
+        <div class="row g-4">
+            <div class="col-12">
         <div class="card border-0 shadow-sm rounded-4 mb-4">
             <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
                 <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-person-lines-fill text-success me-2"></i> Partner Information</h6>
@@ -107,6 +145,35 @@
                         </div>
                     <?php endif; ?>
                 </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Summary -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4 bg-light">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="fw-bold text-secondary mb-1">
+                            <?php if (in_array($party['party_type'], ['SUPPLIER', 'BOTH'])): ?>
+                                Supplier Outstanding Balance (Payable)
+                            <?php else: ?>
+                                Customer Outstanding Balance (Receivable)
+                            <?php endif; ?>
+                        </h6>
+                        <h3 class="fw-bold text-dark mb-0 font-monospace">LKR <?= number_format(abs($currentBalance), 2); ?></h3>
+                        <?php if ($currentBalance > 0): ?>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle mt-2">To Pay / Collect</span>
+                        <?php elseif ($currentBalance < 0): ?>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle mt-2">Overpaid / Advance</span>
+                        <?php else: ?>
+                            <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle mt-2">Settled</span>
+                        <?php endif; ?>
+                    </div>
+                    <div class="text-end">
+                        <i class="bi bi-wallet2 text-success" style="font-size: 2.5rem; opacity: 0.8;"></i>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -129,7 +196,167 @@
             </div>
         </div>
 
-        <!-- Dynamic Tabs for Ledgers -->
+        <!-- Notes -->
+        <?php if (!empty($party['notes'])): ?>
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-header bg-white py-3 border-0">
+                    <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-chat-right-text text-success me-2"></i> Notes / Remarks</h6>
+                </div>
+                <div class="card-body pt-0 small">
+                    <p class="text-secondary mb-0"><?= nl2br(htmlspecialchars($party['notes'])); ?></p>
+                </div>
+            </div>
+        <?php endif; ?>
+            </div> <!-- End col-12 -->
+        </div> <!-- End row -->
+    </div> <!-- End overview tab -->
+
+    <!-- INVOICES TAB -->
+    <?php if (in_array($party['party_type'], ['CUSTOMER', 'BOTH'])): ?>
+    <div class="tab-pane fade" id="invoices" role="tabpanel" tabindex="0">
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Date</th>
+                                <th>Total (LKR)</th>
+                                <th>Status</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($invoices)): ?>
+                                <tr><td colspan="5" class="text-center text-muted py-4">No invoices found.</td></tr>
+                            <?php else: ?>
+                                <?php foreach ($invoices as $inv): ?>
+                                    <tr>
+                                        <td class="fw-bold font-monospace"><?= htmlspecialchars($inv['invoice_number']); ?></td>
+                                        <td><?= htmlspecialchars($inv['invoice_date']); ?></td>
+                                        <td class="font-monospace fw-semibold"><?= number_format($inv['total'] ?? 0, 2); ?></td>
+                                        <td>
+                                            <?php
+                                            $badge = match($inv['status']) {
+                                                'POSTED' => 'bg-success',
+                                                'DRAFT' => 'bg-warning text-dark',
+                                                'CANCELLED' => 'bg-danger',
+                                                default => 'bg-secondary'
+                                            };
+                                            ?>
+                                            <span class="badge <?= $badge; ?> rounded-pill"><?= htmlspecialchars($inv['status']); ?></span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="<?= \Core\Helper::baseUrl('modules/invoices/view?id=' . $inv['id']); ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3">View</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- GRNS TAB -->
+    <?php if (in_array($party['party_type'], ['SUPPLIER', 'BOTH'])): ?>
+    <div class="tab-pane fade" id="grns" role="tabpanel" tabindex="0">
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>GRN #</th>
+                                <th>Date</th>
+                                <th>Product</th>
+                                <th>Quantity</th>
+                                <th>Unit Cost (LKR)</th>
+                                <th>Total (LKR)</th>
+                                <th>Location</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($grns)): ?>
+                                <tr><td colspan="7" class="text-center text-muted py-4">No goods receipt notes found.</td></tr>
+                            <?php else: ?>
+                                <?php foreach ($grns as $grn): ?>
+                                    <tr>
+                                        <td class="fw-bold font-monospace"><?= htmlspecialchars($grn['reference_number'] ?: 'N/A'); ?></td>
+                                        <td><?= htmlspecialchars(date('Y-m-d', strtotime($grn['movement_date']))); ?></td>
+                                        <td><?= htmlspecialchars($grn['product_name']); ?></td>
+                                        <td class="fw-semibold text-dark"><?= (float)$grn['quantity_in']; ?></td>
+                                        <td class="font-monospace text-muted"><?= number_format($grn['unit_cost'], 2); ?></td>
+                                        <td class="font-monospace fw-bold text-dark"><?= number_format($grn['quantity_in'] * $grn['unit_cost'], 2); ?></td>
+                                        <td><?= htmlspecialchars($grn['location_name']); ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PAYMENTS TAB -->
+    <div class="tab-pane fade" id="payments" role="tabpanel" tabindex="0">
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 small">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Method</th>
+                                <th>Account/Bank</th>
+                                <th>Reference</th>
+                                <th>Amount (LKR)</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($payments)): ?>
+                                <tr><td colspan="6" class="text-center text-muted py-4">No payments found.</td></tr>
+                            <?php else: ?>
+                                <?php foreach ($payments as $pay): ?>
+                                    <tr>
+                                        <td><?= htmlspecialchars($pay['payment_date']); ?></td>
+                                        <td><span class="badge bg-light text-dark border"><?= htmlspecialchars($pay['payment_method']); ?></span></td>
+                                        <td>
+                                            <?php if ($pay['payment_method'] === 'Cash'): ?>
+                                                <i class="bi bi-cash me-1 text-success"></i> <?= htmlspecialchars($pay['cash_account_name'] ?? 'Cash Drawer'); ?>
+                                            <?php elseif ($pay['payment_method'] === 'Bank Transfer'): ?>
+                                                <i class="bi bi-bank me-1 text-primary"></i> <?= htmlspecialchars($pay['bank_account_name']); ?> - <?= htmlspecialchars($pay['account_number']); ?>
+                                            <?php else: ?>
+                                                <?= htmlspecialchars($pay['payment_method']); ?>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?= htmlspecialchars($pay['reference_number'] ?: '-'); ?></td>
+                                        <td class="font-monospace fw-bold text-danger"><?= number_format($pay['amount'], 2); ?></td>
+                                        <td class="text-center">
+                                            <?php if ($pay['status'] === 'posted'): ?>
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle">Posted</span>
+                                            <?php else: ?>
+                                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle">Draft</span>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- LEDGER TAB -->
+    <div class="tab-pane fade" id="ledger" role="tabpanel" tabindex="0">
         <div class="card border-0 shadow-sm rounded-4 mb-4">
             <div class="card-body p-4">
                 <ul class="nav nav-tabs border-bottom mb-3" id="profileTabs">
@@ -226,141 +453,9 @@
             </div>
         </div>
     </div>
-
-    <!-- Sidebar details -->
-    <div class="col-12 col-lg-4">
-        <!-- Balances and Limits -->
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
-            <div class="card-header bg-white py-3 border-0">
-                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-wallet2 text-success me-2"></i> Financial & Credit Settings</h6>
-            </div>
-            <div class="card-body p-3 pt-0 small">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                        <span class="text-secondary">Current Balance:</span>
-                        <span class="fw-bold <?= $currentBalance >= 0 ? 'text-success' : 'text-danger'; ?> fs-6">LKR <?= number_format($currentBalance, 2); ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                        <span class="text-secondary">Opening Balance:</span>
-                        <span class="fw-bold text-dark">LKR <?= number_format($openingBalanceVal, 2); ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                        <span class="text-secondary">Credit Limit:</span>
-                        <span class="fw-semibold text-dark"><?= \Core\Helper::formatCurrency($party['credit_limit']); ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                        <span class="text-secondary">Credit Grace Days:</span>
-                        <span class="fw-semibold text-dark"><?= (int)$party['credit_days']; ?> Days</span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                        <span class="text-secondary">Payment Terms:</span>
-                        <span class="fw-semibold text-dark"><?= htmlspecialchars($party['payment_terms'] ?: 'None Specified'); ?></span>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-footer bg-light border-0 text-center py-2">
-                <?php if (!$postedOpeningBalance): ?>
-                    <?php
-                    $canCreate = false;
-                    if ($party['party_type'] === 'CUSTOMER' && \Core\Auth::hasPermission('customer.opening_balance')) $canCreate = true;
-                    elseif ($party['party_type'] === 'SUPPLIER' && \Core\Auth::hasPermission('supplier.opening_balance')) $canCreate = true;
-                    elseif ($party['party_type'] === 'BOTH' && (\Core\Auth::hasPermission('customer.opening_balance') || \Core\Auth::hasPermission('supplier.opening_balance'))) $canCreate = true;
-                    ?>
-                    <?php if ($canCreate): ?>
-                        <a href="<?= \Core\Helper::baseUrl('parties/opening-balance?party_id=' . $party['id']); ?>" class="btn btn-sm btn-success rounded-pill px-3">
-                            <i class="bi bi-plus-circle me-1"></i> Record Opening Balance
-                        </a>
-                    <?php endif; ?>
-                <?php else: ?>
-                    <?php
-                    $canReverse = false;
-                    if ($party['party_type'] === 'CUSTOMER' && \Core\Auth::hasPermission('customer.opening_balance.reverse')) $canReverse = true;
-                    elseif ($party['party_type'] === 'SUPPLIER' && \Core\Auth::hasPermission('supplier.opening_balance.reverse')) $canReverse = true;
-                    elseif ($party['party_type'] === 'BOTH' && (\Core\Auth::hasPermission('customer.opening_balance.reverse') || \Core\Auth::hasPermission('supplier.opening_balance.reverse'))) $canReverse = true;
-                    ?>
-                    <?php if ($canReverse): ?>
-                        <button class="btn btn-sm btn-danger rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#reverseObModal">
-                            <i class="bi bi-arrow-counterclockwise me-1"></i> Reverse Opening Balance
-                        </button>
-                    <?php endif; ?>
-                <?php endif; ?>
-
-                <div class="d-grid gap-2 mt-2 pt-2 border-top">
-                    <?php if (in_array($party['party_type'], ['CUSTOMER', 'BOTH']) && \Core\Auth::hasPermission('receipts.create')): ?>
-                        <a href="<?= \Core\Helper::baseUrl('receipts/create?party_id=' . $party['id']); ?>" class="btn btn-sm btn-outline-success rounded-pill">
-                            <i class="bi bi-download me-1"></i> Receive Payment
-                        </a>
-                    <?php endif; ?>
-                    <?php if (in_array($party['party_type'], ['SUPPLIER', 'BOTH']) && \Core\Auth::hasPermission('supplier_payments.create')): ?>
-                        <a href="<?= \Core\Helper::baseUrl('supplier-payments/create?party_id=' . $party['id']); ?>" class="btn btn-sm btn-outline-danger rounded-pill">
-                            <i class="bi bi-upload me-1"></i> Make Payment
-                        </a>
-                    <?php endif; ?>
-                </div>
-            </div>
         </div>
-
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
-            <div class="card-header bg-white py-3 border-0">
-                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-clock-history text-success me-2"></i> Registration Log</h6>
-            </div>
-            <div class="card-body p-3 pt-0">
-                <ul class="list-group list-group-flush small">
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                        <span class="text-secondary">Registered By:</span>
-                        <span class="fw-semibold text-dark"><?= htmlspecialchars($party['creator_name'] ?? 'System'); ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                        <span class="text-secondary">Registered At:</span>
-                        <span class="fw-semibold text-dark"><?= htmlspecialchars($party['created_at']); ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                        <span class="text-secondary">Last Updated:</span>
-                        <span class="fw-semibold text-dark"><?= htmlspecialchars($party['updated_at']); ?></span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Notes -->
-        <?php if (!empty($party['notes'])): ?>
-            <div class="card border-0 shadow-sm rounded-4 mb-4">
-                <div class="card-header bg-white py-3 border-0">
-                    <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-chat-right-text text-success me-2"></i> Notes / Remarks</h6>
-                </div>
-                <div class="card-body pt-0 small">
-                    <p class="text-secondary mb-0"><?= nl2br(htmlspecialchars($party['notes'])); ?></p>
-                </div>
-            </div>
-        <?php endif; ?>
-
-        <!-- Audit Action Log Details -->
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-header bg-white py-3 border-0">
-                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-shield-check text-success me-2"></i> System Audit Logs</h6>
-            </div>
-            <div class="card-body p-3 pt-0">
-                <?php if (!empty($auditLogs)): ?>
-                    <div class="vstack gap-3" style="max-height: 250px; overflow-y: auto;">
-                        <?php foreach ($auditLogs as $log): ?>
-                            <div class="p-2 border rounded bg-light-subtle">
-                                <div class="d-flex justify-content-between align-items-center mb-1">
-                                    <strong class="text-dark text-capitalize small"><?= str_replace('_', ' ', $log['action']); ?></strong>
-                                    <span class="text-muted" style="font-size: 0.75rem;"><?= htmlspecialchars($log['created_at']); ?></span>
-                                </div>
-                                <div class="text-secondary" style="font-size: 0.8rem;">
-                                    User: <strong><?= htmlspecialchars($log['full_name'] ?? 'System'); ?></strong>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php else: ?>
-                    <p class="text-muted small mb-0">No detailed system audit logs available.</p>
-                <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</div>
+    </div> <!-- End ledger tab -->
+</div> <!-- End tab content -->
 
 <!-- Modal: Reverse Opening Balance -->
 <?php if ($postedOpeningBalance): ?>

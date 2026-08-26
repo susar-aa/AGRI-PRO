@@ -196,6 +196,100 @@
     border: none; cursor: pointer; font-size: .85rem; transition: transform .15s;
 }
 .modal-add-btn:hover { transform: scale(1.1); }
+
+/* ── Item Cards (Mobile-first Modal Layout) ─────────────── */
+.item-card {
+    background: #fff;
+    border: 1.5px solid #e8edf2;
+    border-radius: 14px;
+    overflow: hidden;
+    transition: border-color .15s, box-shadow .15s;
+}
+.item-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 12px rgba(0,0,0,.07);
+}
+.item-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: .75rem;
+    padding: .85rem 1rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e8edf2;
+}
+.item-card-info { flex: 1; min-width: 0; }
+.item-card-name {
+    font-weight: 700;
+    font-size: .88rem;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: .35rem;
+}
+.item-card-meta {
+    display: flex; flex-wrap: wrap; gap: .35rem;
+}
+.item-meta-chip {
+    display: inline-flex; align-items: center; gap: .25rem;
+    background: #fff; border: 1px solid #e2e8f0;
+    border-radius: 50px; padding: .15rem .55rem;
+    font-size: .7rem; color: #64748b; white-space: nowrap;
+}
+.item-meta-chip.stock-chip { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+.item-card-price {
+    text-align: right; flex-shrink: 0;
+}
+.item-card-price .price-label {
+    font-size: .65rem; color: #94a3b8; text-transform: uppercase; letter-spacing: .04em;
+}
+.item-card-price .price-val {
+    font-size: .9rem; font-weight: 800; font-family: 'Courier New', monospace;
+    color: #0f172a; white-space: nowrap;
+}
+.item-card-actions {
+    display: flex;
+    align-items: flex-end;
+    gap: .65rem;
+    padding: .75rem 1rem;
+    flex-wrap: wrap;
+}
+.action-field {
+    display: flex; flex-direction: column; gap: .25rem;
+    flex: 1; min-width: 90px;
+}
+.action-field label {
+    font-size: .68rem; font-weight: 700; color: #64748b;
+    text-transform: uppercase; letter-spacing: .04em; margin: 0;
+}
+.item-add-btn {
+    display: flex; align-items: center; gap: .35rem;
+    padding: .45rem .9rem; border-radius: 10px;
+    font-size: .8rem; font-weight: 700; border: none;
+    cursor: pointer; white-space: nowrap;
+    transition: opacity .15s, transform .1s;
+    align-self: flex-end;
+}
+.item-add-btn:hover { opacity: .88; transform: scale(1.03); }
+.product-add-btn { background: #4f46e5; color: #fff; }
+.service-add-btn { background: #d97706; color: #fff; }
+.rental-add-btn  { background: #0d9488; color: #fff; }
+
+/* On wider screens, 2-column card grid */
+@media (min-width: 600px) {
+    #prodCardGrid, #srvCardGrid, #rentalCardGrid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+@media (max-width: 599px) {
+    .modal-dialog { margin: .5rem; }
+    .item-card-top { flex-direction: column; gap: .5rem; }
+    .item-card-price { text-align: left; }
+    .item-card-actions { flex-direction: column; }
+    .action-field { min-width: unset; width: 100%; }
+    .item-add-btn { width: 100%; justify-content: center; padding: .65rem; }
+}
 </style>
 
 <!-- ═══ PAGE HEADER ════════════════════════════════════════ -->
@@ -240,7 +334,7 @@
                                     <i class="bi bi-person-walking"></i> Walk-in
                                 </span>
                             </label>
-                            <select class="form-select form-select-sm" id="customer_id" name="customer_id" onchange="handleCustomerChange()">
+                            <select class="form-select form-select-sm select2-customer" id="customer_id" name="customer_id" onchange="handleCustomerChange()">
                                 <option value="">-- Walk-in Customer (No Account) --</option>
                                 <optgroup label="Registered Customers">
                                     <?php foreach ($customers as $c): ?>
@@ -261,13 +355,9 @@
                                 <i class="bi bi-exclamation-triangle-fill"></i> Credit sales require a registered customer.
                             </div>
                         </div>
-                        <div class="col-12 col-md-3">
+                        <div class="col-12 col-md-6">
                             <label for="invoice_date" class="form-label fw-semibold small text-muted text-uppercase mb-1">Invoice Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control form-control-sm" id="invoice_date" name="invoice_date" value="<?= date('Y-m-d'); ?>" required>
-                        </div>
-                        <div class="col-12 col-md-3">
-                            <label class="form-label fw-semibold small text-muted text-uppercase mb-1">Reference</label>
-                            <input type="text" class="form-control form-control-sm" name="reference" placeholder="PO / Job Ref (optional)">
                         </div>
                     </div>
                 </div>
@@ -430,10 +520,7 @@
 
                         <div class="d-grid gap-2 mt-3">
                             <button type="submit" name="action" value="post" class="post-btn" onclick="return validateInvoiceForm(event)">
-                                <i class="bi bi-send-check-fill"></i> Post Invoice
-                            </button>
-                            <button type="submit" name="action" value="draft" class="draft-btn">
-                                <i class="bi bi-cloud-arrow-up"></i> Save as Draft
+                                <i class="bi bi-save"></i> Save Invoice
                             </button>
                         </div>
 
@@ -455,51 +542,56 @@
      MODAL: ADD PRODUCT
      ═══════════════════════════════════════════════════════ -->
 <div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
         <div class="modal-content shadow-lg">
-            <div class="modal-header" style="background:linear-gradient(135deg,#312e81,#4f46e5);color:#fff;">
-                <h5 class="modal-title fw-bold" id="productModalLabel">
-                    <i class="bi bi-box-seam me-2"></i>Select Product
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="modal-search-wrap">
-                    <i class="bi bi-search search-icon"></i>
-                    <input type="text" id="prodSearchInput" placeholder="Search by product name, SKU or category..." oninput="filterModalItems('PRODUCT', this.value)">
+            <div class="modal-header" style="background:linear-gradient(135deg,#312e81,#4f46e5);color:#fff;padding:1rem 1.25rem !important;">
+                <div>
+                    <h5 class="modal-title fw-bold mb-0" id="productModalLabel">
+                        <i class="bi bi-box-seam me-2"></i>Select Product
+                    </h5>
+                    <div style="font-size:.75rem;opacity:.75;margin-top:.15rem;">Tap a product to configure qty &amp; price, then add</div>
                 </div>
-                <div class="table-responsive" style="max-height:400px;overflow-y:auto;">
-                    <table class="modal-tbl align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Product</th>
-                                <th class="text-center">In Stock</th>
-                                <th class="text-end">Base Price</th>
-                                <th style="width:90px;">Qty</th>
-                                <th style="width:120px;">Unit Price (LKR)</th>
-                                <th style="width:50px;"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="prodModalTableBody">
-                            <?php foreach ($products as $p): ?>
-                                <tr class="prod-row" data-search="<?= htmlspecialchars(strtolower($p['name_en'] . ' ' . ($p['sku'] ?? '') . ' ' . ($p['category_name'] ?? ''))); ?>">
-                                    <td>
-                                        <div class="fw-bold text-dark"><?= htmlspecialchars($p['name_en']); ?></div>
-                                        <small class="text-muted font-monospace">SKU: <?= htmlspecialchars($p['sku'] ?? '-'); ?> &bull; <?= htmlspecialchars($p['category_name'] ?? 'General'); ?></small>
-                                    </td>
-                                    <td class="text-center fw-semibold font-monospace text-muted"><?= number_format($p['stocks'][$defaultWarehouseId] ?? 0, 2); ?></td>
-                                    <td class="text-end font-monospace text-muted">LKR <?= number_format($p['default_selling_price'], 2); ?></td>
-                                    <td><input type="number" step="1" min="1" class="form-control form-control-sm font-monospace modal-qty-input" value="1"></td>
-                                    <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace modal-price-input" value="<?= number_format($p['default_selling_price'], 2, '.', ''); ?>"></td>
-                                    <td class="text-center">
-                                        <button type="button" class="modal-add-btn" style="background:#4f46e5;color:#fff;" onclick="addProductRowFromModal(<?= htmlspecialchars(json_encode($p)); ?>, this)">
-                                            <i class="bi bi-plus-lg"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                <button type="button" class="btn-close btn-close-white ms-3" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding:1rem !important;">
+                <!-- Search -->
+                <div class="position-relative mb-3">
+                    <i class="bi bi-search position-absolute" style="left:.85rem;top:50%;transform:translateY(-50%);color:#94a3b8;"></i>
+                    <input type="text" id="prodSearchInput" class="form-control rounded-pill" style="padding-left:2.4rem;font-size:.85rem;" placeholder="Search products..." oninput="filterModalItems('PRODUCT', this.value)">
+                </div>
+                <!-- Card Grid -->
+                <div id="prodCardGrid" style="max-height:65vh;overflow-y:auto;display:grid;grid-template-columns:1fr;gap:.65rem;">
+                    <?php foreach ($products as $p): ?>
+                    <div class="item-card prod-row" data-search="<?= htmlspecialchars(strtolower($p['name_en'] . ' ' . ($p['sku'] ?? '') . ' ' . ($p['category_name'] ?? ''))); ?>">
+                        <div class="item-card-top">
+                            <div class="item-card-info">
+                                <div class="item-card-name"><?= htmlspecialchars($p['name_en']); ?></div>
+                                <div class="item-card-meta">
+                                    <span class="item-meta-chip"><i class="bi bi-upc-scan"></i> <?= htmlspecialchars($p['sku'] ?? '-'); ?></span>
+                                    <span class="item-meta-chip"><i class="bi bi-tag"></i> <?= htmlspecialchars($p['category_name'] ?? 'General'); ?></span>
+                                    <span class="item-meta-chip stock-chip"><i class="bi bi-archive"></i> Stock: <?= number_format($p['stocks'][$defaultWarehouseId] ?? 0, 2); ?></span>
+                                </div>
+                            </div>
+                            <div class="item-card-price">
+                                <div class="price-label">Base Price</div>
+                                <div class="price-val">LKR <?= number_format($p['default_selling_price'], 2); ?></div>
+                            </div>
+                        </div>
+                        <div class="item-card-actions">
+                            <div class="action-field">
+                                <label>Qty</label>
+                                <input type="number" step="1" min="1" class="form-control form-control-sm font-monospace modal-qty-input" value="1">
+                            </div>
+                            <div class="action-field">
+                                <label>Unit Price (LKR)</label>
+                                <input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace modal-price-input" value="<?= number_format($p['default_selling_price'], 2, '.', ''); ?>">
+                            </div>
+                            <button type="button" class="item-add-btn product-add-btn" onclick="addProductRowFromModal(<?= htmlspecialchars(json_encode($p)); ?>, this)">
+                                <i class="bi bi-plus-lg"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
@@ -510,51 +602,53 @@
      MODAL: ADD SERVICE
      ═══════════════════════════════════════════════════════ -->
 <div class="modal fade" id="serviceModal" tabindex="-1" aria-labelledby="serviceModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
         <div class="modal-content shadow-lg">
-            <div class="modal-header" style="background:linear-gradient(135deg,#92400e,#d97706);color:#fff;">
-                <h5 class="modal-title fw-bold" id="serviceModalLabel">
-                    <i class="bi bi-gear-wide-connected me-2"></i>Select Service
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="modal-search-wrap">
-                    <i class="bi bi-search search-icon"></i>
-                    <input type="text" id="srvSearchInput" placeholder="Search by service name or code..." oninput="filterModalItems('SERVICE', this.value)">
+            <div class="modal-header" style="background:linear-gradient(135deg,#92400e,#d97706);color:#fff;padding:1rem 1.25rem !important;">
+                <div>
+                    <h5 class="modal-title fw-bold mb-0" id="serviceModalLabel">
+                        <i class="bi bi-gear-wide-connected me-2"></i>Select Service
+                    </h5>
+                    <div style="font-size:.75rem;opacity:.75;margin-top:.15rem;">Set the quantity and price, then add to invoice</div>
                 </div>
-                <div class="table-responsive" style="max-height:400px;overflow-y:auto;">
-                    <table class="modal-tbl align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Service</th>
-                                <th>Unit</th>
-                                <th class="text-end">Base Price</th>
-                                <th style="width:90px;">Qty</th>
-                                <th style="width:120px;">Unit Price (LKR)</th>
-                                <th style="width:50px;"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="srvModalTableBody">
-                            <?php foreach ($services as $s): ?>
-                                <tr class="srv-row" data-search="<?= htmlspecialchars(strtolower($s['service_name'] . ' ' . $s['service_code'])); ?>">
-                                    <td>
-                                        <div class="fw-bold text-dark"><?= htmlspecialchars($s['service_name']); ?></div>
-                                        <small class="text-muted font-monospace">Code: <?= htmlspecialchars($s['service_code']); ?></small>
-                                    </td>
-                                    <td><?= htmlspecialchars($s['unit']); ?></td>
-                                    <td class="text-end font-monospace text-muted">LKR <?= number_format($s['default_price'], 2); ?></td>
-                                    <td><input type="number" step="1" min="1" class="form-control form-control-sm font-monospace modal-qty-input" value="1"></td>
-                                    <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace modal-price-input" value="<?= number_format($s['default_price'], 2, '.', ''); ?>"></td>
-                                    <td class="text-center">
-                                        <button type="button" class="modal-add-btn" style="background:#d97706;color:#fff;" onclick="addServiceRowFromModal(<?= htmlspecialchars(json_encode($s)); ?>, this)">
-                                            <i class="bi bi-plus-lg"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                <button type="button" class="btn-close btn-close-white ms-3" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding:1rem !important;">
+                <div class="position-relative mb-3">
+                    <i class="bi bi-search position-absolute" style="left:.85rem;top:50%;transform:translateY(-50%);color:#94a3b8;"></i>
+                    <input type="text" id="srvSearchInput" class="form-control rounded-pill" style="padding-left:2.4rem;font-size:.85rem;" placeholder="Search services..." oninput="filterModalItems('SERVICE', this.value)">
+                </div>
+                <div id="srvCardGrid" style="max-height:65vh;overflow-y:auto;display:grid;grid-template-columns:1fr;gap:.65rem;">
+                    <?php foreach ($services as $s): ?>
+                    <div class="item-card srv-row" data-search="<?= htmlspecialchars(strtolower($s['service_name'] . ' ' . $s['service_code'])); ?>">
+                        <div class="item-card-top">
+                            <div class="item-card-info">
+                                <div class="item-card-name"><?= htmlspecialchars($s['service_name']); ?></div>
+                                <div class="item-card-meta">
+                                    <span class="item-meta-chip"><i class="bi bi-hash"></i> <?= htmlspecialchars($s['service_code']); ?></span>
+                                    <span class="item-meta-chip"><i class="bi bi-rulers"></i> <?= htmlspecialchars($s['unit']); ?></span>
+                                </div>
+                            </div>
+                            <div class="item-card-price">
+                                <div class="price-label">Base Price</div>
+                                <div class="price-val">LKR <?= number_format($s['default_price'], 2); ?></div>
+                            </div>
+                        </div>
+                        <div class="item-card-actions">
+                            <div class="action-field">
+                                <label>Qty</label>
+                                <input type="number" step="1" min="1" class="form-control form-control-sm font-monospace modal-qty-input" value="1">
+                            </div>
+                            <div class="action-field">
+                                <label>Unit Price (LKR)</label>
+                                <input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace modal-price-input" value="<?= number_format($s['default_price'], 2, '.', ''); ?>">
+                            </div>
+                            <button type="button" class="item-add-btn service-add-btn" onclick="addServiceRowFromModal(<?= htmlspecialchars(json_encode($s)); ?>, this)">
+                                <i class="bi bi-plus-lg"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
@@ -565,55 +659,58 @@
      MODAL: ADD RENTAL / MACHINERY
      ═══════════════════════════════════════════════════════ -->
 <div class="modal fade" id="rentalModal" tabindex="-1" aria-labelledby="rentalModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
         <div class="modal-content shadow-lg">
-            <div class="modal-header" style="background:linear-gradient(135deg,#064e3b,#0d9488);color:#fff;">
-                <h5 class="modal-title fw-bold" id="rentalModalLabel">
-                    <i class="bi bi-truck-flatbed me-2"></i>Select Machinery / Rental Asset
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <div class="modal-search-wrap">
-                    <i class="bi bi-search search-icon"></i>
-                    <input type="text" id="rentalSearchInput" placeholder="Search by machine name, code or category..." oninput="filterModalItems('RENTAL', this.value)">
+            <div class="modal-header" style="background:linear-gradient(135deg,#064e3b,#0d9488);color:#fff;padding:1rem 1.25rem !important;">
+                <div>
+                    <h5 class="modal-title fw-bold mb-0" id="rentalModalLabel">
+                        <i class="bi bi-truck-flatbed me-2"></i>Select Machinery / Rental
+                    </h5>
+                    <div style="font-size:.75rem;opacity:.75;margin-top:.15rem;">Set qty (hours/days/acres) and rate, then add</div>
                 </div>
-                <div class="table-responsive" style="max-height:400px;overflow-y:auto;">
-                    <table class="modal-tbl align-middle mb-0">
-                        <thead>
-                            <tr>
-                                <th>Machine Details</th>
-                                <th>Status</th>
-                                <th class="text-end">Default Rate</th>
-                                <th style="width:90px;">Qty</th>
-                                <th style="width:120px;">Total Price (LKR)</th>
-                                <th style="width:50px;"></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($machineryAssets as $m): ?>
-                                <tr class="rental-row" data-search="<?= htmlspecialchars(strtolower((string)($m['machinery_name'] ?? '') . ' ' . (string)($m['machinery_code'] ?? '') . ' ' . (string)($m['category'] ?? ''))); ?>">
-                                    <td>
-                                        <div class="fw-bold text-dark"><?= htmlspecialchars($m['machinery_name']); ?></div>
-                                        <small class="text-muted font-monospace">Code: <?= htmlspecialchars($m['machinery_code']); ?> &bull; Serial: <?= htmlspecialchars($m['serial_number'] ?: '-'); ?></small>
-                                    </td>
-                                    <td>
-                                        <span class="badge rounded-pill <?= ($m['status'] === 'AVAILABLE') ? 'bg-success' : (($m['status'] === 'RENTED') ? 'bg-warning text-dark' : 'bg-danger'); ?>">
+                <button type="button" class="btn-close btn-close-white ms-3" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" style="padding:1rem !important;">
+                <div class="position-relative mb-3">
+                    <i class="bi bi-search position-absolute" style="left:.85rem;top:50%;transform:translateY(-50%);color:#94a3b8;"></i>
+                    <input type="text" id="rentalSearchInput" class="form-control rounded-pill" style="padding-left:2.4rem;font-size:.85rem;" placeholder="Search machinery..." oninput="filterModalItems('RENTAL', this.value)">
+                </div>
+                <div id="rentalCardGrid" style="max-height:65vh;overflow-y:auto;display:grid;grid-template-columns:1fr;gap:.65rem;">
+                    <?php foreach ($machineryAssets as $m): ?>
+                    <div class="item-card rental-row" data-search="<?= htmlspecialchars(strtolower((string)($m['machinery_name'] ?? '') . ' ' . (string)($m['machinery_code'] ?? '') . ' ' . (string)($m['category'] ?? ''))); ?>">
+                        <div class="item-card-top">
+                            <div class="item-card-info">
+                                <div class="item-card-name"><?= htmlspecialchars($m['machinery_name']); ?></div>
+                                <div class="item-card-meta">
+                                    <span class="item-meta-chip"><i class="bi bi-qr-code"></i> <?= htmlspecialchars($m['machinery_code']); ?></span>
+                                    <span class="item-meta-chip"><i class="bi bi-fingerprint"></i> S/N: <?= htmlspecialchars($m['serial_number'] ?: '-'); ?></span>
+                                    <span class="item-meta-chip">
+                                        <span class="badge rounded-pill <?= ($m['status'] === 'AVAILABLE') ? 'bg-success' : (($m['status'] === 'RENTED') ? 'bg-warning text-dark' : 'bg-danger'); ?>" style="font-size:.65rem;">
                                             <?= htmlspecialchars($m['status']); ?>
                                         </span>
-                                    </td>
-                                    <td class="text-end font-monospace text-muted">LKR <?= number_format($m['default_rental_rate'], 2); ?> / <?= htmlspecialchars($m['rental_unit']); ?></td>
-                                    <td><input type="number" step="1" min="1" class="form-control form-control-sm font-monospace modal-machine-qty-input" value="1"></td>
-                                    <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace modal-machine-price-input" value="<?= number_format($m['default_rental_rate'], 2, '.', ''); ?>"></td>
-                                    <td class="text-center">
-                                        <button type="button" class="modal-add-btn" style="background:#0d9488;color:#fff;" onclick="addMachineRowFromDirectory(<?= htmlspecialchars(json_encode($m)); ?>, this)">
-                                            <i class="bi bi-plus-lg"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="item-card-price">
+                                <div class="price-label">Rate / <?= htmlspecialchars($m['rental_unit']); ?></div>
+                                <div class="price-val">LKR <?= number_format($m['default_rental_rate'], 2); ?></div>
+                            </div>
+                        </div>
+                        <div class="item-card-actions">
+                            <div class="action-field">
+                                <label><?= htmlspecialchars($m['rental_unit'] ?? 'Qty'); ?></label>
+                                <input type="number" step="1" min="1" class="form-control form-control-sm font-monospace modal-machine-qty-input" value="1">
+                            </div>
+                            <div class="action-field">
+                                <label>Price (LKR)</label>
+                                <input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace modal-machine-price-input" value="<?= number_format($m['default_rental_rate'], 2, '.', ''); ?>">
+                            </div>
+                            <button type="button" class="item-add-btn rental-add-btn" onclick="addMachineRowFromDirectory(<?= htmlspecialchars(json_encode($m)); ?>, this)">
+                                <i class="bi bi-plus-lg"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
         </div>
@@ -629,9 +726,22 @@ const defaultServiceId   = <?= !empty($services) ? $services[0]['id'] : '0'; ?>;
 
 /* ── Payment Tabs ──────────────────────────────────────── */
 function selectPayTab(btn) {
+    const val = btn.getAttribute('data-value');
+    const sel = document.getElementById('customer_id');
+
+    if (val === 'CREDIT' && sel.value === '') {
+        alert('Please select a registered Customer first to use Credit payment.');
+        // Briefly focus the customer dropdown
+        if ($('.select2-customer').length) {
+            $('.select2-customer').select2('open');
+        } else {
+            sel.focus();
+        }
+        return;
+    }
+
     document.querySelectorAll('.pay-tab').forEach(t => t.classList.remove('active'));
     btn.classList.add('active');
-    const val = btn.getAttribute('data-value');
     document.getElementById('payment_type').value = val;
     togglePaymentFields(val);
 }
@@ -702,7 +812,7 @@ function updateItemCount() {
 
 /* ── Add Product ───────────────────────────────────────── */
 function addProductRowFromModal(prod, btn) {
-    const row   = btn.closest('tr');
+    const row   = btn.closest('.item-card');
     const qty   = parseInt(row.querySelector('.modal-qty-input').value) || 1;
     const price = parseFloat(row.querySelector('.modal-price-input').value) || parseFloat(prod.default_selling_price);
     rowCount++;
@@ -744,7 +854,7 @@ function addProductRowFromModal(prod, btn) {
 
 /* ── Add Service ───────────────────────────────────────── */
 function addServiceRowFromModal(srv, btn) {
-    const row   = btn.closest('tr');
+    const row   = btn.closest('.item-card');
     const qty   = parseInt(row.querySelector('.modal-qty-input').value) || 1;
     const price = parseFloat(row.querySelector('.modal-price-input').value) || parseFloat(srv.default_price);
     rowCount++;
@@ -785,7 +895,7 @@ function addServiceRowFromModal(srv, btn) {
 
 /* ── Add Machine (from rental modal) ──────────────────── */
 function addMachineRowFromDirectory(machine, btn) {
-    const row   = btn.closest('tr');
+    const row   = btn.closest('.item-card');
     const qty   = parseInt(row.querySelector('.modal-machine-qty-input').value) || 1;
     const price = parseFloat(row.querySelector('.modal-machine-price-input').value) || parseFloat(machine.default_rental_rate);
     rowCount++;
@@ -826,7 +936,7 @@ function addMachineRowFromDirectory(machine, btn) {
 
 /* ── Legacy rental (from job) ──────────────────────────── */
 function addRentalRowFromModal(rental, btn) {
-    const row         = btn.closest('tr');
+    const row         = btn.closest('.item-card');
     const totalCharge = parseFloat(row.querySelector('.modal-price-input').value) || parseFloat(rental.total_charge);
     const qty         = parseInt(rental.quantity) || 1;
     const rate        = (totalCharge / qty);
@@ -937,8 +1047,28 @@ function htmlspecialchars(str) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Select2 for searchable dropdown if jQuery and Select2 are loaded
+    if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
+        $('.select2-customer').select2({
+            theme: 'bootstrap-5',
+            width: '100%',
+            placeholder: "-- Walk-in Customer (No Account) --",
+            allowClear: true
+        });
+        $('.select2-customer').on('change', function() {
+            handleCustomerChange();
+        });
+    }
+
     handleCustomerChange();
     togglePaymentFields();
     updateItemCount();
 });
 </script>
+
+<!-- Include Select2 CSS and JS if not already in layout -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+

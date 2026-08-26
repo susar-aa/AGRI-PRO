@@ -179,13 +179,17 @@ class ReceiptPaymentController extends Controller {
         $db = \Core\Database::getInstance();
         $suppliers = $db->query("SELECT id, party_code, name FROM parties WHERE party_type IN ('SUPPLIER', 'BOTH') AND status = 'active' ORDER BY name ASC")->fetchAll();
 
+        // Fetch expense accounts for Payments (Accounts Payable, COGS, General Expenses)
+        $expenseAccounts = $db->query("SELECT id, account_name, account_code FROM accounts WHERE category IN ('Liability', 'COGS', 'Expense') AND allow_manual_posting=1 ORDER BY account_name ASC")->fetchAll();
+
         $this->render('payments/create', [
             'pageTitle' => 'Make Supplier Payment Voucher',
             'activeNav' => 'payments',
             'selectedParty' => $party,
             'cashAccounts' => $cashAccounts,
             'bankAccounts' => $bankAccounts,
-            'suppliers' => $suppliers
+            'suppliers' => $suppliers,
+            'expenseAccounts' => $expenseAccounts
         ]);
     }
 
@@ -221,7 +225,7 @@ class ReceiptPaymentController extends Controller {
                     Helper::redirect('receipts/create');
                 }
             } else {
-                // Record new cheque
+                // Record new customer received cheque
                 $chequeData = [
                     'cheque_number' => trim($_POST['cheque_number_input'] ?? ''),
                     'party_id' => !empty($_POST['party_id']) ? (int)$_POST['party_id'] : 0,
@@ -239,6 +243,25 @@ class ReceiptPaymentController extends Controller {
                     Session::setFlash('error', 'Failed to register cheque: ' . $e->getMessage());
                     Helper::redirect('receipts/create');
                 }
+            }
+        } else if ($type === 'PAYMENT' && $method === 'Cheque') {
+            // Record new supplier issued cheque
+            $chequeData = [
+                'cheque_number' => trim($_POST['cheque_number_input'] ?? ''),
+                'party_id' => !empty($_POST['party_id']) ? (int)$_POST['party_id'] : 0,
+                'bank_name' => trim($_POST['cheque_bank_name'] ?? ''),
+                'cheque_date' => $_POST['cheque_date'] ?? date('Y-m-d'),
+                'amount' => (float)($_POST['amount'] ?? 0),
+                'received_issued_date' => $_POST['payment_date'] ?? date('Y-m-d'),
+                'reference_number' => trim($_POST['reference_number'] ?? ''),
+                'notes' => trim($_POST['notes'] ?? '')
+            ];
+
+            try {
+                $chequeId = ChequeDepositEngine::issueCheque($chequeData);
+            } catch (\Exception $e) {
+                Session::setFlash('error', 'Failed to register issued cheque: ' . $e->getMessage());
+                Helper::redirect('supplier-payments/create');
             }
         }
 

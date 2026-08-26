@@ -26,9 +26,6 @@
         <p class="text-muted small mb-0">Record, track, and manage all operating and credit expenses across business modules.</p>
     </div>
     <div class="d-flex gap-2">
-        <a href="<?= \Core\Helper::baseUrl('expenses/reports'); ?>" class="btn btn-outline-success rounded-pill px-3">
-            <i class="bi bi-bar-chart-line-fill me-1"></i> Reports & Analytics
-        </a>
         <?php if (\Core\Auth::hasPermission('expenses.create')): ?>
             <a href="<?= \Core\Helper::baseUrl('expenses/create' . (isset($_GET['source_module']) ? '?source_module=' . urlencode($_GET['source_module']) : '')); ?>" class="btn btn-success rounded-pill px-4" style="background-color: #1b4332; border-color: #1b4332;">
                 <i class="bi bi-plus-lg me-1"></i> Record Expense
@@ -70,20 +67,6 @@
                     <option value="Cash" <?= ($filters['payment_method'] === 'Cash') ? 'selected' : ''; ?>>Cash</option>
                     <option value="Bank Transfer" <?= ($filters['payment_method'] === 'Bank Transfer') ? 'selected' : ''; ?>>Bank Transfer</option>
                     <option value="Cheque" <?= ($filters['payment_method'] === 'Cheque') ? 'selected' : ''; ?>>Cheque</option>
-                    <option value="Card" <?= ($filters['payment_method'] === 'Card') ? 'selected' : ''; ?>>Card</option>
-                    <option value="Online Payment" <?= ($filters['payment_method'] === 'Online Payment') ? 'selected' : ''; ?>>Online Payment</option>
-                    <option value="Credit" <?= ($filters['payment_method'] === 'Credit') ? 'selected' : ''; ?>>Credit (Pay Later)</option>
-                </select>
-            </div>
-            <div class="col-6 col-md-3 col-lg-2">
-                <label class="form-label fw-semibold">Source Module</label>
-                <select class="form-select form-select-sm" name="source_module">
-                    <option value="">-- All --</option>
-                    <option value="GENERAL" <?= ($filters['source_module'] === 'GENERAL') ? 'selected' : ''; ?>>General</option>
-                    <option value="PLANTATION" <?= ($filters['source_module'] === 'PLANTATION') ? 'selected' : ''; ?>>Plantation</option>
-                    <option value="CONSTRUCTION" <?= ($filters['source_module'] === 'CONSTRUCTION') ? 'selected' : ''; ?>>Construction</option>
-                    <option value="GRINDING_MILL" <?= ($filters['source_module'] === 'GRINDING_MILL') ? 'selected' : ''; ?>>Grinding Mill</option>
-                    <option value="MARKETPLACE" <?= ($filters['source_module'] === 'MARKETPLACE') ? 'selected' : ''; ?>>Marketplace</option>
                 </select>
             </div>
             <div class="col-6 col-md-3 col-lg-2">

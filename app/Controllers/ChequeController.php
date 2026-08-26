@@ -28,24 +28,33 @@ class ChequeController extends Controller {
         $limit = 20;
         $offset = ($page - 1) * $limit;
 
-        $cheques = $this->chequeModel->getAll($filters, $limit, $offset);
-        $totalItems = $this->chequeModel->getCount($filters);
-        $totalPages = ceil($totalItems / $limit);
+        $filtersReceived = $filters;
+        $filtersReceived['cheque_type'] = 'RECEIVED';
+        $receivedCheques = $this->chequeModel->getAll($filtersReceived, $limit, $offset);
+        $totalReceived = $this->chequeModel->getCount($filtersReceived);
+        
+        $filtersIssued = $filters;
+        $filtersIssued['cheque_type'] = 'ISSUED';
+        $issuedCheques = $this->chequeModel->getAll($filtersIssued, $limit, $offset);
+        $totalIssued = $this->chequeModel->getCount($filtersIssued);
 
-        // Fetch active customers for filtering dropdown
+        $totalPages = ceil(max($totalReceived, $totalIssued) / $limit);
+
+        // Fetch active customers and suppliers for filtering dropdown
         $db = \Core\Database::getInstance();
-        $customers = $db->query("SELECT id, party_code, name FROM parties WHERE party_type IN ('CUSTOMER', 'BOTH') AND status = 'active' ORDER BY name ASC")->fetchAll();
+        $parties = $db->query("SELECT id, party_code, name, party_type FROM parties WHERE party_type IN ('CUSTOMER', 'SUPPLIER', 'BOTH') AND status = 'active' ORDER BY name ASC")->fetchAll();
 
         $this->render('cheques/index', [
             'pageTitle' => 'Cheques Registry',
             'activeNav' => 'cheques',
-            'cheques' => $cheques,
+            'receivedCheques' => $receivedCheques,
+            'issuedCheques' => $issuedCheques,
             'filters' => $filters,
-            'customers' => $customers,
+            'parties' => $parties,
             'pagination' => [
                 'current' => $page,
                 'total' => $totalPages,
-                'count' => $totalItems
+                'count' => max($totalReceived, $totalIssued)
             ]
         ]);
     }
@@ -93,6 +102,39 @@ class ChequeController extends Controller {
             $db = \Core\Database::getInstance();
             $db->prepare("UPDATE cheques SET status = 'CANCELLED', updated_at = NOW() WHERE id = :id")->execute(['id' => $id]);
             Session::setFlash('success', 'Cheque successfully marked as CANCELLED.');
+        } catch (\Exception $e) {
+            Session::setFlash('error', 'Action failed: ' . $e->getMessage());
+        }
+
+        Helper::redirect('cheques');
+    }
+
+    public function pass(): void {
+        Auth::requirePermission('cheques.update_status');
+        $this->validateCsrf();
+
+        $id = !empty($_POST['id']) ? (int)$_POST['id'] : 0;
+
+        try {
+            \App\Services\ChequeDepositEngine::passIssuedCheque($id);
+            Session::setFlash('success', 'Issued Cheque successfully marked as PASSED and bank balance updated.');
+        } catch (\Exception $e) {
+            Session::setFlash('error', 'Action failed: ' . $e->getMessage());
+        }
+
+        Helper::redirect('cheques');
+    }
+
+    public function return(): void {
+        Auth::requirePermission('cheques.update_status');
+        $this->validateCsrf();
+
+        $id = !empty($_POST['id']) ? (int)$_POST['id'] : 0;
+        $reason = trim($_POST['reversal_reason'] ?? 'Cheque Returned');
+
+        try {
+            \App\Services\ChequeDepositEngine::returnIssuedCheque($id, $reason);
+            Session::setFlash('success', 'Issued Cheque marked as RETURNED. Supplier payment reversed.');
         } catch (\Exception $e) {
             Session::setFlash('error', 'Action failed: ' . $e->getMessage());
         }

@@ -308,18 +308,15 @@ class InvoiceController extends Controller {
                    ->execute(['invoice_id' => $invoiceId, 'rental_id' => $rentalId]);
             }
 
-            if (!empty($_POST['action']) && $_POST['action'] === 'post') {
-                Auth::requirePermission('invoices.post');
-                $chequeInfo = [
-                    'cheque_number' => $_POST['cheque_number'] ?? '',
-                    'bank_name' => $_POST['cheque_bank'] ?? '',
-                    'cheque_date' => $_POST['cheque_date'] ?? date('Y-m-d')
-                ];
-                InvoiceEngine::postInvoice($invoiceId, $chequeInfo);
-                Session::setFlash('success', 'Invoice generated and posted successfully.');
-            } else {
-                Session::setFlash('success', 'Invoice recorded as Draft.');
-            }
+            // Automatically post the invoice unconditionally
+            Auth::requirePermission('invoices.post');
+            $chequeInfo = [
+                'cheque_number' => $_POST['cheque_number'] ?? '',
+                'bank_name' => $_POST['cheque_bank'] ?? '',
+                'cheque_date' => $_POST['cheque_date'] ?? date('Y-m-d')
+            ];
+            InvoiceEngine::postInvoice($invoiceId, $chequeInfo);
+            Session::setFlash('success', 'Invoice generated and posted successfully.');
 
             Helper::redirect('modules/invoices/view?id=' . $invoiceId);
 

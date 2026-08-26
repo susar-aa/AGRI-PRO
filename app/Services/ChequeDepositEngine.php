@@ -63,6 +63,57 @@ class ChequeDepositEngine {
     }
 
     /**
+     * Record a new supplier issued cheque.
+     */
+    public static function issueCheque(array $data): int {
+        $db = Database::getInstance();
+
+        if (empty($data['cheque_number'])) {
+            throw new Exception("Cheque number is required.");
+        }
+        if (empty($data['party_id'])) {
+            throw new Exception("Supplier party is required.");
+        }
+        if (empty($data['bank_name'])) {
+            throw new Exception("Bank name is required.");
+        }
+        $amount = round((float)($data['amount'] ?? 0), 2);
+        if ($amount <= 0) {
+            throw new Exception("Cheque amount must be greater than zero.");
+        }
+
+        // Duplicate prevention: same cheque number & bank combination should not exist
+        $stmt = $db->prepare("SELECT COUNT(*) FROM cheques WHERE cheque_number = :num AND bank_name = :bank AND cheque_type = 'ISSUED'");
+        $stmt->execute(['num' => $data['cheque_number'], 'bank' => $data['bank_name']]);
+        if ((int)$stmt->fetchColumn() > 0) {
+            throw new Exception("Issued Cheque with number " . $data['cheque_number'] . " for bank " . $data['bank_name'] . " already exists.");
+        }
+
+        $chequeDate = $data['cheque_date'] ?? date('Y-m-d');
+        $issuedDate = $data['received_issued_date'] ?? date('Y-m-d');
+        $createdBy = $data['created_by'] ?? Auth::id() ?? 1;
+
+        $stmt = $db->prepare("
+            INSERT INTO cheques 
+            (cheque_number, cheque_type, party_id, bank_name, cheque_date, amount, received_issued_date, status, created_by)
+            VALUES 
+            (:cheque_number, 'ISSUED', :party_id, :bank_name, :cheque_date, :amount, :received_issued_date, 'ISSUED', :created_by)
+        ");
+
+        $stmt->execute([
+            'cheque_number' => $data['cheque_number'],
+            'party_id' => (int)$data['party_id'],
+            'bank_name' => $data['bank_name'],
+            'cheque_date' => $chequeDate,
+            'amount' => $amount,
+            'received_issued_date' => $issuedDate,
+            'created_by' => $createdBy
+        ]);
+
+        return (int)$db->lastInsertId();
+    }
+
+    /**
      * Record a bank deposit draft containing cash and/or cheques.
      */
     public static function recordBankDeposit(array $data): int {
@@ -252,17 +303,15 @@ class ChequeDepositEngine {
         // Prepare accounting lines
         $journalLines = [];
 
-        // Debit: Destination bank account ledger ID
-        $journalLines[] = [
-            'account_id' => (int)$ba['account_id'],
-            'debit' => (float)$dep['total_amount'],
-            'credit' => 0.00,
-            'description' => "Bank Deposit: " . $dep['description']
-        ];
-
-        // Credits:
-        // Cash: credit Cash Drawer ledger ID
+        // Cash: debit bank, credit Cash Drawer ledger ID
         if ($totalCash > 0) {
+            $journalLines[] = [
+                'account_id' => (int)$ba['account_id'],
+                'debit' => $totalCash,
+                'credit' => 0.00,
+                'description' => "Bank Deposit (Cash): " . $dep['description']
+            ];
+
             $cashAccountGL = $db->query("SELECT id FROM accounts WHERE account_code = '1110'")->fetchColumn();
             if (!$cashAccountGL) {
                 throw new Exception("Main Cash in Hand account (1110) not found.");
@@ -275,28 +324,7 @@ class ChequeDepositEngine {
             ];
         }
 
-        // Cheques: credit Undeposited Cheques (1115)
-        if ($totalCheques > 0) {
-            $journalLines[] = [
-                'account_id' => 27, // Undeposited Cheques (we created code 1115, let's look up its ID dynamically to be extremely safe!)
-                'debit' => 0.00,
-                'credit' => $totalCheques,
-                'description' => "Cheque Deposit components"
-            ];
-        }
-
-        // Resolve Undeposited Cheques account ID dynamically
-        $undepAccountId = (int)$db->query("SELECT id FROM accounts WHERE account_code = '1115'")->fetchColumn();
-        if (!$undepAccountId) {
-            throw new Exception("Undeposited Cheques account (1115) is missing in Chart of Accounts.");
-        }
-
-        // Update the account ID for Undeposited Cheques line if present
-        foreach ($journalLines as &$line) {
-            if ($line['account_id'] === 27) {
-                $line['account_id'] = $undepAccountId;
-            }
-        }
+        // (Cheques do not hit the bank account until they are CLEARED)
 
         $inTransaction = Database::inTransaction();
         if (!$inTransaction) {
@@ -304,23 +332,28 @@ class ChequeDepositEngine {
         }
 
         try {
-            // 1. Post double-entry journal entry
-            $journalData = [
-                'transaction_date' => $dep['deposit_date'],
-                'description' => "Bank Deposit Voucher (" . $dep['deposit_number'] . ")",
-                'reference' => $dep['deposit_number'],
-                'source_module' => 'finance',
-                'source_transaction_id' => $dep['id'],
-                'cost_center_id' => $costCenterId,
-                'status' => 'approved',
-                'lines' => $journalLines
-            ];
+            $journalId = null;
+            if (!empty($journalLines)) {
+                // 1. Post double-entry journal entry
+                $journalData = [
+                    'transaction_date' => $dep['deposit_date'],
+                    'description' => "Bank Deposit Voucher (" . $dep['deposit_number'] . ")",
+                    'reference' => $dep['deposit_number'],
+                    'source_module' => 'finance',
+                    'source_transaction_id' => $dep['id'],
+                    'cost_center_id' => $costCenterId,
+                    'status' => 'approved',
+                    'lines' => $journalLines
+                ];
 
-            $journalId = AccountingEngine::postJournalEntry($journalData);
+                $journalId = AccountingEngine::postJournalEntry($journalData);
+            }
 
-            // 2. Adjust Bank Account balance (+)
-            $db->prepare("UPDATE bank_accounts SET current_balance = current_balance + :amt WHERE id = :id")
-               ->execute(['amt' => (float)$dep['total_amount'], 'id' => (int)$dep['bank_account_id']]);
+            // 2. Adjust Bank Account balance (+) FOR CASH ONLY
+            if ($totalCash > 0) {
+                $db->prepare("UPDATE bank_accounts SET current_balance = current_balance + :amt WHERE id = :id")
+                   ->execute(['amt' => $totalCash, 'id' => (int)$dep['bank_account_id']]);
+
 
             // 3. Adjust Cash Drawer balance (-) if cash was deposited
             if ($totalCash > 0) {
@@ -373,7 +406,7 @@ class ChequeDepositEngine {
         if (!$dep) {
             throw new Exception("Deposit voucher not found.");
         }
-        if ($dep['status'] !== 'DEPOSITED' || empty($dep['journal_entry_id'])) {
+        if ($dep['status'] !== 'DEPOSITED') {
             throw new Exception("Only posted deposits can be cancelled.");
         }
 
@@ -394,12 +427,17 @@ class ChequeDepositEngine {
         }
 
         try {
-            // 1. Reverse the journal entry
-            $reversalJournalId = AccountingEngine::reverseJournalEntry((int)$dep['journal_entry_id'], "Reversal of Deposit " . $dep['deposit_number'] . ": " . $reason);
+            // 1. Reverse the journal entry (if cash was included and generated an entry)
+            $reversalJournalId = null;
+            if (!empty($dep['journal_entry_id'])) {
+                $reversalJournalId = AccountingEngine::reverseJournalEntry((int)$dep['journal_entry_id'], "Reversal of Deposit " . $dep['deposit_number'] . ": " . $reason);
+            }
 
-            // 2. Revert Bank Balance (-)
-            $db->prepare("UPDATE bank_accounts SET current_balance = current_balance - :amt WHERE id = :id")
-               ->execute(['amt' => (float)$dep['total_amount'], 'id' => (int)$dep['bank_account_id']]);
+            if ($totalCash > 0) {
+                // 2. Revert Bank Balance (-) FOR CASH ONLY
+                $db->prepare("UPDATE bank_accounts SET current_balance = current_balance - :amt WHERE id = :id")
+                   ->execute(['amt' => $totalCash, 'id' => (int)$dep['bank_account_id']]);
+
 
             // 3. Revert Cash Drawer balance (+) if cash was deposited
             if ($totalCash > 0) {
@@ -459,18 +497,81 @@ class ChequeDepositEngine {
         if (!$ch) {
             throw new Exception("Cheque not found.");
         }
-        if (!in_array($ch['status'], ['RECEIVED', 'DEPOSITED'])) {
-            throw new Exception("Only RECEIVED or DEPOSITED cheques can be cleared.");
+        if ($ch['status'] !== 'DEPOSITED') {
+            throw new Exception("Only DEPOSITED cheques can be cleared. You must deposit the cheque first.");
         }
 
-        $db->prepare("UPDATE cheques SET status = 'CLEARED', updated_at = NOW() WHERE id = :id")
-           ->execute(['id' => $chequeId]);
+        if (empty($ch['deposit_bank_account_id'])) {
+            throw new Exception("Linked bank account for this deposited cheque could not be found.");
+        }
 
-        AuditService::log('clear_cheque', 'finance', $chequeId, null, [
-            'cheque_number' => $ch['cheque_number']
-        ]);
+        $bankAccountId = (int)$ch['deposit_bank_account_id'];
+        $bankAccountLedgerId = (int)$db->query("SELECT account_id FROM bank_accounts WHERE id = " . $bankAccountId)->fetchColumn();
+        $undepAccountId = (int)$db->query("SELECT id FROM accounts WHERE account_code = '1115'")->fetchColumn();
 
-        return true;
+        if (!$bankAccountLedgerId || !$undepAccountId) {
+            throw new Exception("Chart of Accounts mapping error.");
+        }
+
+        $inTransaction = Database::inTransaction();
+        if (!$inTransaction) {
+            Database::beginTransaction();
+        }
+
+        try {
+            // Update cheque status to CLEARED
+            $db->prepare("UPDATE cheques SET status = 'CLEARED', updated_at = NOW() WHERE id = :id")
+               ->execute(['id' => $chequeId]);
+
+            // Post accounting entry (Dr Bank Account, Cr Undeposited Cheques)
+            $costCenterId = (int)$db->query("SELECT id FROM cost_centers LIMIT 1")->fetchColumn();
+            $refNumber = 'CLR-' . $ch['cheque_number'];
+
+            $journalData = [
+                'transaction_date' => date('Y-m-d'),
+                'description' => "Received Cheque Cleared: " . $ch['cheque_number'],
+                'reference' => $refNumber,
+                'source_module' => 'finance',
+                'source_transaction_id' => $chequeId,
+                'cost_center_id' => $costCenterId,
+                'status' => 'approved',
+                'lines' => [
+                    [
+                        'account_id' => $bankAccountLedgerId, // Debit (Asset increases)
+                        'debit' => (float)$ch['amount'],
+                        'credit' => 0.00,
+                        'description' => "Cheque Cleared"
+                    ],
+                    [
+                        'account_id' => $undepAccountId, // Credit (Asset decreases)
+                        'debit' => 0.00,
+                        'credit' => (float)$ch['amount'],
+                        'description' => "Cheque Cleared"
+                    ]
+                ]
+            ];
+
+            AccountingEngine::postJournalEntry($journalData);
+
+            // Add to bank account balance
+            $db->prepare("UPDATE bank_accounts SET current_balance = current_balance + :amt WHERE id = :id")
+               ->execute(['amt' => (float)$ch['amount'], 'id' => $bankAccountId]);
+
+            AuditService::log('clear_cheque', 'finance', $chequeId, null, [
+                'cheque_number' => $ch['cheque_number']
+            ]);
+
+            if (!$inTransaction) {
+                Database::commit();
+            }
+            return true;
+
+        } catch (Exception $e) {
+            if (!$inTransaction && Database::inTransaction()) {
+                Database::rollBack();
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -506,11 +607,11 @@ class ChequeDepositEngine {
             if ($receipt) {
                 // Determine credit account based on cheque deposit state
                 $creditAccountLedgerId = null;
-                if ($ch['status'] === 'RECEIVED') {
+                if ($ch['status'] === 'RECEIVED' || $ch['status'] === 'DEPOSITED') {
                     // Credit Undeposited Cheques account (1115)
                     $creditAccountLedgerId = (int)$db->query("SELECT id FROM accounts WHERE account_code = '1115'")->fetchColumn();
                 } else {
-                    // Credit Bank Account Ledger ID (from where it was deposited)
+                    // It was CLEARED, so we must credit the Bank Account Ledger ID
                     if ($ch['deposit_bank_account_id']) {
                         $creditAccountLedgerId = (int)$db->query("SELECT account_id FROM bank_accounts WHERE id = " . (int)$ch['deposit_bank_account_id'])->fetchColumn();
                     } else {
@@ -564,8 +665,8 @@ class ChequeDepositEngine {
                     'reason' => "Cheque Bounced: " . $reason
                 ]);
 
-                // Update current bank account balance if it was deposited
-                if ($ch['status'] !== 'RECEIVED' && $ch['deposit_bank_account_id']) {
+                // Update current bank account balance ONLY if it was CLEARED
+                if ($ch['status'] === 'CLEARED' && $ch['deposit_bank_account_id']) {
                     $db->prepare("UPDATE bank_accounts SET current_balance = current_balance - :amt WHERE id = :id")
                        ->execute(['amt' => (float)$ch['amount'], 'id' => (int)$ch['deposit_bank_account_id']]);
                 }
@@ -588,4 +689,198 @@ class ChequeDepositEngine {
             throw $e;
         }
     }
+    /**
+     * Mark an issued cheque as PASSED. Deducts bank balance.
+     */
+    public static function passIssuedCheque(int $chequeId): bool {
+        $db = Database::getInstance();
+        $chModel = new ChequeModel();
+
+        $ch = $chModel->getById($chequeId);
+        if (!$ch || $ch['cheque_type'] !== 'ISSUED') {
+            throw new Exception("Issued cheque not found.");
+        }
+        if ($ch['status'] !== 'ISSUED') {
+            throw new Exception("Cheque is not in ISSUED state.");
+        }
+
+        // Find the supplier payment receipt where this cheque is linked
+        $stmt = $db->prepare("SELECT * FROM payment_receipts WHERE cheque_id = :cheque_id AND status = 'posted' LIMIT 1");
+        $stmt->execute(['cheque_id' => $chequeId]);
+        $receipt = $stmt->fetch();
+
+        if (!$receipt || empty($receipt['bank_account_id'])) {
+            throw new Exception("Linked bank account for this issued cheque could not be found.");
+        }
+
+        $bankAccountId = (int)$receipt['bank_account_id'];
+        $bankAccountLedgerId = (int)$db->query("SELECT account_id FROM bank_accounts WHERE id = " . $bankAccountId)->fetchColumn();
+        $pendingChequesLedgerId = (int)$db->query("SELECT id FROM accounts WHERE account_code = '2115'")->fetchColumn();
+
+        if (!$bankAccountLedgerId || !$pendingChequesLedgerId) {
+            throw new Exception("Chart of Accounts mapping error.");
+        }
+
+        $inTransaction = Database::inTransaction();
+        if (!$inTransaction) {
+            Database::beginTransaction();
+        }
+
+        try {
+            // Update cheque status to PASSED
+            $db->prepare("UPDATE cheques SET status = 'PASSED', updated_at = NOW() WHERE id = :id")
+               ->execute(['id' => $chequeId]);
+
+            // Post accounting entry (Dr Pending Issued Cheques, Cr Bank Account)
+            $costCenterId = (int)$db->query("SELECT id FROM cost_centers LIMIT 1")->fetchColumn();
+            $refNumber = 'PASS-' . $ch['cheque_number'];
+
+            $journalData = [
+                'transaction_date' => date('Y-m-d'),
+                'description' => "Issued Cheque Passed: " . $ch['cheque_number'],
+                'reference' => $refNumber,
+                'source_module' => 'parties',
+                'source_transaction_id' => $receipt['id'],
+                'cost_center_id' => $costCenterId,
+                'status' => 'approved',
+                'lines' => [
+                    [
+                        'account_id' => $pendingChequesLedgerId, // Debit (Liability decreases)
+                        'debit' => (float)$ch['amount'],
+                        'credit' => 0.00,
+                        'description' => "Cheque Passed"
+                    ],
+                    [
+                        'account_id' => $bankAccountLedgerId, // Credit (Asset decreases)
+                        'debit' => 0.00,
+                        'credit' => (float)$ch['amount'],
+                        'description' => "Cheque Passed"
+                    ]
+                ]
+            ];
+
+            AccountingEngine::postJournalEntry($journalData);
+
+            // Deduct from bank account balance
+            $db->prepare("UPDATE bank_accounts SET current_balance = current_balance - :amt WHERE id = :id")
+               ->execute(['amt' => (float)$ch['amount'], 'id' => $bankAccountId]);
+
+            AuditService::log('pass_issued_cheque', 'finance', $chequeId, null, [
+                'cheque_number' => $ch['cheque_number']
+            ]);
+
+            if (!$inTransaction) {
+                Database::commit();
+            }
+            return true;
+
+        } catch (Exception $e) {
+            if (!$inTransaction && Database::inTransaction()) {
+                Database::rollBack();
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Mark an issued cheque as RETURNED. Reverses original payment.
+     */
+    public static function returnIssuedCheque(int $chequeId, string $reason = ''): bool {
+        $db = Database::getInstance();
+        $chModel = new ChequeModel();
+
+        $ch = $chModel->getById($chequeId);
+        if (!$ch || $ch['cheque_type'] !== 'ISSUED') {
+            throw new Exception("Issued cheque not found.");
+        }
+        if ($ch['status'] !== 'ISSUED') {
+            throw new Exception("Only ISSUED cheques can be returned using this method.");
+        }
+
+        // Find the supplier payment receipt where this cheque is linked
+        $stmt = $db->prepare("SELECT * FROM payment_receipts WHERE cheque_id = :cheque_id AND status = 'posted' LIMIT 1");
+        $stmt->execute(['cheque_id' => $chequeId]);
+        $receipt = $stmt->fetch();
+
+        $pendingChequesLedgerId = (int)$db->query("SELECT id FROM accounts WHERE account_code = '2115'")->fetchColumn();
+        $apLedgerId = 20; // Accounts Payable
+
+        if (!$pendingChequesLedgerId) {
+            throw new Exception("Pending Issued Cheques mapping error.");
+        }
+
+        $inTransaction = Database::inTransaction();
+        if (!$inTransaction) {
+            Database::beginTransaction();
+        }
+
+        try {
+            // Update cheque status to RETURNED
+            $db->prepare("UPDATE cheques SET status = 'RETURNED', updated_at = NOW() WHERE id = :id")
+               ->execute(['id' => $chequeId]);
+
+            if ($receipt) {
+                // Post accounting entry (Dr Pending Issued Cheques, Cr Accounts Payable)
+                $costCenterId = (int)$db->query("SELECT id FROM cost_centers LIMIT 1")->fetchColumn();
+                $refNumber = 'RET-' . $ch['cheque_number'];
+
+                $journalData = [
+                    'transaction_date' => date('Y-m-d'),
+                    'description' => "Issued Cheque Returned: " . $ch['cheque_number'],
+                    'reference' => $refNumber,
+                    'source_module' => 'parties',
+                    'source_transaction_id' => $receipt['id'],
+                    'cost_center_id' => $costCenterId,
+                    'status' => 'approved',
+                    'lines' => [
+                        [
+                            'account_id' => $pendingChequesLedgerId, // Debit (Liability decreases)
+                            'debit' => (float)$ch['amount'],
+                            'credit' => 0.00,
+                            'description' => "Returned Cheque: " . $reason
+                        ],
+                        [
+                            'account_id' => $apLedgerId, // Credit (Liability increases)
+                            'debit' => 0.00,
+                            'credit' => (float)$ch['amount'],
+                            'description' => "Returned Cheque: " . $reason
+                        ]
+                    ]
+                ];
+
+                $reversalJournalId = AccountingEngine::postJournalEntry($journalData);
+
+                // Update receipt record to reversed
+                $db->prepare("
+                    UPDATE payment_receipts 
+                    SET status = 'reversed', 
+                        reversal_journal_entry_id = :rev_je_id,
+                        reversal_reason = :reason,
+                        updated_at = NOW()
+                    WHERE id = :id
+                ")->execute([
+                    'id' => $receipt['id'],
+                    'rev_je_id' => $reversalJournalId,
+                    'reason' => "Cheque Returned: " . $reason
+                ]);
+            }
+
+            AuditService::log('return_issued_cheque', 'finance', $chequeId, null, [
+                'cheque_number' => $ch['cheque_number'],
+                'reason' => $reason
+            ]);
+
+            if (!$inTransaction) {
+                Database::commit();
+            }
+            return true;
+
+        } catch (Exception $e) {
+            if (!$inTransaction && Database::inTransaction()) {
+                Database::rollBack();
+            }
+            throw $e;
+        }
+    }
 }
+

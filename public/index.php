@@ -87,6 +87,8 @@ $router->post('/expenses/post', [ExpenseController::class, 'post']);
 $router->post('/expenses/reverse', [ExpenseController::class, 'reverse']);
 $router->post('/expenses/cancel', [ExpenseController::class, 'cancel']);
 $router->get('/expenses/reports', [ExpenseController::class, 'reports']);
+$router->post('/expenses/api/add-category', [ExpenseController::class, 'apiAddCategory']);
+$router->get('/expenses/api/search-payees', [ExpenseController::class, 'apiSearchPayees']);
 
 // Central Party Management Routes (Stage 5A)
 $router->get('/parties', [PartyController::class, 'index']);
@@ -99,6 +101,8 @@ $router->post('/parties/store', [PartyController::class, 'store']);
 $router->get('/parties/edit', [PartyController::class, 'edit']);
 $router->post('/parties/update', [PartyController::class, 'update']);
 $router->post('/parties/deactivate', [PartyController::class, 'deactivate']);
+$router->post('/parties/delete', [PartyController::class, 'delete']);
+$router->get('/parties/api/balance', [PartyController::class, 'getBalanceApi']);
 
 // Party Opening Balance Routes (Stage 5B)
 $router->get('/parties/opening-balance', [PartyController::class, 'openingBalance']);
@@ -125,6 +129,8 @@ $router->get('/cheques', [ChequeController::class, 'index']);
 $router->post('/cheques/clear', [ChequeController::class, 'clear']);
 $router->post('/cheques/bounce', [ChequeController::class, 'bounce']);
 $router->post('/cheques/cancel', [ChequeController::class, 'cancel']);
+$router->post('/cheques/pass', [ChequeController::class, 'pass']);
+$router->post('/cheques/return', [ChequeController::class, 'return']);
 
 // Deposits Routing (Stage 5E)
 $router->get('/deposits', [DepositController::class, 'index']);
@@ -213,6 +219,7 @@ $router->post('/modules/cash-accounts/transaction', [CashController::class, 'tra
 
 // Bank Accounts Routing
 $router->get('/modules/bank-accounts', [BankController::class, 'index']);
+$router->get('/modules/bank-accounts/transactions', [BankController::class, 'transactions']);
 $router->post('/modules/bank-accounts/store', [BankController::class, 'store']);
 $router->post('/modules/bank-accounts/transaction', [BankController::class, 'transaction']);
 

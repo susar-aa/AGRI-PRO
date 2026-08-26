@@ -18,10 +18,20 @@
             <i class="bi bi-arrow-left me-1"></i> Back to Directory
         </a>
         <h4 class="fw-bold mb-1 text-dark">Director Profile: <?= htmlspecialchars($director['full_name']); ?></h4>
-        <p class="text-muted small mb-0">Registered on: <strong><?= htmlspecialchars($director['registration_date']); ?></strong> | Director No: <strong class="text-success font-monospace"><?= htmlspecialchars($director['member_no']); ?></strong></p>
+        <p class="text-muted small mb-0">Registered on: <strong><?= htmlspecialchars($director['registration_date']); ?></strong> | Directorship No: <strong class="text-success font-monospace"><?= htmlspecialchars($director['member_no']); ?></strong></p>
     </div>
     
     <div class="d-flex gap-2">
+        <a href="<?= \Core\Helper::baseUrl('modules/directors/edit?id=' . $director['id']); ?>" class="btn btn-outline-primary rounded-pill px-3">
+            <i class="bi bi-pencil-square me-1"></i> Edit
+        </a>
+        <form action="<?= \Core\Helper::baseUrl('modules/directors/delete'); ?>" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this director?');">
+            <?= \Core\CSRF::getFormField(); ?>
+            <input type="hidden" name="id" value="<?= $director['id']; ?>">
+            <button type="submit" class="btn btn-outline-danger rounded-pill px-3">
+                <i class="bi bi-trash me-1"></i> Delete
+            </button>
+        </form>
         <?php if (!$director['party_id']): ?>
             <button class="btn btn-success rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#linkModal">
                 <i class="bi bi-link-45deg me-1"></i> Link Customer Ledger
@@ -44,12 +54,8 @@
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button" role="tab">Sales Invoices</button>
     </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="payments-tab" data-bs-toggle="tab" data-bs-target="#payments" type="button" role="tab">Receipts & Payments</button>
-    </li>
-    <li class="nav-item" role="presentation">
-        <button class="nav-link" id="rentals-tab" data-bs-toggle="tab" data-bs-target="#rentals" type="button" role="tab">Machinery Rentals</button>
-    </li>
+
+
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="ledger-tab" data-bs-toggle="tab" data-bs-target="#ledger" type="button" role="tab">Account Ledger</button>
     </li>
@@ -59,7 +65,7 @@
     <div class="tab-pane fade show active" id="overview" role="tabpanel" tabindex="0">
         <div class="row g-4">
     <!-- Profile & Fixed Deposits Info -->
-    <div class="col-12 col-lg-8">
+    <div class="col-12">
         <!-- Profile Card -->
         <div class="card border-0 shadow-sm rounded-4 mb-4">
             <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
@@ -114,56 +120,8 @@
                 </div>
             </div>
         </div>
-
-
-
-    <!-- Registration Payments Sidebar Details -->
-    <div class="col-12 col-lg-4">
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
-            <div class="card-header bg-white py-3 border-0">
-                <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-cash-coin text-success me-2"></i> Registration & Share Fees</h6>
-            </div>
-            <div class="card-body pt-0 small">
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                        <span class="text-secondary">Registration Fee:</span>
-                        <span class="fw-bold text-success font-monospace">LKR <?= number_format($director['registration_fee'], 2); ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                        <span class="text-secondary">Shares Fee:</span>
-                        <span class="fw-bold text-success font-monospace">LKR <?= number_format($director['shares_fee'] ?? 0, 2); ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                        <span class="text-secondary">Payment Method:</span>
-                        <span class="fw-semibold text-dark"><?= htmlspecialchars($director['payment_method']); ?></span>
-                    </li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                        <span class="text-secondary">Status:</span>
-                        <span class="badge <?= $director['payment_status'] === 'PAID' ? 'bg-success' : 'bg-danger'; ?> rounded-pill px-2"><?= htmlspecialchars($director['payment_status']); ?></span>
-                    </li>
-                    <?php if ($journal): ?>
-                        <li class="list-group-item d-flex justify-content-between align-items-center py-2 bg-transparent">
-                            <span class="text-secondary">Journal Ledger:</span>
-                            <span class="fw-bold font-monospace text-dark"><?= htmlspecialchars($journal['journal_number']); ?></span>
-                        </li>
-                    <?php endif; ?>
-                </ul>
-            </div>
-        </div>
-
-        <?php if ($director['party_id']): ?>
-            <div class="card border-0 shadow-sm rounded-4 bg-light">
-                <div class="card-body p-3 d-flex align-items-center justify-content-between">
-                    <div>
-                        <h6 class="fw-bold mb-1 text-dark">Linked Customer Account</h6>
-                        <small class="text-muted font-monospace d-block"><?= htmlspecialchars($director['party_code']); ?></small>
-                    </div>
-                    <a href="<?= \Core\Helper::baseUrl('parties/view?id=' . $director['party_id']); ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3">View Ledger</a>
-                </div>
-            </div>
-        <?php endif; ?>
-    </div>
-        </div>
+    </div> <!-- end col-12 -->
+        </div> <!-- end row -->
     </div> <!-- end overview tab -->
 
     <!-- INVOICES TAB -->
@@ -189,7 +147,7 @@
                                     <tr>
                                         <td class="fw-bold font-monospace"><?= htmlspecialchars($inv['invoice_number']); ?></td>
                                         <td><?= htmlspecialchars($inv['invoice_date']); ?></td>
-                                        <td class="font-monospace fw-semibold"><?= number_format($inv['grand_total'], 2); ?></td>
+                                        <td class="font-monospace fw-semibold"><?= number_format($inv['total'] ?? 0, 2); ?></td>
                                         <td>
                                             <?php
                                             $badge = match($inv['status']) {
@@ -214,97 +172,9 @@
         </div>
     </div>
 
-    <!-- PAYMENTS TAB -->
-    <div class="tab-pane fade" id="payments" role="tabpanel" tabindex="0">
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0 small">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Receipt #</th>
-                                <th>Date</th>
-                                <th>Amount (LKR)</th>
-                                <th>Method</th>
-                                <th>Status</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($payments)): ?>
-                                <tr><td colspan="6" class="text-center text-muted py-4">No payments found.</td></tr>
-                            <?php else: ?>
-                                <?php foreach ($payments as $pay): ?>
-                                    <tr>
-                                        <td class="fw-bold font-monospace"><?= htmlspecialchars($pay['payment_number']); ?></td>
-                                        <td><?= htmlspecialchars($pay['payment_date']); ?></td>
-                                        <td class="font-monospace fw-semibold text-success"><?= number_format($pay['amount'], 2); ?></td>
-                                        <td><?= htmlspecialchars($pay['payment_method']); ?></td>
-                                        <td>
-                                            <span class="badge <?= $pay['status'] === 'posted' ? 'bg-success' : 'bg-danger'; ?> rounded-pill">
-                                                <?= strtoupper($pay['status']); ?>
-                                            </span>
-                                        </td>
-                                        <td class="text-end">
-                                            <a href="<?= \Core\Helper::baseUrl('modules/finance/receipts-payments/view?id=' . $pay['id']); ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3">View</a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- RENTALS TAB -->
-    <div class="tab-pane fade" id="rentals" role="tabpanel" tabindex="0">
-        <div class="card border-0 shadow-sm rounded-4">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0 small">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Rental #</th>
-                                <th>Machine</th>
-                                <th>From - To</th>
-                                <th>Status</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($rentals)): ?>
-                                <tr><td colspan="5" class="text-center text-muted py-4">No rentals found.</td></tr>
-                            <?php else: ?>
-                                <?php foreach ($rentals as $ren): ?>
-                                    <tr>
-                                        <td class="fw-bold font-monospace"><?= htmlspecialchars($ren['rental_number']); ?></td>
-                                        <td><?= htmlspecialchars($ren['machinery_name']); ?></td>
-                                        <td><?= htmlspecialchars($ren['start_date']); ?> to <?= htmlspecialchars($ren['end_date']); ?></td>
-                                        <td>
-                                            <?php
-                                            $badge = match($ren['status']) {
-                                                'ACTIVE' => 'bg-success',
-                                                'COMPLETED' => 'bg-primary',
-                                                'CANCELLED' => 'bg-danger',
-                                                default => 'bg-secondary'
-                                            };
-                                            ?>
-                                            <span class="badge <?= $badge; ?> rounded-pill"><?= htmlspecialchars($ren['status']); ?></span>
-                                        </td>
-                                        <td class="text-end">
-                                            <a href="<?= \Core\Helper::baseUrl('modules/machinery/rentals/view?id=' . $ren['id']); ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3">View</a>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
+
+
 
     <!-- LEDGER TAB -->
     <div class="tab-pane fade" id="ledger" role="tabpanel" tabindex="0">
@@ -377,6 +247,5 @@
         </div>
     </div>
 </div>
-
 
 

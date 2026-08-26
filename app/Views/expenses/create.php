@@ -35,27 +35,41 @@
             <input type="hidden" name="batch_id" value="<?= htmlspecialchars($prefilled['batch_id'] ?? ''); ?>">
 
             <div class="row g-3 mb-3">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <label for="expense_date" class="form-label fw-semibold small">Expense Date <span class="text-danger">*</span></label>
                     <input type="date" class="form-control form-control-sm" id="expense_date" name="expense_date" value="<?= date('Y-m-d'); ?>" required>
                 </div>
-                <div class="col-md-6">
-                    <label for="expense_category_id" class="form-label fw-semibold small">Expense Category <span class="text-danger">*</span></label>
-                    <select class="form-select form-select-sm" id="expense_category_id" name="expense_category_id" required>
-                        <option value="">-- Select Category --</option>
-                        <?php foreach ($categories as $cat): ?>
-                            <option value="<?= $cat['id']; ?>">
-                                <?= htmlspecialchars($cat['name']); ?>
+                <div class="col-md-4">
+                    <label for="cost_center_id" class="form-label fw-semibold small">Operation Management</label>
+                    <select class="form-select form-select-sm" id="cost_center_id" name="cost_center_id">
+                        <option value="">-- Select Operation --</option>
+                        <?php foreach ($costCenters as $op): ?>
+                            <option value="<?= $op['id']; ?>" <?= (isset($prefilled['cost_center_id']) && $prefilled['cost_center_id'] == $op['id']) ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($op['name']); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="expense_category_id" class="form-label fw-semibold small">Expense Category <span class="text-danger">*</span></label>
+                    <div class="input-group input-group-sm">
+                        <select class="form-select" id="expense_category_id" name="expense_category_id" required>
+                            <option value="">-- Select Category --</option>
+                            <?php foreach ($categories as $cat): ?>
+                                <option value="<?= $cat['id']; ?>">
+                                    <?= htmlspecialchars($cat['name']); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <button class="btn btn-outline-success" type="button" data-bs-toggle="modal" data-bs-target="#addCategoryModal" title="Add New Category"><i class="bi bi-plus-lg"></i></button>
+                    </div>
                 </div>
             </div>
 
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
                     <label for="payee" class="form-label fw-semibold small">Payee / Recipient <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control form-control-sm" id="payee" name="payee" placeholder="e.g. Ceylon Electricity Board, Rambukkana Fuel Station" required>
+                    <select class="form-control" id="payee" name="payee" required></select>
                 </div>
                 <div class="col-md-6">
                     <label for="amount" class="form-label fw-semibold small">Amount (LKR) <span class="text-danger">*</span></label>
@@ -71,22 +85,11 @@
                         <option value="Cash">Cash</option>
                         <option value="Bank Transfer">Bank Transfer</option>
                         <option value="Cheque">Cheque</option>
-                        <option value="Card">Card</option>
-                        <option value="Online Payment">Online Payment</option>
-                        <option value="Credit">Credit / Pay Later</option>
                     </select>
                 </div>
 
-                <!-- Dynamic input fields -->
-                <div class="col-md-8" id="cashAccountSection" style="display: none;">
-                    <label for="cash_account_id" class="form-label fw-semibold small">Select Cash Account Drawer <span class="text-danger">*</span></label>
-                    <select class="form-select form-select-sm" id="cash_account_id" name="cash_account_id">
-                        <option value="">-- Select Cash Drawer --</option>
-                        <?php foreach ($cashAccounts as $ca): ?>
-                            <option value="<?= $ca['id']; ?>"><?= htmlspecialchars($ca['name']); ?> (Balance: LKR <?= number_format($ca['current_balance'], 2); ?>)</option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                <!-- Hidden cash account since we always use cash in hand -->
+                <input type="hidden" id="cash_account_id" name="cash_account_id" value="<?= $cashAccounts[0]['id'] ?? 1; ?>">
 
                 <div class="col-md-8" id="bankAccountSection" style="display: none;">
                     <label for="bank_account_id" class="form-label fw-semibold small">Select Bank Account <span class="text-danger">*</span></label>
@@ -97,15 +100,27 @@
                         <?php endforeach; ?>
                     </select>
                 </div>
+            </div>
 
-                <div class="col-md-8" id="supplierSection" style="display: none;">
-                    <label for="supplier_id" class="form-label fw-semibold small">Select Supplier Payee <span class="text-danger">*</span></label>
-                    <select class="form-select form-select-sm" id="supplier_id" name="supplier_id">
-                        <option value="">-- Select Supplier Accounts Payable --</option>
-                        <?php foreach ($suppliers as $s): ?>
-                            <option value="<?= $s['id']; ?>"><?= htmlspecialchars($s['supplier_code']); ?> - <?= htmlspecialchars($s['name_en']); ?></option>
-                        <?php endforeach; ?>
-                    </select>
+            <!-- Issued Cheque Details Section -->
+            <div class="card border border-dashed rounded-4 p-3 bg-light mb-3" id="chequeSection" style="display: none;">
+                <h6 class="fw-bold mb-3 text-dark"><i class="bi bi-wallet2 me-1 text-success"></i> Issued Cheque Specifications</h6>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="cheque_number_input" class="form-label fw-semibold small">Cheque Number <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" id="cheque_number_input" name="cheque_number_input" placeholder="e.g. 010204">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="cheque_bank_name" class="form-label fw-semibold small">Bank Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-sm" id="cheque_bank_name" name="cheque_bank_name" placeholder="e.g. Bank of Ceylon">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="cheque_date" class="form-label fw-semibold small">Cheque Date <span class="text-danger">*</span></label>
+                        <input type="date" class="form-control form-control-sm" id="cheque_date" name="cheque_date" value="<?= date('Y-m-d'); ?>">
+                    </div>
+                </div>
+                <div class="mt-3 text-muted small">
+                    <i class="bi bi-info-circle me-1"></i> The cheque will be recorded as ISSUED. Ensure you also select the Source Bank Account above from which this cheque is drawn.
                 </div>
             </div>
 
@@ -133,28 +148,121 @@
 <script>
 function togglePaymentInputs() {
     const paymentMethod = document.getElementById('payment_method').value;
-    const cashSection = document.getElementById('cashAccountSection');
     const bankSection = document.getElementById('bankAccountSection');
-    const supplierSection = document.getElementById('supplierSection');
+    const chequeSection = document.getElementById('chequeSection');
  
     // Reset required states
-    document.getElementById('cash_account_id').required = false;
     document.getElementById('bank_account_id').required = false;
-    document.getElementById('supplier_id').required = false;
+    document.getElementById('cheque_number_input').required = false;
+    document.getElementById('cheque_bank_name').required = false;
  
-    cashSection.style.display = 'none';
     bankSection.style.display = 'none';
-    supplierSection.style.display = 'none';
+    if(chequeSection) chequeSection.style.display = 'none';
  
     if (paymentMethod === 'Cash') {
-        cashSection.style.display = 'block';
-        document.getElementById('cash_account_id').required = true;
-    } else if (paymentMethod === 'Credit') {
-        supplierSection.style.display = 'block';
-        document.getElementById('supplier_id').required = true;
-    } else if (paymentMethod !== '') {
+        // No additional fields required for cash
+    } else if (paymentMethod === 'Bank Transfer') {
         bankSection.style.display = 'block';
         document.getElementById('bank_account_id').required = true;
+    } else if (paymentMethod === 'Cheque') {
+        bankSection.style.display = 'block'; // Need source bank
+        if(chequeSection) chequeSection.style.display = 'block';
+        document.getElementById('bank_account_id').required = true;
+        document.getElementById('cheque_number_input').required = true;
+        document.getElementById('cheque_bank_name').required = true;
     }
 }
+</script>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-success text-white">
+                <h6 class="modal-title fw-bold"><i class="bi bi-plus-circle me-2"></i>New Category</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-2">
+                    <label class="form-label fw-semibold small">Category Name</label>
+                    <input type="text" id="new_category_name" class="form-control form-control-sm" placeholder="e.g. Refreshments">
+                    <div id="cat_err" class="text-danger small mt-1" style="display:none;"></div>
+                </div>
+            </div>
+            <div class="modal-footer p-2 bg-light">
+                <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-sm btn-success px-3" id="btnSaveCategory">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    .select2-container .select2-selection--single { height: 31px; padding: 2px 0px; font-size: 0.875rem; border-color: #dee2e6; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 28px; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { line-height: 25px; }
+</style>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('#payee').select2({
+        tags: true,
+        placeholder: "Search payee or type new name...",
+        allowClear: true,
+        minimumInputLength: 0,
+        ajax: {
+            url: '<?= \Core\Helper::baseUrl("expenses/api/search-payees"); ?>',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return { q: params.term };
+            },
+            processResults: function (data) {
+                return { results: data.results };
+            },
+            cache: true
+        }
+    });
+
+    $('#btnSaveCategory').click(function() {
+        let name = $('#new_category_name').val().trim();
+        let err = $('#cat_err');
+        
+        if (!name) {
+            err.text('Please enter a name').show();
+            return;
+        }
+        
+        $(this).prop('disabled', true).text('Saving...');
+        err.hide();
+
+        $.ajax({
+            url: '<?= \Core\Helper::baseUrl("expenses/api/add-category"); ?>',
+            type: 'POST',
+            data: {
+                name: name,
+                csrf_token: $('input[name="csrf_token"]').val()
+            },
+            success: function(res) {
+                if(res.success) {
+                    let newOption = new Option(res.name, res.id, true, true);
+                    $('#expense_category_id').append(newOption).trigger('change');
+                    $('#addCategoryModal').modal('hide');
+                    $('#new_category_name').val('');
+                } else {
+                    err.text(res.message || 'Error occurred').show();
+                }
+            },
+            error: function() {
+                err.text('Network error. Try again.').show();
+            },
+            complete: function() {
+                $('#btnSaveCategory').prop('disabled', false).text('Save');
+            }
+        });
+    });
+});
 </script>

@@ -1047,3 +1047,61 @@ Stack trace:
 [18-Aug-2026 21:33:30 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 291
 [19-Aug-2026 06:15:19 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 262
 [19-Aug-2026 06:15:19 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 262
+[19-Aug-2026 07:11:09 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 262
+[19-Aug-2026 07:11:09 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 262
+[19-Aug-2026 07:12:21 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 262
+[19-Aug-2026 07:12:21 Europe/Berlin] PHP Warning:  Undefined array key "grand_total" in C:\xampp\htdocs\AGRI PRO\app\Views\members\view.php on line 262
+[19-Aug-2026 08:20:51 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.fixed_deposits' doesn't exist in C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php:56
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php(56): PDO->prepare('\n            SE...')
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\MemberController.php(235): App\Models\PartyLedger->getLedgerEntries(3, 'CUSTOMER')
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\MemberController->view()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(329): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php on line 56
+[19-Aug-2026 09:05:32 Europe/Berlin] PHP Warning:  Undefined array key "transaction_date" in C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php on line 173
+[19-Aug-2026 09:05:32 Europe/Berlin] PHP Warning:  Undefined array key "transaction_date" in C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php on line 179
+[19-Aug-2026 09:05:32 Europe/Berlin] PHP Warning:  Undefined array key "transaction_date" in C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php on line 173
+[19-Aug-2026 09:05:32 Europe/Berlin] PHP Warning:  Undefined array key "transaction_date" in C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php on line 179
+[19-Aug-2026 09:05:32 Europe/Berlin] PHP Warning:  Undefined array key "transaction_date" in C:\xampp\htdocs\AGRI PRO\app\Views\parties\view.php on line 260
+[19-Aug-2026 09:06:04 Europe/Berlin] PHP Warning:  Undefined array key "transaction_date" in C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php on line 173
+[19-Aug-2026 09:06:04 Europe/Berlin] PHP Warning:  Undefined array key "transaction_date" in C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php on line 179
+[19-Aug-2026 09:06:04 Europe/Berlin] PHP Warning:  Undefined array key "transaction_date" in C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php on line 173
+[19-Aug-2026 09:06:04 Europe/Berlin] PHP Warning:  Undefined array key "transaction_date" in C:\xampp\htdocs\AGRI PRO\app\Models\PartyLedger.php on line 179
+[19-Aug-2026 09:06:04 Europe/Berlin] PHP Warning:  Undefined array key "transaction_date" in C:\xampp\htdocs\AGRI PRO\app\Views\parties\view.php on line 260
+[19-Aug-2026 09:32:41 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\PartyController.php on line 565
+[19-Aug-2026 09:34:12 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\PartyController.php on line 565
+[19-Aug-2026 09:34:22 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\PartyController.php on line 565
+[19-Aug-2026 09:35:56 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\PartyController.php on line 565
+[19-Aug-2026 10:10:29 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'name_en' in 'field list' in C:\xampp\htdocs\AGRI PRO\test.php:12
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\test.php(12): PDO->prepare('SELECT id, name...')
+#1 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\test.php on line 12
+[19-Aug-2026 10:10:59 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'name_en' in 'field list' in C:\xampp\htdocs\AGRI PRO\test.php:12
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\test.php(12): PDO->prepare('SELECT id, name...')
+#1 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\test.php on line 12
+[19-Aug-2026 10:57:22 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 324
+[19-Aug-2026 10:57:24 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 324
+[19-Aug-2026 10:57:24 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 324
+[19-Aug-2026 10:57:24 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 324
+[19-Aug-2026 10:57:24 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 324
+[19-Aug-2026 10:57:25 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 324
+[19-Aug-2026 10:57:25 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 324
+[19-Aug-2026 10:57:25 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 324
+[19-Aug-2026 11:00:01 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 329
+[19-Aug-2026 11:00:01 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 329
+[19-Aug-2026 11:00:01 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 329
+[19-Aug-2026 11:00:01 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 329
+[19-Aug-2026 11:00:04 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 329
+[19-Aug-2026 11:00:07 Europe/Berlin] PHP Parse error:  syntax error, unexpected token "public" in C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php on line 329
+[19-Aug-2026 11:00:44 Europe/Berlin] PHP Fatal error:  Uncaught Error: Call to undefined method App\Controllers\BankController::layout() in C:\xampp\htdocs\AGRI PRO\app\Views\bank\transactions.php:2
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\core\Controller.php(23): require()
+#1 C:\xampp\htdocs\AGRI PRO\app\Controllers\BankController.php(360): Core\Controller->render('bank/transactio...', Array)
+#2 C:\xampp\htdocs\AGRI PRO\core\Router.php(52): App\Controllers\BankController->transactions()
+#3 C:\xampp\htdocs\AGRI PRO\public\index.php(328): Core\Router->dispatch()
+#4 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\app\Views\bank\transactions.php on line 2

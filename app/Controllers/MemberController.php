@@ -226,12 +226,12 @@ class MemberController extends Controller {
             $partyId = (int)$member['party_id'];
             $invoiceModel = new \App\Models\InvoiceModel();
             $paymentModel = new \App\Models\ReceiptPaymentModel();
-            $rentalModel = new \App\Models\MachineryRentalModel();
+            
             $ledgerModel = new \App\Models\PartyLedger();
 
             $invoices = $invoiceModel->getAll(['customer_id' => $partyId], 50);
             $payments = $paymentModel->getAll(['party_id' => $partyId], 50);
-            $rentals = $rentalModel->getAll(['customer_id' => $partyId], 50);
+            
             $ledgerEntries = $ledgerModel->getLedgerEntries($partyId, 'CUSTOMER');
         }
 
@@ -309,7 +309,7 @@ class MemberController extends Controller {
     }
 
     public function delete(): void {
-        Auth::requirePermission('parties.delete');
+        Auth::requirePermission('parties.deactivate');
         $this->validateCsrf();
 
         $id = (int)$_POST['id'];

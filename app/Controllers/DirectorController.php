@@ -223,12 +223,12 @@ class DirectorController extends Controller {
             $partyId = (int)$director['party_id'];
             $invoiceModel = new \App\Models\InvoiceModel();
             $paymentModel = new \App\Models\ReceiptPaymentModel();
-            $rentalModel = new \App\Models\MachineryRentalModel();
+            
             $ledgerModel = new \App\Models\PartyLedger();
 
             $invoices = $invoiceModel->getAll(['customer_id' => $partyId], 50);
             $payments = $paymentModel->getAll(['party_id' => $partyId], 50);
-            $rentals = $rentalModel->getAll(['customer_id' => $partyId], 50);
+            
             $ledgerEntries = $ledgerModel->getLedgerEntries($partyId, 'CUSTOMER');
         }
 
@@ -244,7 +244,81 @@ class DirectorController extends Controller {
         ]);
     }
 
+    public function edit(): void {
+        Auth::requirePermission('parties.edit');
 
+        $id = !empty($_GET['id']) ? (int)$_GET['id'] : 0;
+        $director = $this->directorModel->getById($id);
+
+        if (!$director) {
+            Session::setFlash('error', 'Director not found.');
+            Helper::redirect('modules/directors/directory');
+        }
+
+        $this->render('directors/edit', [
+            'pageTitle' => 'Edit Director: ' . $director['full_name'],
+            'activeNav' => 'directory',
+            'director' => $director,
+            'customers' => []
+        ]);
+    }
+
+    public function update(): void {
+        Auth::requirePermission('parties.edit');
+        $this->validateCsrf();
+
+        $id = (int)$_POST['id'];
+        $director = $this->directorModel->getById($id);
+
+        if (!$director) {
+            Session::setFlash('error', 'Director not found.');
+            Helper::redirect('modules/directors/directory');
+        }
+
+        $directorData = [
+            'full_name' => trim($_POST['full_name'] ?? ''),
+            'nic' => trim($_POST['nic'] ?? ''),
+            'dob' => $_POST['dob'] ?? '',
+            'gender' => $_POST['gender'] ?? 'Male',
+            'phone' => trim($_POST['phone'] ?? ''),
+            'heir_name' => trim($_POST['heir_name'] ?? ''),
+            'heir_address' => trim($_POST['heir_address'] ?? ''),
+            'heir_nic' => trim($_POST['heir_nic'] ?? ''),
+            'heir_contact_number' => trim($_POST['heir_contact_number'] ?? ''),
+            'address' => trim($_POST['address'] ?? ''),
+            'city' => trim($_POST['city'] ?? ''),
+            'status' => $_POST['status'] ?? $director['status'],
+            'notes' => trim($_POST['notes'] ?? ''),
+            'party_id' => !empty($_POST['party_id']) ? (int)$_POST['party_id'] : $director['party_id']
+        ];
+
+        try {
+            $this->directorModel->update($id, $directorData);
+            Session::setFlash('success', 'Director updated successfully!');
+            Helper::redirect('modules/directors/view?id=' . $id);
+        } catch (\Exception $e) {
+            Session::setFlash('error', 'Update failed: ' . $e->getMessage());
+            Helper::redirect('modules/directors/edit?id=' . $id);
+        }
+    }
+
+    public function delete(): void {
+        Auth::requirePermission('parties.deactivate');
+        $this->validateCsrf();
+
+        $id = (int)$_POST['id'];
+        $db = Database::getInstance();
+        
+        try {
+            $stmt = $db->prepare("UPDATE coop_members SET status = 'INACTIVE' WHERE id = :id AND member_type = 'DIRECTOR'");
+            $stmt->execute(['id' => $id]);
+            Session::setFlash('success', 'Director marked as inactive.');
+        } catch (\Exception $e) {
+            Session::setFlash('error', 'Deletion failed: ' . $e->getMessage());
+        }
+        
+        Helper::redirect('modules/directors/directory');
+    }
 
     public function linkCustomer(): void {
         Auth::requirePermission('parties.edit');

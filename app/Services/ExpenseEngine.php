@@ -108,11 +108,11 @@ class ExpenseEngine {
             $stmt = $db->prepare("
                 INSERT INTO expenses 
                 (expense_number, expense_date, reference_number, payee, supplier_id, expense_category_id, description, amount, 
-                 payment_method, cash_account_id, bank_account_id, accounts_payable_account_id, expense_account_id, cost_center_id, 
+                 payment_method, cash_account_id, bank_account_id, cheque_id, accounts_payable_account_id, expense_account_id, cost_center_id, 
                  project_id, batch_id, service_job_id, machinery_id, machinery_rental_id, source_module, source_type, source_transaction_id, notes, status, created_by)
                 VALUES 
                 (:expense_number, :expense_date, :reference_number, :payee, :supplier_id, :expense_category_id, :description, :amount, 
-                 :payment_method, :cash_account_id, :bank_account_id, :accounts_payable_account_id, :expense_account_id, :cost_center_id, 
+                 :payment_method, :cash_account_id, :bank_account_id, :cheque_id, :accounts_payable_account_id, :expense_account_id, :cost_center_id, 
                  :project_id, :batch_id, :service_job_id, :machinery_id, :machinery_rental_id, :source_module, :source_type, :source_transaction_id, :notes, :status, :created_by)
             ");
 
@@ -128,6 +128,7 @@ class ExpenseEngine {
                 'payment_method' => $paymentMethod,
                 'cash_account_id' => $cashAccountId,
                 'bank_account_id' => $bankAccountId,
+                'cheque_id' => !empty($data['cheque_id']) ? (int)$data['cheque_id'] : null,
                 'accounts_payable_account_id' => $apAccountId,
                 'expense_account_id' => $expenseAccountId,
                 'cost_center_id' => $costCenterId,
