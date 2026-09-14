@@ -15,7 +15,7 @@ return [
     'host' => getenv('DB_HOST') ?: '127.0.0.1',
     'port' => getenv('DB_PORT') ?: '3306',
     'database' => getenv('DB_NAME') ?: 'agri_erp',
-    'username' => getenv('DB_USER') ?: ($isProduction ? 'suzxlabs' : 'root'),
+    'username' => getenv('DB_USER') ?: ($isProduction ? 'susar.aa' : 'root'),
     'password' => getenv('DB_PASS') ?: ($isProduction ? 'Susara@200611003614' : ''),
     'charset' => 'utf8mb4',
     'options' => [
