@@ -44,7 +44,7 @@
             <input type="hidden" name="payment_type" value="RECEIPT">
 
             <div class="row g-3 mb-3">
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <label for="party_id" class="form-label fw-semibold">Select Customer / Member <span class="text-danger">*</span></label>
                     <span id="customer_balance_display" class="float-end fw-bold text-primary small" style="display: none;"></span>
                     <select class="form-select select2" id="party_id" name="party_id" required>
@@ -56,22 +56,7 @@
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-6">
-                    <label for="income_account_id" class="form-label fw-semibold">Income Category <span class="text-danger">*</span></label>
-                    <select class="form-select" id="income_account_id" name="income_account_id" required>
-                        <?php foreach ($incomeAccounts as $acc): 
-                            $name = htmlspecialchars($acc['account_name']);
-                            if ($acc['id'] == 12) $name = "Customer Invoice Payment";
-                            elseif ($acc['id'] == 62) $name = "Member's Registration Fee";
-                            elseif ($acc['id'] == 25) $name = "Member's Share Capital";
-                            elseif ($acc['id'] == 37) $name = "Other Income";
-                        ?>
-                            <option value="<?= $acc['id']; ?>" <?= ($acc['id'] == 12) ? 'selected' : ''; ?>>
-                                <?= $name; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                <input type="hidden" name="income_account_id" value="12">
             </div>
             <div class="row g-3 mb-3">
                 <div class="col-md-6">
