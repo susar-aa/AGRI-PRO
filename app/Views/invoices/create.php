@@ -386,6 +386,14 @@
                             <span class="tile-icon"><i class="bi bi-truck-flatbed"></i></span>
                             Add Rental
                         </button>
+                        <button type="button" class="add-item-tile" style="background:#eef2ff; color:#3730a3; border-color:#c7d2fe;" onclick="addDirectAccountItem('MEMBER_FEE', 'Member Fee')">
+                            <span class="tile-icon" style="background:#c7d2fe; color:#3730a3;"><i class="bi bi-person-badge"></i></span>
+                            Member Fee
+                        </button>
+                        <button type="button" class="add-item-tile" style="background:#fff7ed; color:#9a3412; border-color:#ffedd5;" onclick="addDirectAccountItem('SHARE_CAPITAL', 'Share Capital')">
+                            <span class="tile-icon" style="background:#ffedd5; color:#9a3412;"><i class="bi bi-bank"></i></span>
+                            Share Capital
+                        </button>
                     </div>
 
                     <!-- Line Items Table -->
@@ -891,6 +899,44 @@ function addServiceRowFromModal(srv, btn) {
     row.querySelector('.modal-price-input').value = parseFloat(srv.default_price).toFixed(2);
     document.getElementById('srvSearchInput').value = '';
     filterModalItems('SERVICE', '');
+}
+
+/* ── Add Direct Account Item (Member Fee / Share Capital) ─────────────────────────── */
+function addDirectAccountItem(type, label) {
+    rowCount++;
+    const tbody = document.getElementById('itemsTableBody');
+    const tr    = document.createElement('tr');
+    tr.id = `row_${rowCount}`;
+    const price = 0.00;
+    const total = 0.00;
+    
+    // Style pills based on type
+    let pillClass = "text-bg-primary";
+    if (type === 'MEMBER_FEE') pillClass = "text-bg-info";
+    else if (type === 'SHARE_CAPITAL') pillClass = "text-bg-warning";
+    
+    tr.innerHTML = `
+        <td>
+            <span class="badge ${pillClass} bg-opacity-10 text-dark fw-bold rounded-pill" style="font-size:0.65rem; padding:0.35rem 0.6rem;">${label.toUpperCase()}</span>
+            <input type="hidden" name="items[${rowCount}][item_type]" value="${type}">
+        </td>
+        <td>
+            <div class="fw-semibold text-dark small">${label}</div>
+            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" placeholder="Remarks (optional)" style="font-size:.74rem;">
+        </td>
+        <td class="text-center text-muted" id="available_${rowCount}">—</td>
+        <td>
+            <div class="input-group input-group-sm">
+                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="1" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
+                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">Unit</span>
+            </div>
+        </td>
+        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
+        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total.toFixed(2)}</td>
+        <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
+    `;
+    tbody.appendChild(tr);
+    calculateInvoiceTotal(); updateItemCount();
 }
 
 /* ── Add Machine (from rental modal) ──────────────────── */

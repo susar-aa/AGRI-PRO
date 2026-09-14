@@ -151,8 +151,8 @@ class ReceiptPaymentController extends Controller {
         $chModel = new ChequeModel();
         $undepositedCheques = $chModel->getUndepositedCheques();
 
-        // Fetch income accounts for Receipts (A/R, Share Capital, Registration Fees, Other Income)
-        $incomeAccounts = $db->query("SELECT id, account_name, account_code FROM accounts WHERE id IN (12, 25, 37, 62) ORDER BY account_code ASC")->fetchAll();
+        // Fetch income accounts for Receipts (A/R, Other Income)
+        $incomeAccounts = $db->query("SELECT id, account_name, account_code FROM accounts WHERE id IN (12, 62) ORDER BY account_code ASC")->fetchAll();
 
         $this->render('receipts/create', [
             'pageTitle' => 'Record Customer Collection Receipt',

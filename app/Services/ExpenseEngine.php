@@ -80,11 +80,21 @@ class ExpenseEngine {
             if (!$bankAccountId) {
                 throw new Exception("Bank account is required for bank/electronic payments.");
             }
-            $bankStmt = $db->prepare("SELECT account_id FROM bank_accounts WHERE id = :id LIMIT 1");
-            $bankStmt->execute(['id' => $bankAccountId]);
-            $creditAccountId = (int)$bankStmt->fetchColumn();
-            if (!$creditAccountId) {
-                throw new Exception("Invalid bank account.");
+
+            if ($paymentMethod === 'Cheque') {
+                $chqStmt = $db->prepare("SELECT id FROM accounts WHERE account_code = '2115' LIMIT 1");
+                $chqStmt->execute();
+                $creditAccountId = (int)$chqStmt->fetchColumn();
+                if (!$creditAccountId) {
+                    throw new Exception("Pending Issued Cheques account (2115) is missing in Chart of Accounts.");
+                }
+            } else {
+                $bankStmt = $db->prepare("SELECT account_id FROM bank_accounts WHERE id = :id LIMIT 1");
+                $bankStmt->execute(['id' => $bankAccountId]);
+                $creditAccountId = (int)$bankStmt->fetchColumn();
+                if (!$creditAccountId) {
+                    throw new Exception("Invalid bank account.");
+                }
             }
         }
 
@@ -314,7 +324,7 @@ class ExpenseEngine {
             if ($exp['payment_method'] === 'Cash') {
                 $updBal = $db->prepare("UPDATE cash_accounts SET current_balance = current_balance - :amount WHERE id = :id");
                 $updBal->execute(['amount' => $exp['amount'], 'id' => $exp['cash_account_id']]);
-            } elseif ($exp['payment_method'] !== 'Credit') {
+            } elseif ($exp['payment_method'] !== 'Credit' && $exp['payment_method'] !== 'Cheque') {
                 $updBal = $db->prepare("UPDATE bank_accounts SET current_balance = current_balance - :amount WHERE id = :id");
                 $updBal->execute(['amount' => $exp['amount'], 'id' => $exp['bank_account_id']]);
             }
@@ -381,7 +391,7 @@ class ExpenseEngine {
             if ($exp['payment_method'] === 'Cash') {
                 $updBal = $db->prepare("UPDATE cash_accounts SET current_balance = current_balance + :amount WHERE id = :id");
                 $updBal->execute(['amount' => $exp['amount'], 'id' => $exp['cash_account_id']]);
-            } elseif ($exp['payment_method'] !== 'Credit') {
+            } elseif ($exp['payment_method'] !== 'Credit' && $exp['payment_method'] !== 'Cheque') {
                 $updBal = $db->prepare("UPDATE bank_accounts SET current_balance = current_balance + :amount WHERE id = :id");
                 $updBal->execute(['amount' => $exp['amount'], 'id' => $exp['bank_account_id']]);
             }

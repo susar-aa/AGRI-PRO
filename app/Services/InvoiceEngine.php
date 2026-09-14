@@ -25,6 +25,10 @@ class InvoiceEngine {
         if (empty($data['customer_id'])) {
             throw new Exception("Customer is required.");
         }
+        
+        $customerId = (int)$data['customer_id'];
+        $partyType = $db->query("SELECT party_type FROM parties WHERE id = {$customerId}")->fetchColumn();
+        
         if (empty($data['items']) || !is_array($data['items'])) {
             throw new Exception("At least one product or service line item is required.");
         }
@@ -59,13 +63,19 @@ class InvoiceEngine {
                 }
                 $price = round((float)($item['unit_price'] ?? $prod['default_selling_price']), 2);
                 $hasProducts = true;
-            } else {
+            } elseif ($type === 'SERVICE') {
                 $srvId = (int)$item['service_id'];
                 $srv = $srvModel->getById($srvId);
                 if (!$srv || !$srv['is_active']) {
                     throw new Exception("Selected service is invalid or inactive.");
                 }
                 $price = round((float)($item['unit_price'] ?? $srv['default_price']), 2);
+            } else {
+                // MEMBER_FEE or SHARE_CAPITAL or other direct account items
+                if (($type === 'MEMBER_FEE' || $type === 'SHARE_CAPITAL') && $partyType !== 'MEMBER' && $partyType !== 'BOTH') {
+                    throw new Exception(str_replace('_', ' ', $type) . " can only be billed to a registered Member.");
+                }
+                $price = round((float)($item['unit_price'] ?? 0), 2);
             }
 
             $disc = round((float)($item['discount'] ?? 0), 2);
@@ -306,7 +316,7 @@ class InvoiceEngine {
                     $totalCogs += $itemCogs;
                     $productRevenueSum += (float)$item['total'];
                     $hasProducts = true;
-                } else {
+                } elseif ($item['item_type'] === 'SERVICE') {
                     // Service
                     $srv = $db->query("SELECT revenue_account_id FROM services WHERE id = " . (int)$item['service_id'])->fetch();
                     if (!$srv) {
@@ -318,6 +328,13 @@ class InvoiceEngine {
                     }
                     $serviceRevenueAllocations[$srvAcc] += (float)$item['total'];
                     $hasServices = true;
+                } else {
+                    // MEMBER_FEE or SHARE_CAPITAL
+                    $accId = ($item['item_type'] === 'SHARE_CAPITAL') ? 25 : 37;
+                    if (!isset($serviceRevenueAllocations[$accId])) {
+                        $serviceRevenueAllocations[$accId] = 0.00;
+                    }
+                    $serviceRevenueAllocations[$accId] += (float)$item['total'];
                 }
             }
 

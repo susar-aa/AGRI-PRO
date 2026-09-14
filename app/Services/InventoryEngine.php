@@ -165,7 +165,12 @@ class InventoryEngine {
 
                 $newQty = $currentQty + $qty;
                 $newVal = round($currentVal + ($qty * $unitCost), 2);
-                $newAvgCost = $newQty > 0 ? round($newVal / $newQty, 4) : 0.00;
+                
+                if ($newQty > 0) {
+                    $newAvgCost = round($newVal / $newQty, 4);
+                } else {
+                    $newAvgCost = $currentQty != 0 ? (float)$balance['average_cost'] : $unitCost;
+                }
 
                 $stmt = $db->prepare("
                     UPDATE inventory_balances 
