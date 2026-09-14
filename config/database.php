@@ -4,7 +4,7 @@
  */
 
 $isProduction = false;
-if (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'agripro.suzxlabs.com') !== false) {
+if (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'agripro.trycurtiss.com') !== false) {
     $isProduction = true;
 } elseif (PHP_SAPI === 'cli' && stripos(PHP_OS, 'WIN') === false) {
     // If running in CLI on a Linux server (Plesk), assume production
