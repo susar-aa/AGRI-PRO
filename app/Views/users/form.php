@@ -72,6 +72,15 @@ $actionUrl = $isEdit ? \Core\Helper::baseUrl('modules/users/update') : \Core\Hel
                             <?php endif; ?>
                         </div>
                         <div class="col-md-6">
+                            <label for="role_id" class="form-label fw-semibold">User Role <span class="text-danger">*</span></label>
+                            <select class="form-select" id="role_id" name="role_id" required>
+                                <option value="">Select a Role...</option>
+                                <?php foreach ($roles as $r): ?>
+                                    <option value="<?= $r['id']; ?>" <?= ($userRoleId == $r['id']) ? 'selected' : ''; ?>><?= htmlspecialchars($r['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
                             <label for="status" class="form-label fw-semibold">Account Status</label>
                             <select class="form-select" id="status" name="status">
                                 <option value="active" <?= ($isEdit && $user['status'] === 'active') ? 'selected' : ''; ?>>Active (Can Login)</option>

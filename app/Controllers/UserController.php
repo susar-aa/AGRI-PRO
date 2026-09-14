@@ -26,10 +26,15 @@ class UserController extends Controller {
     public function create(): void {
         Auth::requirePermission('users.manage');
 
+        $db = Database::getInstance();
+        $roles = $db->query("SELECT id, name FROM roles ORDER BY id ASC")->fetchAll();
+
         $this->render('users/form', [
             'pageTitle' => 'Create New User',
             'activeNav' => 'users',
-            'user' => null
+            'user' => null,
+            'roles' => $roles,
+            'userRoleId' => null
         ]);
     }
 
@@ -44,9 +49,10 @@ class UserController extends Controller {
             $phone = trim($_POST['phone'] ?? '');
             $password = $_POST['password'] ?? '';
             $status = $_POST['status'] ?? 'active';
+            $roleId = (int)($_POST['role_id'] ?? 0);
 
-            if (empty($username) || empty($fullName) || empty($password)) {
-                throw new Exception("Username, Full Name, and Password are required.");
+            if (empty($username) || empty($fullName) || empty($password) || empty($roleId)) {
+                throw new Exception("Username, Full Name, Password, and Role are required.");
             }
 
             $db = Database::getInstance();
@@ -72,6 +78,11 @@ class UserController extends Controller {
                 'password_hash' => $passwordHash,
                 'status' => $status
             ]);
+            
+            $userId = $db->lastInsertId();
+            
+            $roleStmt = $db->prepare("INSERT INTO user_roles (user_id, role_id) VALUES (:user_id, :role_id)");
+            $roleStmt->execute(['user_id' => $userId, 'role_id' => $roleId]);
 
             Session::setFlash('success', 'User created successfully.');
             Helper::redirect('modules/users');
@@ -95,10 +106,18 @@ class UserController extends Controller {
             Helper::redirect('modules/users');
         }
 
+        $roles = $db->query("SELECT id, name FROM roles ORDER BY id ASC")->fetchAll();
+        $roleStmt = $db->prepare("SELECT role_id FROM user_roles WHERE user_id = :user_id LIMIT 1");
+        $roleStmt->execute(['user_id' => $id]);
+        $userRole = $roleStmt->fetch();
+        $userRoleId = $userRole ? $userRole['role_id'] : null;
+
         $this->render('users/form', [
             'pageTitle' => 'Edit User',
             'activeNav' => 'users',
-            'user' => $user
+            'user' => $user,
+            'roles' => $roles,
+            'userRoleId' => $userRoleId
         ]);
     }
 
@@ -114,9 +133,10 @@ class UserController extends Controller {
             $phone = trim($_POST['phone'] ?? '');
             $password = $_POST['password'] ?? '';
             $status = $_POST['status'] ?? 'active';
+            $roleId = (int)($_POST['role_id'] ?? 0);
 
-            if (empty($username) || empty($fullName)) {
-                throw new Exception("Username and Full Name are required.");
+            if (empty($username) || empty($fullName) || empty($roleId)) {
+                throw new Exception("Username, Full Name, and Role are required.");
             }
 
             $db = Database::getInstance();
@@ -154,6 +174,11 @@ class UserController extends Controller {
                     'phone' => $phone, 'status' => $status, 'id' => $id
                 ]);
             }
+            
+            // Update role
+            $db->prepare("DELETE FROM user_roles WHERE user_id = :user_id")->execute(['user_id' => $id]);
+            $db->prepare("INSERT INTO user_roles (user_id, role_id) VALUES (:user_id, :role_id)")
+               ->execute(['user_id' => $id, 'role_id' => $roleId]);
 
             Session::setFlash('success', 'User updated successfully.');
             Helper::redirect('modules/users');
