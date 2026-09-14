@@ -58,7 +58,10 @@ class Router {
         }
 
         // 404 Fallback
-        http_response_code(404);
-        echo "<h1>404 Not Found</h1><p>The requested page [{$requestUri}] was not found on Agri Co-Op ERP.</p>";
+        http_response_code(200); // Temporarily 200 to prevent Nginx from intercepting
+        echo "<h1>PHP ROUTER 404 DEBUG</h1><p>The requested page [{$requestUri}] was not found.</p>";
+        echo "<p>Base URL was: [{$baseUrl}]</p>";
+        echo "<p>Request Method: [{$requestMethod}]</p>";
+        echo "<p>Original REQUEST_URI: [" . ($_SERVER['REQUEST_URI'] ?? 'NONE') . "]</p>";
     }
 }
