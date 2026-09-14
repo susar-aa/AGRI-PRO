@@ -40,7 +40,7 @@ class UserController extends Controller {
         try {
             $username = trim($_POST['username'] ?? '');
             $fullName = trim($_POST['full_name'] ?? '');
-            $email = trim($_POST['email'] ?? '');
+            $email = trim($_POST['email'] ?? '') ?: null;
             $phone = trim($_POST['phone'] ?? '');
             $password = $_POST['password'] ?? '';
             $status = $_POST['status'] ?? 'active';
@@ -110,7 +110,7 @@ class UserController extends Controller {
             $id = (int)$_POST['id'];
             $username = trim($_POST['username'] ?? '');
             $fullName = trim($_POST['full_name'] ?? '');
-            $email = trim($_POST['email'] ?? '');
+            $email = trim($_POST['email'] ?? '') ?: null;
             $phone = trim($_POST['phone'] ?? '');
             $password = $_POST['password'] ?? '';
             $status = $_POST['status'] ?? 'active';
