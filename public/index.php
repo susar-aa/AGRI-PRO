@@ -232,6 +232,9 @@ $router->get('/modules/members/directory', [MemberController::class, 'directory'
 $router->get('/modules/members/register', [MemberController::class, 'registerForm']);
 $router->post('/modules/members/store', [MemberController::class, 'store']);
 $router->get('/modules/members/view', [MemberController::class, 'view']);
+$router->get('/modules/members/edit', [MemberController::class, 'edit']);
+$router->post('/modules/members/update', [MemberController::class, 'update']);
+$router->post('/modules/members/delete', [MemberController::class, 'delete']);
 $router->post('/modules/members/link-customer', [MemberController::class, 'linkCustomer']);
 
 // Society Director Routing
@@ -239,6 +242,9 @@ $router->get('/modules/directors/directory', [DirectorController::class, 'direct
 $router->get('/modules/directors/register', [DirectorController::class, 'registerForm']);
 $router->post('/modules/directors/store', [DirectorController::class, 'store']);
 $router->get('/modules/directors/view', [DirectorController::class, 'view']);
+$router->get('/modules/directors/edit', [DirectorController::class, 'edit']);
+$router->post('/modules/directors/update', [DirectorController::class, 'update']);
+$router->post('/modules/directors/delete', [DirectorController::class, 'delete']);
 $router->post('/modules/directors/link-customer', [DirectorController::class, 'linkCustomer']);
 
 // Complete Fixed Deposits Routing
