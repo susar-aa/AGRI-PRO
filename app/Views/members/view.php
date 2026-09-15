@@ -85,7 +85,43 @@
                         <small class="text-muted d-block">Contact Number</small>
                         <span class="fw-bold text-dark"><?= htmlspecialchars($member['phone']); ?></span>
                     </div>
-                    <div class="col-12 border-top pt-2">
+                    
+                    <div class="col-6 col-md-4 mt-3">
+                        <small class="text-muted d-block">WhatsApp Number</small>
+                        <span class="fw-bold text-dark"><?= htmlspecialchars($member['whatsapp'] ?: 'N/A'); ?></span>
+                    </div>
+                    <div class="col-6 col-md-4 mt-3">
+                        <small class="text-muted d-block">Email Address</small>
+                        <span class="fw-bold text-dark"><?= htmlspecialchars($member['email'] ?: 'N/A'); ?></span>
+                    </div>
+                    <div class="col-6 col-md-4 mt-3">
+                        <small class="text-muted d-block">Occupation</small>
+                        <span class="fw-bold text-dark"><?= htmlspecialchars($member['occupation'] ?: 'N/A'); ?></span>
+                    </div>
+                    
+                    <div class="col-12 mt-3 pt-2 border-top">
+                        <small class="text-muted d-block mb-1">Agricultural Sectors</small>
+                        <div>
+                            <?php 
+                            $sectors = explode(',', $member['agricultural_sector'] ?? '');
+                            $hasSectors = false;
+                            foreach($sectors as $sec): 
+                                $sec = trim($sec);
+                                if(!empty($sec)): 
+                                    $hasSectors = true;
+                            ?>
+                                <span class="badge bg-success-subtle text-success border border-success-subtle me-1 mb-1"><?= htmlspecialchars($sec) ?></span>
+                            <?php 
+                                endif; 
+                            endforeach; 
+                            if(!$hasSectors):
+                            ?>
+                                <span class="fw-bold text-dark">N/A</span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                    <div class="col-12 border-top pt-2 mt-2">
                         <small class="text-muted d-block">Home Address</small>
                         <span class="fw-semibold text-dark"><?= htmlspecialchars($member['address']); ?>, <?= htmlspecialchars($member['city']); ?></span>
                     </div>
