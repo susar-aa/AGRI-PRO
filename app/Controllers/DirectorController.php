@@ -43,11 +43,14 @@ class DirectorController extends Controller {
     public function registerForm(): void {
         Auth::requirePermission('parties.create');
 
+        $db = \Core\Database::getInstance();
+        $sectors = $db->query("SELECT name FROM agricultural_sectors ORDER BY name")->fetchAll();
+
         $this->render('directors/register', [
-            'pageTitle' => 'Register New Society director',
+            'pageTitle' => 'Register Director',
             'activeNav' => 'directory',
-            'customers' => [],
-            'member_no' => $this->directorModel->generateDirectorNumber()
+            'member_no' => $this->directorModel->generateDirectorNumber(),
+            'sectors' => $sectors
         ]);
     }
 
@@ -63,6 +66,9 @@ class DirectorController extends Controller {
             'dob' => $_POST['dob'] ?? '',
             'gender' => $_POST['gender'] ?? 'Male',
             'phone' => trim($_POST['phone'] ?? ''),
+            'email' => trim($_POST['email'] ?? ''),
+            'whatsapp' => trim($_POST['whatsapp'] ?? ''),
+            'agricultural_sector' => trim($_POST['agricultural_sector'] ?? ''),
             'heir_name' => trim($_POST['heir_name'] ?? ''),
             'heir_address' => trim($_POST['heir_address'] ?? ''),
             'heir_nic' => trim($_POST['heir_nic'] ?? ''),
@@ -97,6 +103,11 @@ class DirectorController extends Controller {
 
         try {
             $db->beginTransaction();
+
+            if (!empty($directorData['agricultural_sector'])) {
+                $stmt = $db->prepare("INSERT IGNORE INTO agricultural_sectors (name) VALUES (:name)");
+                $stmt->execute(['name' => $directorData['agricultural_sector']]);
+            }
 
             $directorId = $this->directorModel->create($directorData);
 
@@ -170,11 +181,15 @@ class DirectorController extends Controller {
             Helper::redirect('modules/directors/directory');
         }
 
+        $db = \Core\Database::getInstance();
+        $sectors = $db->query("SELECT name FROM agricultural_sectors ORDER BY name")->fetchAll();
+
         $this->render('directors/edit', [
             'pageTitle' => 'Edit Director: ' . $director['full_name'],
             'activeNav' => 'directory',
             'director' => $director,
-            'customers' => []
+            'customers' => [],
+            'sectors' => $sectors
         ]);
     }
 
@@ -197,6 +212,9 @@ class DirectorController extends Controller {
             'dob' => $_POST['dob'] ?? '',
             'gender' => $_POST['gender'] ?? 'Male',
             'phone' => trim($_POST['phone'] ?? ''),
+            'email' => trim($_POST['email'] ?? ''),
+            'whatsapp' => trim($_POST['whatsapp'] ?? ''),
+            'agricultural_sector' => trim($_POST['agricultural_sector'] ?? ''),
             'heir_name' => trim($_POST['heir_name'] ?? ''),
             'heir_address' => trim($_POST['heir_address'] ?? ''),
             'heir_nic' => trim($_POST['heir_nic'] ?? ''),
@@ -231,6 +249,10 @@ class DirectorController extends Controller {
         }
 
         try {
+            if (!empty($directorData['agricultural_sector'])) {
+                $stmt = $db->prepare("INSERT IGNORE INTO agricultural_sectors (name) VALUES (:name)");
+                $stmt->execute(['name' => $directorData['agricultural_sector']]);
+            }
             $this->directorModel->update($id, $directorData);
             Session::setFlash('success', 'Director updated successfully!');
             Helper::redirect('modules/directors/view?id=' . $id);

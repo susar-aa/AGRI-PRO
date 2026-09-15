@@ -43,11 +43,14 @@ class MemberController extends Controller {
     public function registerForm(): void {
         Auth::requirePermission('parties.create');
 
+        $db = \Core\Database::getInstance();
+        $sectors = $db->query("SELECT name FROM agricultural_sectors ORDER BY name")->fetchAll();
+
         $this->render('members/register', [
-            'pageTitle' => 'Register New Society Member',
+            'pageTitle' => 'Register Member',
             'activeNav' => 'directory',
-            'customers' => [],
-            'member_no' => $this->memberModel->generateMembershipNumber()
+            'member_no' => $this->memberModel->generateMembershipNumber(),
+            'sectors' => $sectors
         ]);
     }
 
@@ -63,6 +66,9 @@ class MemberController extends Controller {
             'dob' => $_POST['dob'] ?? '',
             'gender' => $_POST['gender'] ?? 'Male',
             'phone' => trim($_POST['phone'] ?? ''),
+            'email' => trim($_POST['email'] ?? ''),
+            'whatsapp' => trim($_POST['whatsapp'] ?? ''),
+            'agricultural_sector' => trim($_POST['agricultural_sector'] ?? ''),
             'heir_name' => trim($_POST['heir_name'] ?? ''),
             'heir_address' => trim($_POST['heir_address'] ?? ''),
             'heir_nic' => trim($_POST['heir_nic'] ?? ''),
@@ -98,6 +104,11 @@ class MemberController extends Controller {
 
         try {
             $db->beginTransaction();
+
+            if (!empty($memberData['agricultural_sector'])) {
+                $stmt = $db->prepare("INSERT IGNORE INTO agricultural_sectors (name) VALUES (:name)");
+                $stmt->execute(['name' => $memberData['agricultural_sector']]);
+            }
 
             $memberId = $this->memberModel->create($memberData);
 
@@ -176,11 +187,15 @@ class MemberController extends Controller {
             Helper::redirect('modules/members/directory');
         }
 
+        $db = \Core\Database::getInstance();
+        $sectors = $db->query("SELECT name FROM agricultural_sectors ORDER BY name")->fetchAll();
+
         $this->render('members/edit', [
             'pageTitle' => 'Edit Member: ' . $member['full_name'],
             'activeNav' => 'directory',
             'member' => $member,
-            'customers' => []
+            'customers' => [],
+            'sectors' => $sectors
         ]);
     }
 
@@ -203,6 +218,9 @@ class MemberController extends Controller {
             'dob' => $_POST['dob'] ?? '',
             'gender' => $_POST['gender'] ?? 'Male',
             'phone' => trim($_POST['phone'] ?? ''),
+            'email' => trim($_POST['email'] ?? ''),
+            'whatsapp' => trim($_POST['whatsapp'] ?? ''),
+            'agricultural_sector' => trim($_POST['agricultural_sector'] ?? ''),
             'heir_name' => trim($_POST['heir_name'] ?? ''),
             'heir_address' => trim($_POST['heir_address'] ?? ''),
             'heir_nic' => trim($_POST['heir_nic'] ?? ''),
@@ -237,6 +255,10 @@ class MemberController extends Controller {
         }
 
         try {
+            if (!empty($memberData['agricultural_sector'])) {
+                $stmt = $db->prepare("INSERT IGNORE INTO agricultural_sectors (name) VALUES (:name)");
+                $stmt->execute(['name' => $memberData['agricultural_sector']]);
+            }
             $this->memberModel->update($id, $memberData);
             Session::setFlash('success', 'Member updated successfully!');
             Helper::redirect('modules/members/view?id=' . $id);

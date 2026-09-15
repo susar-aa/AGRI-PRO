@@ -46,13 +46,35 @@
                                 <option value="Other" <?= ($director['gender'] ?? '') === 'Other' ? 'selected' : '' ?>>Other</option>
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label fw-semibold small">Contact Number <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="phone" required placeholder="Phone number" value="<?= htmlspecialchars($director['phone'] ?? '') ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small">WhatsApp Number</label>
+                            <input type="text" class="form-control" name="whatsapp" placeholder="WhatsApp number" value="<?= htmlspecialchars($director['whatsapp'] ?? '') ?>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small">Email Address</label>
+                            <input type="email" class="form-control" name="email" placeholder="Email address" value="<?= htmlspecialchars($director['email'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small">Occupation</label>
                             <input type="text" class="form-control" name="occupation" placeholder="Occupation" value="<?= htmlspecialchars($director['occupation'] ?? '') ?>">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold small">Agricultural Sector</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" name="agricultural_sector" id="agri_sector" list="sector_list" placeholder="Search or type new..." autocomplete="off" value="<?= htmlspecialchars($director['agricultural_sector'] ?? '') ?>">
+                                <datalist id="sector_list">
+                                    <?php if(isset($sectors)): foreach($sectors as $s): ?>
+                                        <option value="<?= htmlspecialchars($s['name']) ?>">
+                                    <?php endforeach; endif; ?>
+                                </datalist>
+                                <button class="btn btn-outline-success" type="button" id="add_sector_btn" style="display:none;" title="Add new sector">
+                                    <i class="bi bi-plus-lg"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold small">Address <span class="text-danger">*</span></label>
@@ -126,3 +148,35 @@
         </div>
     </div>
 </form>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('agri_sector');
+    const btn = document.getElementById('add_sector_btn');
+    const datalist = document.getElementById('sector_list');
+
+    if(input && btn && datalist) {
+        input.addEventListener('input', function() {
+            const val = this.value.trim();
+            if(val === '') {
+                btn.style.display = 'none';
+                return;
+            }
+            
+            let exists = false;
+            for(let option of datalist.options) {
+                if(option.value.toLowerCase() === val.toLowerCase()) {
+                    exists = true;
+                    break;
+                }
+            }
+            
+            btn.style.display = exists ? 'none' : 'block';
+        });
+
+        btn.addEventListener('click', function() {
+            alert('Sector "' + input.value + '" is ready to be added! It will be saved automatically when you submit this form.');
+            btn.style.display = 'none';
+        });
+    }
+});
+</script>

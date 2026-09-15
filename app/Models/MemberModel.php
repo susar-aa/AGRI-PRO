@@ -90,10 +90,10 @@ class MemberModel extends Model {
 
         $stmt = $this->db->prepare("
             INSERT INTO coop_members 
-            (member_type, member_no, party_id, full_name, nic, dob, gender, occupation, phone, heir_name, heir_address, heir_nic, heir_contact_number, address, city, 
+            (member_type, member_no, party_id, full_name, nic, dob, gender, occupation, phone, email, whatsapp, agricultural_sector, heir_name, heir_address, heir_nic, heir_contact_number, address, city, 
              registration_date, membership_type, status, registration_fee, shares_fee, payment_method, payment_status, notes, journal_entry_id)
             VALUES 
-            ('MEMBER', :member_no, :party_id, :full_name, :nic, :dob, :gender, :occupation, :phone, :heir_name, :heir_address, :heir_nic, :heir_contact_number, :address, :city, 
+            ('MEMBER', :member_no, :party_id, :full_name, :nic, :dob, :gender, :occupation, :phone, :email, :whatsapp, :agricultural_sector, :heir_name, :heir_address, :heir_nic, :heir_contact_number, :address, :city, 
              :registration_date, :membership_type, :status, :registration_fee, :shares_fee, :payment_method, :payment_status, :notes, :journal_entry_id)
         ");
 
@@ -106,6 +106,9 @@ class MemberModel extends Model {
             'gender' => $data['gender'],
             'occupation' => $data['occupation'] ?? null,
             'phone' => $data['phone'],
+            'email' => $data['email'] ?? null,
+            'whatsapp' => $data['whatsapp'] ?? null,
+            'agricultural_sector' => $data['agricultural_sector'] ?? null,
             'heir_name' => $data['heir_name'] ?? null,
             'heir_address' => $data['heir_address'] ?? null,
             'heir_nic' => $data['heir_nic'] ?? null,
@@ -129,7 +132,7 @@ class MemberModel extends Model {
     public function update(int $id, array $data): bool {
         $stmt = $this->db->prepare("
             UPDATE coop_members 
-            SET member_no = :member_no, full_name = :full_name, nic = :nic, dob = :dob, gender = :gender, occupation = :occupation, phone = :phone, 
+            SET member_no = :member_no, full_name = :full_name, nic = :nic, dob = :dob, gender = :gender, occupation = :occupation, phone = :phone, email = :email, whatsapp = :whatsapp, agricultural_sector = :agricultural_sector, 
                 heir_name = :heir_name, heir_address = :heir_address, heir_nic = :heir_nic, heir_contact_number = :heir_contact_number, 
                 address = :address, city = :city, status = :status, notes = :notes, 
                 party_id = :party_id
@@ -145,6 +148,9 @@ class MemberModel extends Model {
             'gender' => $data['gender'],
             'occupation' => $data['occupation'] ?? null,
             'phone' => $data['phone'],
+            'email' => $data['email'] ?? null,
+            'whatsapp' => $data['whatsapp'] ?? null,
+            'agricultural_sector' => $data['agricultural_sector'] ?? null,
             'heir_name' => $data['heir_name'] ?? null,
             'heir_address' => $data['heir_address'] ?? null,
             'heir_nic' => $data['heir_nic'] ?? null,
