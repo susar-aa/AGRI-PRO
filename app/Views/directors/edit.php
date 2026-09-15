@@ -63,15 +63,25 @@
                             <input type="text" class="form-control" name="occupation" placeholder="Occupation" value="<?= htmlspecialchars($director['occupation'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">Agricultural Sector</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="agricultural_sector" id="agri_sector" list="sector_list" placeholder="Search or type new..." autocomplete="off" value="<?= htmlspecialchars($director['agricultural_sector'] ?? '') ?>">
-                                <datalist id="sector_list">
-                                    <?php if(isset($sectors)): foreach($sectors as $s): ?>
-                                        <option value="<?= htmlspecialchars($s['name']) ?>">
-                                    <?php endforeach; endif; ?>
-                                </datalist>
-                                <button class="btn btn-outline-success" type="button" id="add_sector_btn" style="display:none;" title="Add new sector">
+                            <label class="form-label fw-semibold small">Agricultural Sectors</label>
+                            <div class="border rounded p-2 d-flex flex-wrap gap-1 align-items-center bg-white" id="sector_tags_container" style="min-height: 38px; cursor: text;">
+                                <?php 
+                                $current_sectors = isset($director['agricultural_sector']) && $director['agricultural_sector'] !== '' ? explode(',', $director['agricultural_sector']) : [];
+                                foreach($current_sectors as $cs): 
+                                    $cs = trim($cs);
+                                    if(empty($cs)) continue;
+                                ?>
+                                <span class="badge bg-success d-flex align-items-center gap-1 sector-tag mb-1 mt-1">
+                                    <?= htmlspecialchars($cs) ?>
+                                    <button type="button" class="btn-close btn-close-white" style="font-size: 0.5em;" onclick="this.parentElement.remove()"></button>
+                                    <input type="hidden" name="agricultural_sectors[]" value="<?= htmlspecialchars($cs) ?>">
+                                </span>
+                                <?php endforeach; ?>
+                                <div class="dropdown" style="flex-grow: 1;">
+                                    <input type="text" id="agri_sector_input" class="border-0 shadow-none p-0 m-0 w-100" placeholder="Type and press Enter or +" autocomplete="off" style="outline: none; background: transparent;">
+                                    <ul class="dropdown-menu w-100 shadow-sm" id="sector_suggestions" style="max-height: 200px; overflow-y: auto; display: none; position: absolute;"></ul>
+                                </div>
+                                <button class="btn btn-sm btn-outline-success border-0" type="button" id="add_sector_btn" style="display:none;" title="Add new sector">
                                     <i class="bi bi-plus-lg"></i>
                                 </button>
                             </div>
@@ -150,33 +160,108 @@
 </form>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const input = document.getElementById('agri_sector');
-    const btn = document.getElementById('add_sector_btn');
-    const datalist = document.getElementById('sector_list');
+    const container = document.getElementById('sector_tags_container');
+    if(!container) return;
+    
+    const input = document.getElementById('agri_sector_input');
+    const addBtn = document.getElementById('add_sector_btn');
+    const suggestionsBox = document.getElementById('sector_suggestions');
+    
+    const availableSectors = <?= json_encode(array_column($sectors ?? [], 'name')) ?>;
+    
+    function addTag(value) {
+        value = value.trim();
+        if(!value) return;
+        
+        const existing = Array.from(container.querySelectorAll('input[name="agricultural_sectors[]"]')).map(i => i.value.toLowerCase());
+        if(existing.includes(value.toLowerCase())) {
+            input.value = '';
+            hideSuggestions();
+            return;
+        }
 
-    if(input && btn && datalist) {
-        input.addEventListener('input', function() {
-            const val = this.value.trim();
-            if(val === '') {
-                btn.style.display = 'none';
-                return;
-            }
-            
-            let exists = false;
-            for(let option of datalist.options) {
-                if(option.value.toLowerCase() === val.toLowerCase()) {
-                    exists = true;
-                    break;
-                }
-            }
-            
-            btn.style.display = exists ? 'none' : 'block';
-        });
-
-        btn.addEventListener('click', function() {
-            alert('Sector "' + input.value + '" is ready to be added! It will be saved automatically when you submit this form.');
-            btn.style.display = 'none';
-        });
+        const span = document.createElement('span');
+        span.className = 'badge bg-success d-flex align-items-center gap-1 sector-tag mt-1 mb-1';
+        span.innerHTML = `
+            ${value}
+            <button type="button" class="btn-close btn-close-white" style="font-size: 0.5em;" onclick="this.parentElement.remove()"></button>
+            <input type="hidden" name="agricultural_sectors[]" value="${value}">
+        `;
+        
+        container.insertBefore(span, container.querySelector('.dropdown'));
+        input.value = '';
+        hideSuggestions();
     }
+
+    function hideSuggestions() {
+        suggestionsBox.style.display = 'none';
+        addBtn.style.display = 'none';
+    }
+
+    function showSuggestions(val) {
+        val = val.trim().toLowerCase();
+        suggestionsBox.innerHTML = '';
+        
+        if(!val) {
+            hideSuggestions();
+            return;
+        }
+
+        let hasExactMatch = false;
+        let matchCount = 0;
+
+        availableSectors.forEach(sector => {
+            if(sector.toLowerCase().includes(val)) {
+                if(sector.toLowerCase() === val) hasExactMatch = true;
+                
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.className = 'dropdown-item py-1 px-2';
+                a.href = '#';
+                a.textContent = sector;
+                a.onclick = function(e) {
+                    e.preventDefault();
+                    addTag(sector);
+                };
+                li.appendChild(a);
+                suggestionsBox.appendChild(li);
+                matchCount++;
+            }
+        });
+
+        suggestionsBox.style.display = matchCount > 0 ? 'block' : 'none';
+        addBtn.style.display = !hasExactMatch ? 'block' : 'none';
+    }
+
+    input.addEventListener('input', function() {
+        showSuggestions(this.value);
+    });
+
+    input.addEventListener('keydown', function(e) {
+        if(e.key === 'Enter') {
+            e.preventDefault();
+            if(this.value.trim()) {
+                addTag(this.value);
+            }
+        }
+    });
+
+    addBtn.addEventListener('click', function() {
+        if(input.value.trim()) {
+            addTag(input.value);
+        }
+    });
+
+    container.addEventListener('click', function(e) {
+        if(e.target === container) {
+            input.focus();
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if(!container.contains(e.target)) {
+            hideSuggestions();
+        }
+    });
 });
 </script>

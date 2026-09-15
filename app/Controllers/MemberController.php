@@ -68,7 +68,7 @@ class MemberController extends Controller {
             'phone' => trim($_POST['phone'] ?? ''),
             'email' => trim($_POST['email'] ?? ''),
             'whatsapp' => trim($_POST['whatsapp'] ?? ''),
-            'agricultural_sector' => trim($_POST['agricultural_sector'] ?? ''),
+            'agricultural_sector' => implode(', ', array_filter(array_map('trim', $_POST['agricultural_sectors'] ?? []))),
             'heir_name' => trim($_POST['heir_name'] ?? ''),
             'heir_address' => trim($_POST['heir_address'] ?? ''),
             'heir_nic' => trim($_POST['heir_nic'] ?? ''),
@@ -105,9 +105,12 @@ class MemberController extends Controller {
         try {
             $db->beginTransaction();
 
-            if (!empty($memberData['agricultural_sector'])) {
-                $stmt = $db->prepare("INSERT IGNORE INTO agricultural_sectors (name) VALUES (:name)");
-                $stmt->execute(['name' => $memberData['agricultural_sector']]);
+            foreach($_POST['agricultural_sectors'] ?? [] as $sec) {
+                $sec = trim($sec);
+                if (!empty($sec)) {
+                    $stmt = $db->prepare("INSERT IGNORE INTO agricultural_sectors (name) VALUES (:name)");
+                    $stmt->execute(['name' => $sec]);
+                }
             }
 
             $memberId = $this->memberModel->create($memberData);
@@ -220,7 +223,7 @@ class MemberController extends Controller {
             'phone' => trim($_POST['phone'] ?? ''),
             'email' => trim($_POST['email'] ?? ''),
             'whatsapp' => trim($_POST['whatsapp'] ?? ''),
-            'agricultural_sector' => trim($_POST['agricultural_sector'] ?? ''),
+            'agricultural_sector' => implode(', ', array_filter(array_map('trim', $_POST['agricultural_sectors'] ?? []))),
             'heir_name' => trim($_POST['heir_name'] ?? ''),
             'heir_address' => trim($_POST['heir_address'] ?? ''),
             'heir_nic' => trim($_POST['heir_nic'] ?? ''),
@@ -255,9 +258,12 @@ class MemberController extends Controller {
         }
 
         try {
-            if (!empty($memberData['agricultural_sector'])) {
-                $stmt = $db->prepare("INSERT IGNORE INTO agricultural_sectors (name) VALUES (:name)");
-                $stmt->execute(['name' => $memberData['agricultural_sector']]);
+            foreach($_POST['agricultural_sectors'] ?? [] as $sec) {
+                $sec = trim($sec);
+                if (!empty($sec)) {
+                    $stmt = $db->prepare("INSERT IGNORE INTO agricultural_sectors (name) VALUES (:name)");
+                    $stmt->execute(['name' => $sec]);
+                }
             }
             $this->memberModel->update($id, $memberData);
             Session::setFlash('success', 'Member updated successfully!');
