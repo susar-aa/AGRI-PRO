@@ -129,7 +129,7 @@ class MemberModel extends Model {
     public function update(int $id, array $data): bool {
         $stmt = $this->db->prepare("
             UPDATE coop_members 
-            SET full_name = :full_name, nic = :nic, dob = :dob, gender = :gender, occupation = :occupation, phone = :phone, 
+            SET member_no = :member_no, full_name = :full_name, nic = :nic, dob = :dob, gender = :gender, occupation = :occupation, phone = :phone, 
                 heir_name = :heir_name, heir_address = :heir_address, heir_nic = :heir_nic, heir_contact_number = :heir_contact_number, 
                 address = :address, city = :city, status = :status, notes = :notes, 
                 party_id = :party_id
@@ -138,6 +138,7 @@ class MemberModel extends Model {
 
         return $stmt->execute([
             'id' => $id,
+            'member_no' => $data['member_no'],
             'full_name' => $data['full_name'],
             'nic' => $data['nic'],
             'dob' => $data['dob'],
@@ -157,16 +158,21 @@ class MemberModel extends Model {
     }
 
     public function generateMembershipNumber(): string {
-        $stmtMem = $this->db->query("SELECT MAX(CAST(SUBSTRING(member_no, 5) AS UNSIGNED)) FROM coop_members WHERE member_no LIKE 'AGC %' AND member_type = 'MEMBER'");
+        $year = date('y');
+        $prefix = "AGC/{$year}/";
+        
+        $stmtMem = $this->db->prepare("SELECT MAX(CAST(SUBSTRING(member_no, 8) AS UNSIGNED)) FROM coop_members WHERE member_no LIKE :prefix AND member_type = 'MEMBER'");
+        $stmtMem->execute(['prefix' => $prefix . '%']);
         $maxMem = (int)$stmtMem->fetchColumn();
 
-        $stmtDir = $this->db->query("SELECT MAX(CAST(SUBSTRING(member_no, 5) AS UNSIGNED)) FROM coop_members WHERE member_no LIKE 'AGC %' AND member_type = 'DIRECTOR'");
+        $stmtDir = $this->db->prepare("SELECT MAX(CAST(SUBSTRING(member_no, 8) AS UNSIGNED)) FROM coop_members WHERE member_no LIKE :prefix AND member_type = 'DIRECTOR'");
+        $stmtDir->execute(['prefix' => $prefix . '%']);
         $maxDir = (int)$stmtDir->fetchColumn();
 
         $maxVal = max($maxMem, $maxDir);
         $newSeq = $maxVal + 1;
 
-        return 'AGC ' . str_pad($newSeq, 3, '0', STR_PAD_LEFT);
+        return $prefix . str_pad($newSeq, 3, '0', STR_PAD_LEFT);
     }
 
     public function getFixedDepositsByMember(int $memberId): array {

@@ -46,7 +46,8 @@ class MemberController extends Controller {
         $this->render('members/register', [
             'pageTitle' => 'Register New Society Member',
             'activeNav' => 'directory',
-            'customers' => []
+            'customers' => [],
+            'member_no' => $this->memberModel->generateMembershipNumber()
         ]);
     }
 
@@ -56,6 +57,7 @@ class MemberController extends Controller {
 
         $db = Database::getInstance();
         $memberData = [
+            'member_no' => trim($_POST['member_no'] ?? ''),
             'full_name' => trim($_POST['full_name'] ?? ''),
             'nic' => trim($_POST['nic'] ?? ''),
             'dob' => $_POST['dob'] ?? '',
@@ -79,6 +81,18 @@ class MemberController extends Controller {
         $nicExists->execute(['nic' => $memberData['nic']]);
         if ($nicExists->fetch()) {
             Session::setFlash('error', 'A member with this NIC is already registered.');
+            Helper::redirect('modules/members/register');
+        }
+
+        // Ensure registration number is provided and unique
+        if (empty($memberData['member_no'])) {
+            Session::setFlash('error', 'Registration number is required.');
+            Helper::redirect('modules/members/register');
+        }
+        $noExists = $db->prepare("SELECT id FROM coop_members WHERE member_no = :no");
+        $noExists->execute(['no' => $memberData['member_no']]);
+        if ($noExists->fetch()) {
+            Session::setFlash('error', 'This Registration Number is already in use.');
             Helper::redirect('modules/members/register');
         }
 
@@ -183,6 +197,7 @@ class MemberController extends Controller {
         }
 
         $memberData = [
+            'member_no' => trim($_POST['member_no'] ?? ''),
             'full_name' => trim($_POST['full_name'] ?? ''),
             'nic' => trim($_POST['nic'] ?? ''),
             'dob' => $_POST['dob'] ?? '',
@@ -198,6 +213,28 @@ class MemberController extends Controller {
             'notes' => trim($_POST['notes'] ?? ''),
             'party_id' => !empty($_POST['party_id']) ? (int)$_POST['party_id'] : $member['party_id']
         ];
+        
+        $db = Database::getInstance();
+        
+        // Ensure no duplicate NIC exists
+        $nicExists = $db->prepare("SELECT id FROM coop_members WHERE nic = :nic AND member_type = 'MEMBER' AND id != :id");
+        $nicExists->execute(['nic' => $memberData['nic'], 'id' => $id]);
+        if ($nicExists->fetch()) {
+            Session::setFlash('error', 'A member with this NIC is already registered.');
+            Helper::redirect('modules/members/edit?id=' . $id);
+        }
+
+        // Ensure registration number is provided and unique
+        if (empty($memberData['member_no'])) {
+            Session::setFlash('error', 'Registration number is required.');
+            Helper::redirect('modules/members/edit?id=' . $id);
+        }
+        $noExists = $db->prepare("SELECT id FROM coop_members WHERE member_no = :no AND id != :id");
+        $noExists->execute(['no' => $memberData['member_no'], 'id' => $id]);
+        if ($noExists->fetch()) {
+            Session::setFlash('error', 'This Registration Number is already in use.');
+            Helper::redirect('modules/members/edit?id=' . $id);
+        }
 
         try {
             $this->memberModel->update($id, $memberData);

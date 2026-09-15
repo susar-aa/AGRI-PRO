@@ -46,7 +46,8 @@ class DirectorController extends Controller {
         $this->render('directors/register', [
             'pageTitle' => 'Register New Society director',
             'activeNav' => 'directory',
-            'customers' => []
+            'customers' => [],
+            'member_no' => $this->directorModel->generateDirectorNumber()
         ]);
     }
 
@@ -56,6 +57,7 @@ class DirectorController extends Controller {
 
         $db = Database::getInstance();
         $directorData = [
+            'member_no' => trim($_POST['member_no'] ?? ''),
             'full_name' => trim($_POST['full_name'] ?? ''),
             'nic' => trim($_POST['nic'] ?? ''),
             'dob' => $_POST['dob'] ?? '',
@@ -78,6 +80,18 @@ class DirectorController extends Controller {
         $nicExists->execute(['nic' => $directorData['nic']]);
         if ($nicExists->fetch()) {
             Session::setFlash('error', 'A director with this NIC is already registered.');
+            Helper::redirect('modules/directors/register');
+        }
+
+        // Ensure registration number is provided and unique
+        if (empty($directorData['member_no'])) {
+            Session::setFlash('error', 'Registration number is required.');
+            Helper::redirect('modules/directors/register');
+        }
+        $noExists = $db->prepare("SELECT id FROM coop_members WHERE member_no = :no");
+        $noExists->execute(['no' => $directorData['member_no']]);
+        if ($noExists->fetch()) {
+            Session::setFlash('error', 'This Registration Number is already in use.');
             Helper::redirect('modules/directors/register');
         }
 
@@ -177,6 +191,7 @@ class DirectorController extends Controller {
         }
 
         $directorData = [
+            'member_no' => trim($_POST['member_no'] ?? ''),
             'full_name' => trim($_POST['full_name'] ?? ''),
             'nic' => trim($_POST['nic'] ?? ''),
             'dob' => $_POST['dob'] ?? '',
@@ -192,6 +207,28 @@ class DirectorController extends Controller {
             'notes' => trim($_POST['notes'] ?? ''),
             'party_id' => !empty($_POST['party_id']) ? (int)$_POST['party_id'] : $director['party_id']
         ];
+        
+        $db = Database::getInstance();
+        
+        // Ensure no duplicate NIC exists
+        $nicExists = $db->prepare("SELECT id FROM coop_members WHERE nic = :nic AND member_type = 'DIRECTOR' AND id != :id");
+        $nicExists->execute(['nic' => $directorData['nic'], 'id' => $id]);
+        if ($nicExists->fetch()) {
+            Session::setFlash('error', 'A director with this NIC is already registered.');
+            Helper::redirect('modules/directors/edit?id=' . $id);
+        }
+
+        // Ensure registration number is provided and unique
+        if (empty($directorData['member_no'])) {
+            Session::setFlash('error', 'Registration number is required.');
+            Helper::redirect('modules/directors/edit?id=' . $id);
+        }
+        $noExists = $db->prepare("SELECT id FROM coop_members WHERE member_no = :no AND id != :id");
+        $noExists->execute(['no' => $directorData['member_no'], 'id' => $id]);
+        if ($noExists->fetch()) {
+            Session::setFlash('error', 'This Registration Number is already in use.');
+            Helper::redirect('modules/directors/edit?id=' . $id);
+        }
 
         try {
             $this->directorModel->update($id, $directorData);

@@ -20,7 +20,11 @@
                 </div>
                 <div class="card-body pt-0">
                     <div class="row g-3">
-                        <div class="col-12">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold small">Registration Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control fw-bold text-success" name="member_no" required value="<?= htmlspecialchars($member_no ?? ''); ?>">
+                        </div>
+                        <div class="col-md-8">
                             <label class="form-label fw-semibold small">Full Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" name="full_name" required placeholder="Enter director full name">
                         </div>
