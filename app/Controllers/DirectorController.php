@@ -62,8 +62,8 @@ class DirectorController extends Controller {
         $directorData = [
             'member_no' => trim($_POST['member_no'] ?? ''),
             'full_name' => trim($_POST['full_name'] ?? ''),
-            'nic' => trim($_POST['nic'] ?? ''),
-            'dob' => $_POST['dob'] ?? '',
+            'nic' => !empty(trim($_POST['nic'] ?? '')) ? trim($_POST['nic'] ?? '') : null,
+            'dob' => !empty($_POST['dob']) ? $_POST['dob'] : null,
             'gender' => $_POST['gender'] ?? 'Male',
             'occupation' => trim($_POST['occupation'] ?? ''),
             'phone' => trim($_POST['phone'] ?? ''),
@@ -76,18 +76,20 @@ class DirectorController extends Controller {
             'heir_contact_number' => trim($_POST['heir_contact_number'] ?? ''),
             'address' => trim($_POST['address'] ?? ''),
             'city' => trim($_POST['city'] ?? ''),
-            'registration_date' => $_POST['registration_date'] ?? date('Y-m-d'),
+            'registration_date' => !empty($_POST['registration_date']) ? $_POST['registration_date'] : date('Y-m-d'),
             'status' => 'ACTIVE',
             'notes' => trim($_POST['notes'] ?? ''),
             'party_id' => !empty($_POST['party_id']) ? (int)$_POST['party_id'] : null
         ];
 
         // Ensure no duplicate NIC exists
-        $nicExists = $db->prepare("SELECT id FROM coop_members WHERE nic = :nic AND member_type = 'DIRECTOR'");
-        $nicExists->execute(['nic' => $directorData['nic']]);
-        if ($nicExists->fetch()) {
-            Session::setFlash('error', 'A director with this NIC is already registered.');
-            Helper::redirect('modules/directors/register');
+        if (!empty($directorData['nic'])) {
+            $nicExists = $db->prepare("SELECT id FROM coop_members WHERE nic = :nic AND member_type = 'DIRECTOR'");
+            $nicExists->execute(['nic' => $directorData['nic']]);
+            if ($nicExists->fetch()) {
+                Session::setFlash('error', 'A director with this NIC is already registered.');
+                Helper::redirect('modules/directors/register');
+            }
         }
 
         // Ensure registration number is provided and unique
@@ -212,8 +214,8 @@ class DirectorController extends Controller {
         $directorData = [
             'member_no' => trim($_POST['member_no'] ?? ''),
             'full_name' => trim($_POST['full_name'] ?? ''),
-            'nic' => trim($_POST['nic'] ?? ''),
-            'dob' => $_POST['dob'] ?? '',
+            'nic' => !empty(trim($_POST['nic'] ?? '')) ? trim($_POST['nic'] ?? '') : null,
+            'dob' => !empty($_POST['dob']) ? $_POST['dob'] : null,
             'gender' => $_POST['gender'] ?? 'Male',
             'occupation' => trim($_POST['occupation'] ?? ''),
             'phone' => trim($_POST['phone'] ?? ''),
@@ -234,11 +236,13 @@ class DirectorController extends Controller {
         $db = Database::getInstance();
         
         // Ensure no duplicate NIC exists
-        $nicExists = $db->prepare("SELECT id FROM coop_members WHERE nic = :nic AND member_type = 'DIRECTOR' AND id != :id");
-        $nicExists->execute(['nic' => $directorData['nic'], 'id' => $id]);
-        if ($nicExists->fetch()) {
-            Session::setFlash('error', 'A director with this NIC is already registered.');
-            Helper::redirect('modules/directors/edit?id=' . $id);
+        if (!empty($directorData['nic'])) {
+            $nicExists = $db->prepare("SELECT id FROM coop_members WHERE nic = :nic AND member_type = 'DIRECTOR' AND id != :id");
+            $nicExists->execute(['nic' => $directorData['nic'], 'id' => $id]);
+            if ($nicExists->fetch()) {
+                Session::setFlash('error', 'A director with this NIC is already registered.');
+                Helper::redirect("modules/directors/edit?id=$id");
+            }
         }
 
         // Ensure registration number is provided and unique

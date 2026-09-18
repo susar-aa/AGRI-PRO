@@ -29,24 +29,24 @@
                             <input type="text" class="form-control" name="full_name" required placeholder="Enter member full name">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">NIC / National ID <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nic" required placeholder="NIC number">
+                            <label class="form-label fw-semibold small">NIC / National ID</label>
+                            <input type="text" class="form-control" name="nic" placeholder="NIC number">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">Date of Birth <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" name="dob" required>
+                            <label class="form-label fw-semibold small">Date of Birth</label>
+                            <input type="date" class="form-control" name="dob">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">Gender <span class="text-danger">*</span></label>
-                            <select class="form-select" name="gender" required>
+                            <label class="form-label fw-semibold small">Gender</label>
+                            <select class="form-select" name="gender">
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
                                 <option value="Other">Other</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold small">Contact Number <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="phone" required placeholder="Phone number">
+                            <label class="form-label fw-semibold small">Contact Number</label>
+                            <input type="text" class="form-control" name="phone" placeholder="Phone number">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold small">WhatsApp Number</label>
@@ -73,12 +73,12 @@
                             </div>
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-semibold small">Address <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="address" required placeholder="Home address">
+                            <label class="form-label fw-semibold small">Address</label>
+                            <input type="text" class="form-control" name="address" placeholder="Home address">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">City <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="city" required placeholder="City name">
+                            <label class="form-label fw-semibold small">City</label>
+                            <input type="text" class="form-control" name="city" placeholder="City name">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small">District</label>
@@ -123,8 +123,8 @@
                 <div class="card-body pt-0">
                     <div class="row g-3">
                         <div class="col-12">
-                            <label class="form-label fw-semibold small">Registration Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" name="registration_date" value="<?= date('Y-m-d'); ?>" required>
+                            <label class="form-label fw-semibold small">Registration Date</label>
+                            <input type="date" class="form-control" name="registration_date" value="<?= date('Y-m-d'); ?>">
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-semibold small">Notes</label>

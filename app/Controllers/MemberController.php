@@ -62,8 +62,8 @@ class MemberController extends Controller {
         $memberData = [
             'member_no' => trim($_POST['member_no'] ?? ''),
             'full_name' => trim($_POST['full_name'] ?? ''),
-            'nic' => trim($_POST['nic'] ?? ''),
-            'dob' => $_POST['dob'] ?? '',
+            'nic' => !empty(trim($_POST['nic'] ?? '')) ? trim($_POST['nic'] ?? '') : null,
+            'dob' => !empty($_POST['dob']) ? $_POST['dob'] : null,
             'gender' => $_POST['gender'] ?? 'Male',
             'occupation' => trim($_POST['occupation'] ?? ''),
             'phone' => trim($_POST['phone'] ?? ''),
@@ -76,7 +76,7 @@ class MemberController extends Controller {
             'heir_contact_number' => trim($_POST['heir_contact_number'] ?? ''),
             'address' => trim($_POST['address'] ?? ''),
             'city' => trim($_POST['city'] ?? ''),
-            'registration_date' => $_POST['registration_date'] ?? date('Y-m-d'),
+            'registration_date' => !empty($_POST['registration_date']) ? $_POST['registration_date'] : date('Y-m-d'),
             'membership_type' => $_POST['membership_type'] ?? 'Ordinary',
             'status' => 'ACTIVE',
             'notes' => trim($_POST['notes'] ?? ''),
@@ -84,11 +84,13 @@ class MemberController extends Controller {
         ];
 
         // Ensure no duplicate NIC exists
-        $nicExists = $db->prepare("SELECT id FROM coop_members WHERE nic = :nic AND member_type = 'MEMBER'");
-        $nicExists->execute(['nic' => $memberData['nic']]);
-        if ($nicExists->fetch()) {
-            Session::setFlash('error', 'A member with this NIC is already registered.');
-            Helper::redirect('modules/members/register');
+        if (!empty($memberData['nic'])) {
+            $nicExists = $db->prepare("SELECT id FROM coop_members WHERE nic = :nic AND member_type = 'MEMBER'");
+            $nicExists->execute(['nic' => $memberData['nic']]);
+            if ($nicExists->fetch()) {
+                Session::setFlash('error', 'A member with this NIC is already registered.');
+                Helper::redirect('modules/members/register');
+            }
         }
 
         // Ensure registration number is provided and unique
@@ -218,8 +220,8 @@ class MemberController extends Controller {
         $memberData = [
             'member_no' => trim($_POST['member_no'] ?? ''),
             'full_name' => trim($_POST['full_name'] ?? ''),
-            'nic' => trim($_POST['nic'] ?? ''),
-            'dob' => $_POST['dob'] ?? '',
+            'nic' => !empty(trim($_POST['nic'] ?? '')) ? trim($_POST['nic'] ?? '') : null,
+            'dob' => !empty($_POST['dob']) ? $_POST['dob'] : null,
             'gender' => $_POST['gender'] ?? 'Male',
             'occupation' => trim($_POST['occupation'] ?? ''),
             'phone' => trim($_POST['phone'] ?? ''),
@@ -240,11 +242,13 @@ class MemberController extends Controller {
         $db = Database::getInstance();
         
         // Ensure no duplicate NIC exists
-        $nicExists = $db->prepare("SELECT id FROM coop_members WHERE nic = :nic AND member_type = 'MEMBER' AND id != :id");
-        $nicExists->execute(['nic' => $memberData['nic'], 'id' => $id]);
-        if ($nicExists->fetch()) {
-            Session::setFlash('error', 'A member with this NIC is already registered.');
-            Helper::redirect('modules/members/edit?id=' . $id);
+        if (!empty($memberData['nic'])) {
+            $nicExists = $db->prepare("SELECT id FROM coop_members WHERE nic = :nic AND member_type = 'MEMBER' AND id != :id");
+            $nicExists->execute(['nic' => $memberData['nic'], 'id' => $id]);
+            if ($nicExists->fetch()) {
+                Session::setFlash('error', 'A member with this NIC is already registered.');
+                Helper::redirect("modules/members/edit?id=$id");
+            }
         }
 
         // Ensure registration number is provided and unique

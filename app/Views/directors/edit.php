@@ -31,24 +31,24 @@
                             <input type="text" class="form-control" name="full_name" required placeholder="Enter director full name" value="<?= htmlspecialchars($director['full_name'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">NIC / National ID <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="nic" required placeholder="NIC number" value="<?= htmlspecialchars($director['nic'] ?? '') ?>">
+                            <label class="form-label fw-semibold small">NIC / National ID</label>
+                            <input type="text" class="form-control" name="nic" placeholder="NIC number" value="<?= htmlspecialchars($director['nic'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">Date of Birth <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" name="dob" required value="<?= htmlspecialchars($director['dob'] ?? '') ?>">
+                            <label class="form-label fw-semibold small">Date of Birth</label>
+                            <input type="date" class="form-control" name="dob" value="<?= htmlspecialchars($director['dob'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">Gender <span class="text-danger">*</span></label>
-                            <select class="form-select" name="gender" required>
+                            <label class="form-label fw-semibold small">Gender</label>
+                            <select class="form-select" name="gender">
                                 <option value="Male" <?= ($director['gender'] ?? '') === 'Male' ? 'selected' : '' ?>>Male</option>
                                 <option value="Female" <?= ($director['gender'] ?? '') === 'Female' ? 'selected' : '' ?>>Female</option>
                                 <option value="Other" <?= ($director['gender'] ?? '') === 'Other' ? 'selected' : '' ?>>Other</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label fw-semibold small">Contact Number <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="phone" required placeholder="Phone number" value="<?= htmlspecialchars($director['phone'] ?? '') ?>">
+                            <label class="form-label fw-semibold small">Contact Number</label>
+                            <input type="text" class="form-control" name="phone" placeholder="Phone number" value="<?= htmlspecialchars($director['phone'] ?? '') ?>">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold small">WhatsApp Number</label>
@@ -87,12 +87,12 @@
                             </div>
                         </div>
                         <div class="col-12">
-                            <label class="form-label fw-semibold small">Address <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="address" required placeholder="Home address" value="<?= htmlspecialchars($director['address'] ?? '') ?>">
+                            <label class="form-label fw-semibold small">Address</label>
+                            <input type="text" class="form-control" name="address" placeholder="Home address" value="<?= htmlspecialchars($director['address'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold small">City <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" name="city" required placeholder="City name" value="<?= htmlspecialchars($director['city'] ?? '') ?>">
+                            <label class="form-label fw-semibold small">City</label>
+                            <input type="text" class="form-control" name="city" placeholder="City name" value="<?= htmlspecialchars($director['city'] ?? '') ?>">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small">Status</label>
