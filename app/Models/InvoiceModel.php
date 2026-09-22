@@ -129,16 +129,16 @@ class InvoiceModel extends Model {
     }
 
     public function generateInvoiceNumber(): string {
-        $prefix = 'INV-' . date('Y') . '-';
+        $prefix = 'INV - ';
         $stmt = $this->db->prepare("SELECT invoice_number FROM invoices WHERE invoice_number LIKE :prefix ORDER BY id DESC LIMIT 1");
         $stmt->execute(['prefix' => $prefix . '%']);
         $lastNum = $stmt->fetchColumn();
 
         if ($lastNum) {
-            $seq = (int)substr($lastNum, -6);
-            $newSeq = str_pad($seq + 1, 6, '0', STR_PAD_LEFT);
+            $seq = (int)str_replace($prefix, '', $lastNum);
+            $newSeq = str_pad($seq + 1, 3, '0', STR_PAD_LEFT);
         } else {
-            $newSeq = '000001';
+            $newSeq = '001';
         }
 
         return $prefix . $newSeq;
