@@ -210,7 +210,7 @@ class InvoiceController extends Controller {
 
         $db = \Core\Database::getInstance();
         $customers = $db->query("SELECT id, party_code, name, phone, address FROM parties WHERE party_type IN ('CUSTOMER', 'BOTH') AND status = 'active' ORDER BY name ASC")->fetchAll();
-        $members = $db->query("SELECT id, member_number, full_name, phone, address, party_id FROM coop_members WHERE status = 'ACTIVE' ORDER BY full_name ASC")->fetchAll();
+        $members = $db->query("SELECT id, member_no, full_name, member_type, party_id FROM coop_members WHERE status = 'ACTIVE' AND member_type IN ('MEMBER', 'DIRECTOR') ORDER BY full_name ASC")->fetchAll();
         $staff = $db->query("SELECT id, username, full_name, role_id, party_id FROM users WHERE status = 'active' ORDER BY full_name ASC")->fetchAll();
         $warehouses = $db->query("SELECT id, code, name FROM inventory_locations WHERE is_active = 1 ORDER BY name ASC")->fetchAll();
         $defaultWarehouseId = $warehouses[0]['id'] ?? 1;
