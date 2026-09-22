@@ -676,10 +676,10 @@ class InvoiceController extends Controller {
 
             $stmt = $db->prepare("
                 INSERT INTO invoices (
-                    invoice_number, customer_id, invoice_date, due_date, status, payment_type, 
+                    invoice_number, customer_id, invoice_date, status, payment_type, 
                     subtotal, discount, tax_amount, total, created_by, reversal_reason
                 ) VALUES (
-                    :invoice_number, :customer_id, :invoice_date, :due_date, 'CANCELLED', 'CASH',
+                    :invoice_number, :customer_id, :invoice_date, 'CANCELLED', 'CASH',
                     0.00, 0.00, 0.00, 0.00, :created_by, :reversal_reason
                 )
             ");
@@ -693,7 +693,6 @@ class InvoiceController extends Controller {
                 'invoice_number' => $invoiceNumber,
                 'customer_id' => $customerId,
                 'invoice_date' => date('Y-m-d'),
-                'due_date' => date('Y-m-d'),
                 'created_by' => Auth::id(),
                 'reversal_reason' => $reason
             ]);
