@@ -72,9 +72,7 @@ class InvoiceEngine {
                 $price = round((float)($item['unit_price'] ?? $srv['default_price']), 2);
             } else {
                 // MEMBER_FEE or SHARE_CAPITAL or other direct account items
-                if (($type === 'MEMBER_FEE' || $type === 'SHARE_CAPITAL') && $partyType !== 'MEMBER' && $partyType !== 'BOTH') {
-                    throw new Exception(str_replace('_', ' ', $type) . " can only be billed to a registered Member.");
-                }
+                // Removed strict partyType check to allow billing Directors and Staff as well
                 $price = round((float)($item['unit_price'] ?? 0), 2);
             }
 

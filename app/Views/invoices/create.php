@@ -334,7 +334,7 @@
                                     <i class="bi bi-person-walking"></i> Walk-in
                                 </span>
                             </label>
-                            <select class="form-select form-select-sm select2-customer" id="customer_id" name="customer_id" onchange="handleCustomerChange()">
+                            <select class="form-select form-select-sm select2-customer" id="customer_id" name="customer_id">
                                 <option value="">-- Walk-in Customer (No Account) --</option>
                                 <optgroup label="Registered Customers">
                                     <?php foreach ($customers as $c): ?>
@@ -781,6 +781,7 @@ function togglePaymentFields(method) {
 }
 
 /* ── Customer Change ───────────────────────────────────── */
+let lastDiscountConfirm = null;
 function handleCustomerChange() {
     const sel             = document.getElementById('customer_id');
     const creditTab       = document.getElementById('creditTab');
@@ -801,10 +802,15 @@ function handleCustomerChange() {
 
     const selected = sel.options[sel.selectedIndex];
     if (selected && selected.getAttribute('data-is-member') === '1') {
+        if (lastDiscountConfirm === sel.value) return; // Prevent double prompt
+        lastDiscountConfirm = sel.value;
+        
         if (confirm('This person is a society member. Apply 10% member discount?')) {
             document.getElementById('discount_percent').value = '10.00';
             calculateDiscountAmount();
         }
+    } else {
+        lastDiscountConfirm = sel.value; // Track non-members too
     }
 }
 
@@ -1110,6 +1116,7 @@ function htmlspecialchars(str) {
 
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize Select2 for searchable dropdown if jQuery and Select2 are loaded
+    const custSelect = document.getElementById('customer_id');
     if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
         $('.select2-customer').select2({
             theme: 'bootstrap-5',
@@ -1120,6 +1127,8 @@ document.addEventListener('DOMContentLoaded', () => {
         $('.select2-customer').on('change', function() {
             handleCustomerChange();
         });
+    } else if (custSelect) {
+        custSelect.addEventListener('change', handleCustomerChange);
     }
 
     handleCustomerChange();
