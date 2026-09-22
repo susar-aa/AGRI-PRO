@@ -335,7 +335,13 @@ class InvoiceEngine {
                     $hasServices = true;
                 } else {
                     // MEMBER_FEE or SHARE_CAPITAL
-                    $accId = ($item['item_type'] === 'SHARE_CAPITAL') ? 25 : 37;
+                    if ($item['item_type'] === 'SHARE_CAPITAL') {
+                        $accId = 25; // Member Share Capital
+                    } else {
+                        // MEMBER_FEE -> General Reserves (27) or Member Share Capital
+                        // To avoid Revenue category (Other Income), map to General Reserves
+                        $accId = 27; 
+                    }
                     if (!isset($serviceRevenueAllocations[$accId])) {
                         $serviceRevenueAllocations[$accId] = 0.00;
                     }
