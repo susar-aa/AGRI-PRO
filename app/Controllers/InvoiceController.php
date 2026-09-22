@@ -200,8 +200,6 @@ class InvoiceController extends Controller {
 
     
     public function edit(): void {
-        Auth::requirePermission('invoices.edit');
-
         $id = !empty($_GET['id']) ? (int)$_GET['id'] : 0;
         $invoice = $this->invoiceModel->getById($id);
 
@@ -271,7 +269,6 @@ class InvoiceController extends Controller {
 
     
     public function update(): void {
-        Auth::requirePermission('invoices.edit');
         $this->validateCsrf();
 
         $id = !empty($_POST['id']) ? (int)$_POST['id'] : 0;
