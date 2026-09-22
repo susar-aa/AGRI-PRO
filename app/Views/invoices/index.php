@@ -153,7 +153,9 @@
                     Use this to record an invoice that was physically voided or cancelled in your manual bill book, so that the invoice number is maintained in the system sequence.
                 </div>
                 <div class="mb-3">
-                    <p class="text-muted small">The system will automatically assign the next sequential invoice number and mark it as cancelled.</p>
+                    <label class="form-label fw-bold">Next Sequential Invoice Number</label>
+                    <input type="text" class="form-control font-monospace bg-light fw-bold text-danger" name="invoice_number" value="<?= htmlspecialchars($nextInvoiceNumber ?? ''); ?>" readonly>
+                    <small class="text-muted">This invoice number will be recorded in the system sequence with status <strong>CANCELLED</strong>.</small>
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-bold">Reason for Cancellation</label>

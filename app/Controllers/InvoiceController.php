@@ -50,6 +50,7 @@ class InvoiceController extends Controller {
         // Fetch active customers
         $db = \Core\Database::getInstance();
         $customers = $db->query("SELECT id, party_code, name FROM parties WHERE party_type IN ('CUSTOMER', 'BOTH') AND status = 'active' ORDER BY name ASC")->fetchAll();
+        $nextInvoiceNumber = $this->invoiceModel->generateInvoiceNumber();
 
         $this->render('invoices/index', [
             'pageTitle' => 'Central Invoices Directory',
@@ -57,6 +58,7 @@ class InvoiceController extends Controller {
             'invoices' => $invoices,
             'filters' => $filters,
             'customers' => $customers,
+            'nextInvoiceNumber' => $nextInvoiceNumber,
             'pagination' => [
                 'current' => $page,
                 'total' => $totalPages,
@@ -659,12 +661,11 @@ class InvoiceController extends Controller {
         $this->validateCsrf();
 
         $invoiceNumber = trim($_POST['invoice_number'] ?? '');
-        $reason = trim($_POST['reason'] ?? 'Physically voided');
-
         if (empty($invoiceNumber)) {
-            Session::setFlash('error', 'Invoice number is required.');
-            Helper::redirect('modules/invoices');
+            $invoiceNumber = $this->invoiceModel->generateInvoiceNumber();
         }
+
+        $reason = trim($_POST['reason'] ?? 'Physically voided in bill book');
 
         $db = \Core\Database::getInstance();
         
@@ -688,23 +689,26 @@ class InvoiceController extends Controller {
                 )
             ");
             
-            // Assign to a default walk-in customer if available, or just first customer, or null
-            // Table might require customer_id. Let's find first customer.
-            $customerId = (int)$db->query("SELECT id FROM parties WHERE party_type IN ('CUSTOMER','BOTH') LIMIT 1")->fetchColumn();
+            // Assign to walk-in or default customer
+            $walkinCustomer = $db->query("SELECT id FROM parties WHERE party_code = 'PTY-WALKIN'")->fetch();
+            $customerId = $walkinCustomer ? (int)$walkinCustomer['id'] : (int)$db->query("SELECT id FROM parties WHERE party_type IN ('CUSTOMER','BOTH') LIMIT 1")->fetchColumn();
             if (!$customerId) $customerId = 1;
 
             $stmt->execute([
                 'invoice_number' => $invoiceNumber,
                 'customer_id' => $customerId,
                 'invoice_date' => date('Y-m-d'),
-                'created_by' => Auth::id(),
+                'created_by' => Auth::id() ?? 1,
                 'notes' => $reason
             ]);
 
             $db->commit();
             Session::setFlash('success', "Invoice {$invoiceNumber} successfully recorded as Cancelled.");
         } catch (\Exception $e) {
-            $db->rollBack();
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            \Core\Logger::error("Failed to record cancelled invoice {$invoiceNumber}: " . $e->getMessage());
             Session::setFlash('error', 'Failed to record cancelled invoice: ' . $e->getMessage());
         }
 
