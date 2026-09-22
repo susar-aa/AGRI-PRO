@@ -1105,3 +1105,8 @@ Stack trace:
 #3 C:\xampp\htdocs\AGRI PRO\public\index.php(328): Core\Router->dispatch()
 #4 {main}
   thrown in C:\xampp\htdocs\AGRI PRO\app\Views\bank\transactions.php on line 2
+[22-Sep-2026 12:24:48 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'account_name' in 'field list' in C:\xampp\htdocs\AGRI PRO\insert_cash.php:4
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\insert_cash.php(4): PDO->exec('INSERT INTO cas...')
+#1 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\insert_cash.php on line 4
