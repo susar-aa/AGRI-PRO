@@ -288,6 +288,16 @@
                 <i class="bi bi-arrow-counterclockwise"></i> Reverse
             </button>
         <?php endif; ?>
+
+        <?php if (\Core\Auth::hasPermission('invoices.cancel')): ?>
+            <form action="<?= \Core\Helper::baseUrl('modules/invoices/delete'); ?>" method="POST" class="d-inline" onsubmit="return confirm('WARNING: Are you sure you want to permanently delete this invoice? This will wipe the transaction completely and cannot be undone.');">
+                <?= \Core\CSRF::getFormField(); ?>
+                <input type="hidden" name="id" value="<?= $invoice['id']; ?>">
+                <button type="submit" class="bar-btn danger-btn">
+                    <i class="bi bi-trash3-fill"></i> Delete
+                </button>
+            </form>
+        <?php endif; ?>
     </div>
 </div>
 

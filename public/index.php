@@ -163,6 +163,7 @@ $router->post('/modules/invoices/store', [InvoiceController::class, 'store']);
 $router->get('/modules/invoices/view', [InvoiceController::class, 'view']);
 $router->post('/modules/invoices/post', [InvoiceController::class, 'post']);
 $router->post('/modules/invoices/cancel', [InvoiceController::class, 'cancel']);
+$router->post('/modules/invoices/delete', [InvoiceController::class, 'delete']);
 
 // Services Routing (Stage 6B)
 $router->get('/modules/services', [ServiceController::class, 'index']);

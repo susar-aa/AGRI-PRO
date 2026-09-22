@@ -393,4 +393,52 @@ class InvoiceController extends Controller {
 
         Helper::redirect('modules/invoices/view?id=' . $id);
     }
+
+    public function delete(): void {
+        Auth::requirePermission('invoices.cancel');
+        $this->validateCsrf();
+
+        $id = !empty($_POST['id']) ? (int)$_POST['id'] : 0;
+        if ($id <= 0) {
+            \Core\Helper::redirect('modules/invoices');
+        }
+
+        try {
+            $db = \Core\Database::getInstance();
+            $invoice = $db->query("SELECT * FROM invoices WHERE id = $id")->fetch();
+            if ($invoice) {
+                // Delete items
+                $db->exec("DELETE FROM invoice_items WHERE invoice_id = $id");
+                
+                // Revert balances and journals if POSTED
+                if ($invoice['status'] === 'POSTED') {
+                    if ($invoice['payment_type'] === 'CASH' && $invoice['cash_account_id']) {
+                        $db->exec("UPDATE cash_accounts SET current_balance = current_balance - {$invoice['total']} WHERE id = {$invoice['cash_account_id']}");
+                    } elseif ($invoice['payment_type'] === 'BANK' && $invoice['bank_account_id']) {
+                        $db->exec("UPDATE bank_accounts SET current_balance = current_balance - {$invoice['total']} WHERE id = {$invoice['bank_account_id']}");
+                    }
+                    
+                    $journal = $db->query("SELECT id FROM journal_entries WHERE source_module = 'invoices' AND source_transaction_id = $id")->fetch();
+                    if ($journal) {
+                        $db->exec("DELETE FROM journal_lines WHERE journal_entry_id = {$journal['id']}");
+                        $db->exec("DELETE FROM journal_entries WHERE id = {$journal['id']}");
+                    }
+                }
+                
+                $db->exec("DELETE FROM invoices WHERE id = $id");
+                
+                // Reset auto-increment
+                $count = $db->query("SELECT COUNT(*) FROM invoices")->fetchColumn();
+                if ($count == 0) {
+                    $db->exec("ALTER TABLE invoices AUTO_INCREMENT = 1");
+                }
+                
+                \Core\Session::setFlash('success', 'Invoice permanently deleted.');
+            }
+        } catch (\Exception $e) {
+            \Core\Session::setFlash('error', 'Delete failed: ' . $e->getMessage());
+        }
+
+        \Core\Helper::redirect('modules/invoices');
+    }
 }
