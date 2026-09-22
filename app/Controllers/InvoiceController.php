@@ -216,7 +216,14 @@ class InvoiceController extends Controller {
         $defaultWarehouseId = $warehouses[0]['id'] ?? 1;
         $cashAccounts = $db->query("SELECT id, name FROM cash_accounts WHERE status = 'active' ORDER BY name ASC")->fetchAll();
         $bankAccounts = $db->query("SELECT id, account_name, bank_name FROM bank_accounts WHERE status = 'active' ORDER BY account_name ASC")->fetchAll();
-        $products = $db->query("SELECT p.id, p.sku, p.name_en, p.price, p.sales_unit_id, u.code AS unit_code FROM products p LEFT JOIN units_of_measure u ON p.sales_unit_id = u.id WHERE p.status = 'active' ORDER BY p.name_en ASC")->fetchAll();
+        $products = $db->query("
+            SELECT p.*, pc.name AS category_name, u.code AS unit_code
+            FROM products p
+            LEFT JOIN product_categories pc ON p.category_id = pc.id
+            LEFT JOIN units_of_measure u ON p.sales_unit_id = u.id
+            WHERE p.is_marketplace = 1 AND p.is_active = 1
+            ORDER BY p.name_en ASC
+        ")->fetchAll();
 
         foreach ($products as &$p) {
             $p['stocks'] = [];
