@@ -1,12 +1,12 @@
 <?php
 // Variables available from controller:
-// $customers, $products, $services, $machineryAssets, $bankAccounts
-// $defaultWarehouseId, $prefilled
+// $customers, $members, $staff, $selectedCustomerVal, $products, $services, $machineryAssets, 
+// $cashAccounts, $bankAccounts, $defaultWarehouseId, $invoice, $editItems, $chequeData
 ?>
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   AGRI PRO — Create Invoice  (Premium Redesign)
+   AGRI PRO — Edit Invoice Panel
    ═══════════════════════════════════════════════════════════ */
 
 /* ── Page Header ─────────────────────────────────────────── */
@@ -142,14 +142,6 @@
     align-items: center; justify-content: center; gap: .5rem;
 }
 .post-btn:hover { opacity: .9; }
-.draft-btn {
-    background: transparent; color: #64748b;
-    border: 2px solid #e2e8f0; border-radius: 12px;
-    padding: .7rem 1rem; font-weight: 600; font-size: .85rem;
-    width: 100%; cursor: pointer; transition: all .2s;
-    display: flex; align-items: center; justify-content: center; gap: .5rem;
-}
-.draft-btn:hover { border-color: #94a3b8; color: #1e293b; }
 
 /* ── Payment method toggle tabs ─────────────────────────── */
 .pay-tabs { display: flex; gap: .5rem; flex-wrap: wrap; }
@@ -168,34 +160,6 @@
 .modal-content { border-radius: 18px !important; border: 0 !important; overflow: hidden; }
 .modal-header  { border-bottom: 0 !important; padding: 1.25rem 1.5rem !important; }
 .modal-body    { padding: 1.1rem 1.5rem 1.5rem !important; }
-.modal-search-wrap {
-    position: relative; margin-bottom: .9rem;
-}
-.modal-search-wrap .search-icon {
-    position: absolute; left: .85rem; top: 50%; transform: translateY(-50%);
-    color: #94a3b8; font-size: .9rem; pointer-events: none;
-}
-.modal-search-wrap input {
-    width: 100%; border: 1.5px solid #e2e8f0; border-radius: 50px;
-    padding: .55rem .9rem .55rem 2.2rem;
-    background: #f8fafc; font-size: .85rem; outline: none; transition: all .2s;
-}
-.modal-search-wrap input:focus { border-color: #16a34a; background: #fff; box-shadow: 0 0 0 3px rgba(22,163,74,.1); }
-.modal-tbl { font-size: .8rem; width: 100%; border-collapse: collapse; }
-.modal-tbl thead th {
-    background: #f8fafc; color: #64748b; font-weight: 700;
-    font-size: .7rem; text-transform: uppercase; letter-spacing: .05em;
-    padding: .55rem .8rem; border-bottom: 2px solid #e2e8f0;
-}
-.modal-tbl tbody tr { border-bottom: 1px solid #f1f5f9; transition: background .1s; }
-.modal-tbl tbody tr:hover td { background: #f0fdf4; }
-.modal-tbl td { padding: .55rem .8rem; vertical-align: middle; }
-.modal-add-btn {
-    width: 32px; height: 32px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    border: none; cursor: pointer; font-size: .85rem; transition: transform .15s;
-}
-.modal-add-btn:hover { transform: scale(1.1); }
 
 /* ── Item Cards (Mobile-first Modal Layout) ─────────────── */
 .item-card {
@@ -276,7 +240,6 @@
 .service-add-btn { background: #d97706; color: #fff; }
 .rental-add-btn  { background: #0d9488; color: #fff; }
 
-/* On wider screens, 2-column card grid */
 @media (min-width: 600px) {
     #prodCardGrid, #srvCardGrid, #rentalCardGrid {
         grid-template-columns: 1fr 1fr;
@@ -295,10 +258,10 @@
 <!-- ═══ PAGE HEADER ════════════════════════════════════════ -->
 <div class="inv-page-header">
     <div class="header-left">
-        <div class="inv-icon"><i class="bi bi-receipt-cutoff"></i></div>
+        <div class="inv-icon"><i class="bi bi-pencil-square"></i></div>
         <div>
-            <h4>Create New Invoice</h4>
-            <p>Compose a sales invoice — mix products, services and machinery rentals.</p>
+            <h4>Edit Invoice <?= htmlspecialchars($invoice['invoice_number']); ?></h4>
+            <p>Modify sales invoice — adjust customer, line items or payment details.</p>
         </div>
     </div>
     <a href="<?= \Core\Helper::baseUrl('modules/invoices'); ?>" class="inv-back-btn">
@@ -310,9 +273,7 @@
 <form action="<?= \Core\Helper::baseUrl('modules/invoices/update'); ?>" method="POST" id="invoiceForm">
     <?= \Core\CSRF::getFormField(); ?>
     <input type="hidden" name="id" value="<?= $invoice['id']; ?>">
-    <input type="hidden" name="service_job_id"      id="service_job_id"      value="<?= htmlspecialchars($prefilled['service_job_id'] ?? ''); ?>">
-    <input type="hidden" name="machinery_rental_id" id="machinery_rental_id" value="<?= htmlspecialchars($prefilled['machinery_rental_id'] ?? ''); ?>">
-    <input type="hidden" name="warehouse_id"        id="warehouse_id"        value="<?= $defaultWarehouseId; ?>">
+    <input type="hidden" name="warehouse_id" id="warehouse_id" value="<?= $defaultWarehouseId; ?>">
 
     <div class="row g-4">
 
@@ -336,30 +297,27 @@
                                 </span>
                             </label>
                             <select class="form-select form-select-sm select2-customer" id="customer_id" name="customer_id">
-                                <option value="">-- Walk-in Customer (No Account) --</option>
+                                <option value="" <?= ($selectedCustomerVal === '') ? 'selected' : ''; ?>>-- Walk-in Customer (No Account) --</option>
                                 <optgroup label="Registered Customers">
                                     <?php foreach ($customers as $c): ?>
-    <?php $cval = $c['id']; $sel = ($invoice['customer_id'] == $c['id']) ? 'selected' : ''; ?>
-    <option value="<?= $cval ?>" <?= $sel ?>>
-                                        
+                                        <?php $cval = (string)$c['id']; $sel = ($selectedCustomerVal === $cval) ? 'selected' : ''; ?>
+                                        <option value="<?= $cval ?>" <?= $sel ?>>
                                             <?= htmlspecialchars($c['party_code']); ?> &mdash; <?= htmlspecialchars($c['name']); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </optgroup>
                                 <optgroup label="Society Members & Directors">
                                     <?php foreach ($members as $m): ?>
-    <?php $mval = "M_" . $m['id']; $sel = ($invoice['customer_id'] == $m['party_id']) ? 'selected' : ''; ?>
-    <option value="<?= $mval ?>" <?= $sel ?>>
-                                        <option value="M_<?= $m['id']; ?>" data-is-member="1">
+                                        <?php $mval = "M_" . $m['id']; $sel = ($selectedCustomerVal === $mval) ? 'selected' : ''; ?>
+                                        <option value="<?= $mval ?>" <?= $sel ?> data-is-member="1">
                                             <?= htmlspecialchars($m['member_no']); ?> &mdash; <?= htmlspecialchars($m['full_name']); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </optgroup>
                                 <optgroup label="Staff (Internal Users)">
                                     <?php foreach ($staff as $s): ?>
-    <?php $sval = "U_" . $s['id']; $sel = ($invoice['customer_id'] == $s['party_id']) ? 'selected' : ''; ?>
-    <option value="<?= $sval ?>" <?= $sel ?>>
-                                        <option value="U_<?= $s['id']; ?>" data-is-user="1">
+                                        <?php $sval = "U_" . $s['id']; $sel = ($selectedCustomerVal === $sval) ? 'selected' : ''; ?>
+                                        <option value="<?= $sval ?>" <?= $sel ?> data-is-user="1">
                                             @<?= htmlspecialchars($s['username']); ?> &mdash; <?= htmlspecialchars($s['full_name']); ?>
                                         </option>
                                     <?php endforeach; ?>
@@ -444,7 +402,7 @@
                 </div>
                 <div class="inv-section-body">
                     <textarea class="form-control form-control-sm" id="notes" name="notes" rows="2"
-                        placeholder="Specific terms, delivery instructions, or remarks..."></textarea>
+                        placeholder="Specific terms, delivery instructions, or remarks..."><?= htmlspecialchars($invoice['notes'] ?? ''); ?></textarea>
                 </div>
             </div>
 
@@ -463,45 +421,57 @@
                     <div class="inv-section-body">
                         <!-- Stylish toggle tabs -->
                         <div class="pay-tabs mb-3" id="payTabs">
-                            <button type="button" class="pay-tab active" data-value="CASH" onclick="selectPayTab(this)">
+                            <button type="button" class="pay-tab <?= ($invoice['payment_type'] === 'CASH') ? 'active' : ''; ?>" data-value="CASH" onclick="selectPayTab(this)">
                                 <i class="bi bi-cash-coin"></i> Cash
                             </button>
-                            <button type="button" class="pay-tab" data-value="BANK" onclick="selectPayTab(this)">
+                            <button type="button" class="pay-tab <?= ($invoice['payment_type'] === 'BANK') ? 'active' : ''; ?>" data-value="BANK" onclick="selectPayTab(this)">
                                 <i class="bi bi-bank2"></i> Bank
                             </button>
-                            <button type="button" class="pay-tab" data-value="CHEQUE" onclick="selectPayTab(this)">
+                            <button type="button" class="pay-tab <?= ($invoice['payment_type'] === 'CHEQUE') ? 'active' : ''; ?>" data-value="CHEQUE" onclick="selectPayTab(this)">
                                 <i class="bi bi-journal-check"></i> Cheque
                             </button>
-                            <button type="button" class="pay-tab" data-value="CREDIT" id="creditTab" onclick="selectPayTab(this)">
+                            <button type="button" class="pay-tab <?= ($invoice['payment_type'] === 'CREDIT') ? 'active' : ''; ?>" data-value="CREDIT" id="creditTab" onclick="selectPayTab(this)">
                                 <i class="bi bi-clock-history"></i> Credit
                             </button>
                         </div>
-                        <input type="hidden" id="payment_type" name="payment_type" value="CASH">
+                        <input type="hidden" id="payment_type" name="payment_type" value="<?= htmlspecialchars($invoice['payment_type']); ?>">
+
+                        <!-- Cash Section -->
+                        <div id="cashAccountSection" class="mb-3" style="<?= ($invoice['payment_type'] === 'CASH') ? 'display:block;' : 'display:none;'; ?>">
+                            <label for="cash_account_id" class="form-label fw-semibold small text-muted text-uppercase mb-1">Cash Account / Drawer</label>
+                            <select class="form-select form-select-sm" id="cash_account_id" name="cash_account_id">
+                                <?php foreach ($cashAccounts as $ca): ?>
+                                    <?php $sel = ($invoice['cash_account_id'] == $ca['id']) ? 'selected' : ''; ?>
+                                    <option value="<?= $ca['id']; ?>" <?= $sel ?>><?= htmlspecialchars($ca['name']); ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
                         <!-- Bank Section -->
-                        <div id="bankAccountSection" style="display:none;">
+                        <div id="bankAccountSection" class="mb-3" style="<?= ($invoice['payment_type'] === 'BANK') ? 'display:block;' : 'display:none;'; ?>">
                             <label for="bank_account_id" class="form-label fw-semibold small text-muted text-uppercase mb-1">Bank Account <span class="text-danger">*</span></label>
                             <select class="form-select form-select-sm" id="bank_account_id" name="bank_account_id">
                                 <?php foreach ($bankAccounts as $ba): ?>
-                                    <option value="<?= $ba['id']; ?>"><?= htmlspecialchars($ba['bank_name']); ?> &mdash; <?= htmlspecialchars($ba['account_number']); ?></option>
+                                    <?php $sel = ($invoice['bank_account_id'] == $ba['id']) ? 'selected' : ''; ?>
+                                    <option value="<?= $ba['id']; ?>" <?= $sel ?>><?= htmlspecialchars($ba['bank_name']); ?> &mdash; <?= htmlspecialchars($ba['account_number'] ?? $ba['account_name'] ?? ''); ?></option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
 
                         <!-- Cheque Section -->
-                        <div id="chequeDetailsSection" style="display:none;">
+                        <div id="chequeDetailsSection" style="<?= ($invoice['payment_type'] === 'CHEQUE') ? 'display:block;' : 'display:none;'; ?>">
                             <div class="row g-2">
                                 <div class="col-12">
                                     <label class="form-label fw-semibold small mb-1">Cheque Number <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control form-control-sm" id="cheque_number" name="cheque_number" placeholder="e.g. 012356">
+                                    <input type="text" class="form-control form-control-sm" id="cheque_number" name="cheque_number" value="<?= htmlspecialchars($chequeData['cheque_number'] ?? ''); ?>" placeholder="e.g. 012356">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label fw-semibold small mb-1">Bank Name <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control form-control-sm" id="cheque_bank" name="cheque_bank" placeholder="e.g. BOC, Sampath">
+                                    <input type="text" class="form-control form-control-sm" id="cheque_bank" name="cheque_bank" value="<?= htmlspecialchars($chequeData['bank_name'] ?? ''); ?>" placeholder="e.g. BOC, Sampath">
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label fw-semibold small mb-1">Cheque Date <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control form-control-sm" id="cheque_date" name="cheque_date" value="<?= date('Y-m-d'); ?>">
+                                    <input type="date" class="form-control form-control-sm" id="cheque_date" name="cheque_date" value="<?= htmlspecialchars($chequeData['cheque_date'] ?? date('Y-m-d')); ?>">
                                 </div>
                             </div>
                         </div>
@@ -542,7 +512,7 @@
 
                         <div class="d-grid gap-2 mt-3">
                             <button type="submit" name="action" value="post" class="post-btn" onclick="return validateInvoiceForm(event)">
-                                <i class="bi bi-save"></i> Save Invoice
+                                <i class="bi bi-save"></i> Save Changes
                             </button>
                         </div>
 
@@ -559,16 +529,13 @@
     </div>
 </form>
 
-
-<!-- ═══════════════════════════════════════════════════════
-     MODAL: ADD PRODUCT
-     ═══════════════════════════════════════════════════════ -->
-<div class="modal fade" id="productModal" tabindex="-1" aria-labelledby="productModalLabel" aria-hidden="true">
+<!-- MODALS -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
         <div class="modal-content shadow-lg">
             <div class="modal-header" style="background:linear-gradient(135deg,#312e81,#4f46e5);color:#fff;padding:1rem 1.25rem !important;">
                 <div>
-                    <h5 class="modal-title fw-bold mb-0" id="productModalLabel">
+                    <h5 class="modal-title fw-bold mb-0">
                         <i class="bi bi-box-seam me-2"></i>Select Product
                     </h5>
                     <div style="font-size:.75rem;opacity:.75;margin-top:.15rem;">Tap a product to configure qty &amp; price, then add</div>
@@ -576,12 +543,10 @@
                 <button type="button" class="btn-close btn-close-white ms-3" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" style="padding:1rem !important;">
-                <!-- Search -->
                 <div class="position-relative mb-3">
                     <i class="bi bi-search position-absolute" style="left:.85rem;top:50%;transform:translateY(-50%);color:#94a3b8;"></i>
                     <input type="text" id="prodSearchInput" class="form-control rounded-pill" style="padding-left:2.4rem;font-size:.85rem;" placeholder="Search products..." oninput="filterModalItems('PRODUCT', this.value)">
                 </div>
-                <!-- Card Grid -->
                 <div id="prodCardGrid" style="max-height:65vh;overflow-y:auto;display:grid;grid-template-columns:1fr;gap:.65rem;">
                     <?php foreach ($products as $p): ?>
                     <div class="item-card prod-row" data-search="<?= htmlspecialchars(strtolower($p['name_en'] . ' ' . ($p['sku'] ?? '') . ' ' . ($p['category_name'] ?? ''))); ?>">
@@ -620,15 +585,12 @@
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MODAL: ADD SERVICE
-     ═══════════════════════════════════════════════════════ -->
-<div class="modal fade" id="serviceModal" tabindex="-1" aria-labelledby="serviceModalLabel" aria-hidden="true">
+<div class="modal fade" id="serviceModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
         <div class="modal-content shadow-lg">
             <div class="modal-header" style="background:linear-gradient(135deg,#92400e,#d97706);color:#fff;padding:1rem 1.25rem !important;">
                 <div>
-                    <h5 class="modal-title fw-bold mb-0" id="serviceModalLabel">
+                    <h5 class="modal-title fw-bold mb-0">
                         <i class="bi bi-gear-wide-connected me-2"></i>Select Service
                     </h5>
                     <div style="font-size:.75rem;opacity:.75;margin-top:.15rem;">Set the quantity and price, then add to invoice</div>
@@ -677,18 +639,15 @@
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════
-     MODAL: ADD RENTAL / MACHINERY
-     ═══════════════════════════════════════════════════════ -->
-<div class="modal fade" id="rentalModal" tabindex="-1" aria-labelledby="rentalModalLabel" aria-hidden="true">
+<div class="modal fade" id="rentalModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
         <div class="modal-content shadow-lg">
             <div class="modal-header" style="background:linear-gradient(135deg,#064e3b,#0d9488);color:#fff;padding:1rem 1.25rem !important;">
                 <div>
-                    <h5 class="modal-title fw-bold mb-0" id="rentalModalLabel">
+                    <h5 class="modal-title fw-bold mb-0">
                         <i class="bi bi-truck-flatbed me-2"></i>Select Machinery / Rental
                     </h5>
-                    <div style="font-size:.75rem;opacity:.75;margin-top:.15rem;">Set qty (hours/days/acres) and rate, then add</div>
+                    <div style="font-size:.75rem;opacity:.75;margin-top:.15rem;">Set qty and rate, then add to invoice</div>
                 </div>
                 <button type="button" class="btn-close btn-close-white ms-3" data-bs-dismiss="modal"></button>
             </div>
@@ -714,7 +673,7 @@
                                 </div>
                             </div>
                             <div class="item-card-price">
-                                <div class="price-label">Rate / <?= htmlspecialchars($m['rental_unit']); ?></div>
+                                <div class="price-label">Rate / <?= htmlspecialchars($m['rental_unit'] ?? 'Hour'); ?></div>
                                 <div class="price-val">LKR <?= number_format($m['default_rental_rate'], 2); ?></div>
                             </div>
                         </div>
@@ -739,12 +698,119 @@
     </div>
 </div>
 
-
 <script>
 const availableProducts  = <?= json_encode($products); ?>;
+const editItemsData      = <?= json_encode($editItems); ?>;
 let rowCount = 0;
 const defaultWarehouseId = <?= json_encode($defaultWarehouseId); ?>;
 const defaultServiceId   = <?= !empty($services) ? $services[0]['id'] : '0'; ?>;
+
+/* ── Load Existing Item Rows on Load ───────────────────── */
+function loadExistingItem(item) {
+    rowCount++;
+    const tbody = document.getElementById('itemsTableBody');
+    const tr = document.createElement('tr');
+    tr.id = `row_${rowCount}`;
+
+    const type = item.type || 'PRODUCT';
+    const qty = parseFloat(item.quantity) || 1;
+    const price = parseFloat(item.unit_price) || 0;
+    const total = parseFloat(item.total) || (qty * price);
+    const desc = item.description || '';
+
+    if (type === 'PRODUCT') {
+        const prodId = item.product_id;
+        const prod = availableProducts.find(p => p.id == prodId) || {};
+        const stock = prod.stocks && prod.stocks[defaultWarehouseId] !== undefined ? parseFloat(prod.stocks[defaultWarehouseId]) : 0;
+        const prodName = item.product_name || prod.name_en || 'Product';
+        const sku = item.sku || prod.sku || '-';
+        const unit = item.product_unit || prod.unit_code || 'Units';
+
+        tr.innerHTML = `
+            <td>
+                <span class="type-pill product">PRODUCT</span>
+                <input type="hidden" name="items[${rowCount}][item_type]" value="PRODUCT">
+                <input type="hidden" name="items[${rowCount}][product_id]" value="${prodId}">
+            </td>
+            <td>
+                <div class="fw-semibold text-dark small">${htmlspecialchars(prodName)}</div>
+                <div class="text-muted" style="font-size:.71rem;font-family:monospace;">SKU: ${htmlspecialchars(sku)}</div>
+                <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" value="${htmlspecialchars(desc)}" placeholder="Remarks (optional)" style="font-size:.74rem;">
+            </td>
+            <td class="text-center font-monospace fw-semibold text-muted" id="available_${rowCount}">${stock.toFixed(2)}</td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
+                    <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">${htmlspecialchars(unit)}</span>
+                </div>
+            </td>
+            <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
+            <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total.toFixed(2)}</td>
+            <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
+        `;
+    } else if (type === 'SERVICE') {
+        const srvId = item.service_id;
+        const srvName = item.service_name || 'Service';
+        const srvCode = item.service_code || '';
+        const unit = item.service_unit || 'Job';
+
+        tr.innerHTML = `
+            <td>
+                <span class="type-pill service">SERVICE</span>
+                <input type="hidden" name="items[${rowCount}][item_type]" value="SERVICE">
+                <input type="hidden" name="items[${rowCount}][service_id]" value="${srvId}">
+            </td>
+            <td>
+                <div class="fw-semibold text-dark small">${htmlspecialchars(srvName)} ${srvCode ? '<span class="font-monospace text-muted">(' + htmlspecialchars(srvCode) + ')</span>' : ''}</div>
+                <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" value="${htmlspecialchars(desc)}" placeholder="Remarks (optional)" style="font-size:.74rem;">
+            </td>
+            <td class="text-center text-muted" id="available_${rowCount}">—</td>
+            <td>
+                <div class="input-group input-group-sm">
+                    <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
+                    <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">${htmlspecialchars(unit)}</span>
+                </div>
+            </td>
+            <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
+            <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total.toFixed(2)}</td>
+            <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
+        `;
+    } else {
+        let label = (type === 'SHARE_CAPITAL') ? 'Share Capital' : 'Member Fee';
+        let pillClass = (type === 'SHARE_CAPITAL') ? 'text-bg-warning' : 'text-bg-info';
+
+        let qtyHtml = `
+            <div class="input-group input-group-sm">
+                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
+                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">Unit</span>
+            </div>
+        `;
+        if (type === 'SHARE_CAPITAL' || type === 'MEMBER_FEE') {
+            qtyHtml = `
+                <div class="text-center text-muted pt-1">—</div>
+                <input type="hidden" class="qty-input" name="items[${rowCount}][quantity]" value="1">
+            `;
+        }
+
+        tr.innerHTML = `
+            <td>
+                <span class="badge ${pillClass} bg-opacity-10 text-dark fw-bold rounded-pill" style="font-size:0.65rem; padding:0.35rem 0.6rem;">${label.toUpperCase()}</span>
+                <input type="hidden" name="items[${rowCount}][item_type]" value="${type}">
+            </td>
+            <td>
+                <div class="fw-semibold text-dark small">${label}</div>
+                <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" value="${htmlspecialchars(desc)}" placeholder="Remarks (optional)" style="font-size:.74rem;">
+            </td>
+            <td class="text-center text-muted" id="available_${rowCount}">—</td>
+            <td>${qtyHtml}</td>
+            <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();" placeholder="Enter Value"></td>
+            <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total.toFixed(2)}</td>
+            <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
+        `;
+    }
+
+    tbody.appendChild(tr);
+}
 
 /* ── Payment Tabs ──────────────────────────────────────── */
 function selectPayTab(btn) {
@@ -753,7 +819,6 @@ function selectPayTab(btn) {
 
     if (val === 'CREDIT' && sel.value === '') {
         alert('Please select a registered Customer first to use Credit payment.');
-        // Briefly focus the customer dropdown
         if ($('.select2-customer').length) {
             $('.select2-customer').select2('open');
         } else {
@@ -770,21 +835,21 @@ function selectPayTab(btn) {
 
 function togglePaymentFields(method) {
     if (!method) method = document.getElementById('payment_type').value;
+    const cashSect   = document.getElementById('cashAccountSection');
     const bankSect   = document.getElementById('bankAccountSection');
     const chequeSect = document.getElementById('chequeDetailsSection');
-    document.getElementById('bank_account_id').required = false;
-    document.getElementById('cheque_number').required   = false;
-    document.getElementById('cheque_bank').required     = false;
-    bankSect.style.display   = 'none';
-    chequeSect.style.display = 'none';
-    if (method === 'BANK') {
-        bankSect.style.display = 'block';
-        document.getElementById('bank_account_id').required = true;
-    } else if (method === 'CHEQUE') {
-        chequeSect.style.display = 'block';
-        document.getElementById('cheque_number').required = true;
-        document.getElementById('cheque_bank').required   = true;
-    }
+
+    if (cashSect) cashSect.style.display = (method === 'CASH') ? 'block' : 'none';
+    if (bankSect) bankSect.style.display = (method === 'BANK') ? 'block' : 'none';
+    if (chequeSect) chequeSect.style.display = (method === 'CHEQUE') ? 'block' : 'none';
+
+    const bankSelect = document.getElementById('bank_account_id');
+    const chqNum = document.getElementById('cheque_number');
+    const chqBank = document.getElementById('cheque_bank');
+
+    if (bankSelect) bankSelect.required = (method === 'BANK');
+    if (chqNum) chqNum.required = (method === 'CHEQUE');
+    if (chqBank) chqBank.required = (method === 'CHEQUE');
 }
 
 /* ── Customer Change ───────────────────────────────────── */
@@ -795,29 +860,30 @@ function handleCustomerChange() {
     const walkinIndicator = document.getElementById('walkinIndicator');
     const isWalkin = (sel.value === '');
 
-    walkinIndicator.style.display = isWalkin ? '' : 'none';
+    if (walkinIndicator) walkinIndicator.style.display = isWalkin ? '' : 'none';
 
     if (isWalkin) {
         if (document.getElementById('payment_type').value === 'CREDIT') {
             document.querySelector('.pay-tab[data-value="CASH"]').click();
         }
-        creditTab.disabled = true;
-        creditTab.classList.remove('active');
+        if (creditTab) {
+            creditTab.disabled = true;
+            creditTab.classList.remove('active');
+        }
     } else {
-        creditTab.disabled = false;
+        if (creditTab) creditTab.disabled = false;
     }
 
     const selected = sel.options[sel.selectedIndex];
     if (selected && selected.getAttribute('data-is-member') === '1') {
-        if (lastDiscountConfirm === sel.value) return; // Prevent double prompt
+        if (lastDiscountConfirm === sel.value) return;
         lastDiscountConfirm = sel.value;
-        
         if (confirm('This person is a society member. Apply 10% member discount?')) {
             document.getElementById('discount_percent').value = '10.00';
             calculateDiscountAmount();
         }
     } else {
-        lastDiscountConfirm = sel.value; // Track non-members too
+        lastDiscountConfirm = sel.value;
     }
 }
 
@@ -838,40 +904,24 @@ function updateItemCount() {
     document.getElementById('emptyCartMsg').style.display = rows.length ? 'none' : '';
 }
 
-/* ── Add Product ───────────────────────────────────────── */
+/* ── Modal Add Handlers ────────────────────────────────── */
 function addProductRowFromModal(prod, btn) {
     const row   = btn.closest('.item-card');
     const qty   = parseInt(row.querySelector('.modal-qty-input').value) || 1;
     const price = parseFloat(row.querySelector('.modal-price-input').value) || parseFloat(prod.default_selling_price);
-    rowCount++;
-    const tbody = document.getElementById('itemsTableBody');
-    const tr    = document.createElement('tr');
-    tr.id = `row_${rowCount}`;
-    const stock = prod.stocks && prod.stocks[defaultWarehouseId] !== undefined ? parseFloat(prod.stocks[defaultWarehouseId]) : 0;
-    const total = (qty * price).toFixed(2);
-    tr.innerHTML = `
-        <td>
-            <span class="type-pill product">PRODUCT</span>
-            <input type="hidden" name="items[${rowCount}][item_type]" value="PRODUCT">
-            <input type="hidden" name="items[${rowCount}][product_id]" value="${prod.id}">
-        </td>
-        <td>
-            <div class="fw-semibold text-dark small">${htmlspecialchars(prod.name_en)}</div>
-            <div class="text-muted" style="font-size:.71rem;font-family:monospace;">SKU: ${htmlspecialchars(prod.sku || '-')}</div>
-            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" placeholder="Remarks (optional)" style="font-size:.74rem;">
-        </td>
-        <td class="text-center font-monospace fw-semibold text-muted" id="available_${rowCount}">${stock.toFixed(2)}</td>
-        <td>
-            <div class="input-group input-group-sm">
-                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
-                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">${htmlspecialchars(prod.unit_code || 'Units')}</span>
-            </div>
-        </td>
-        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
-        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total}</td>
-        <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
-    `;
-    tbody.appendChild(tr);
+    
+    loadExistingItem({
+        type: 'PRODUCT',
+        product_id: prod.id,
+        product_name: prod.name_en,
+        sku: prod.sku,
+        product_unit: prod.unit_code,
+        quantity: qty,
+        unit_price: price,
+        total: qty * price,
+        description: ''
+    });
+
     calculateInvoiceTotal(); updateItemCount();
     bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
     row.querySelector('.modal-qty-input').value = '1';
@@ -880,39 +930,23 @@ function addProductRowFromModal(prod, btn) {
     filterModalItems('PRODUCT', '');
 }
 
-/* ── Add Service ───────────────────────────────────────── */
 function addServiceRowFromModal(srv, btn) {
     const row   = btn.closest('.item-card');
     const qty   = parseInt(row.querySelector('.modal-qty-input').value) || 1;
     const price = parseFloat(row.querySelector('.modal-price-input').value) || parseFloat(srv.default_price);
-    rowCount++;
-    const tbody = document.getElementById('itemsTableBody');
-    const tr    = document.createElement('tr');
-    tr.id = `row_${rowCount}`;
-    const total = (qty * price).toFixed(2);
-    document.getElementById('service_job_id').value = srv.service_job_id || srv.id;
-    tr.innerHTML = `
-        <td>
-            <span class="type-pill service">SERVICE</span>
-            <input type="hidden" name="items[${rowCount}][item_type]" value="SERVICE">
-            <input type="hidden" name="items[${rowCount}][service_id]" value="${srv.id}">
-        </td>
-        <td>
-            <div class="fw-semibold text-dark small">${htmlspecialchars(srv.service_name)} <span class="font-monospace text-muted">(${htmlspecialchars(srv.service_code)})</span></div>
-            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" value="${htmlspecialchars(srv.description || '')}" placeholder="Remarks (optional)" style="font-size:.74rem;">
-        </td>
-        <td class="text-center text-muted" id="available_${rowCount}">—</td>
-        <td>
-            <div class="input-group input-group-sm">
-                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
-                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">${htmlspecialchars(srv.unit || 'Job')}</span>
-            </div>
-        </td>
-        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
-        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total}</td>
-        <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
-    `;
-    tbody.appendChild(tr);
+
+    loadExistingItem({
+        type: 'SERVICE',
+        service_id: srv.id,
+        service_name: srv.service_name,
+        service_code: srv.service_code,
+        service_unit: srv.unit,
+        quantity: qty,
+        unit_price: price,
+        total: qty * price,
+        description: srv.description || ''
+    });
+
     calculateInvoiceTotal(); updateItemCount();
     bootstrap.Modal.getInstance(document.getElementById('serviceModal')).hide();
     row.querySelector('.modal-qty-input').value = '1';
@@ -921,130 +955,38 @@ function addServiceRowFromModal(srv, btn) {
     filterModalItems('SERVICE', '');
 }
 
-/* ── Add Direct Account Item (Member Fee / Share Capital) ─────────────────────────── */
 function addDirectAccountItem(type, label) {
-    rowCount++;
-    const tbody = document.getElementById('itemsTableBody');
-    const tr    = document.createElement('tr');
-    tr.id = `row_${rowCount}`;
-    const price = 0.00;
-    const total = 0.00;
-    
-    // Style pills based on type
-    let pillClass = "text-bg-primary";
-    if (type === 'MEMBER_FEE') pillClass = "text-bg-info";
-    else if (type === 'SHARE_CAPITAL') pillClass = "text-bg-warning";
-    
-    let qtyHtml = `
-            <div class="input-group input-group-sm">
-                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="1" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
-                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">Unit</span>
-            </div>
-    `;
-
-    if (type === 'SHARE_CAPITAL' || type === 'MEMBER_FEE') {
-        qtyHtml = `
-            <div class="text-center text-muted pt-1">—</div>
-            <input type="hidden" class="qty-input" name="items[${rowCount}][quantity]" value="1">
-        `;
-    }
-
-    tr.innerHTML = `
-        <td>
-            <span class="badge ${pillClass} bg-opacity-10 text-dark fw-bold rounded-pill" style="font-size:0.65rem; padding:0.35rem 0.6rem;">${label.toUpperCase()}</span>
-            <input type="hidden" name="items[${rowCount}][item_type]" value="${type}">
-        </td>
-        <td>
-            <div class="fw-semibold text-dark small">${label}</div>
-            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" placeholder="Remarks (optional)" style="font-size:.74rem;">
-        </td>
-        <td class="text-center text-muted" id="available_${rowCount}">—</td>
-        <td>${qtyHtml}</td>
-        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();" placeholder="Enter Value"></td>
-        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total.toFixed(2)}</td>
-        <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
-    `;
-    tbody.appendChild(tr);
+    loadExistingItem({
+        type: type,
+        description: label,
+        quantity: 1,
+        unit_price: 0,
+        total: 0
+    });
     calculateInvoiceTotal(); updateItemCount();
 }
 
-/* ── Add Machine (from rental modal) ──────────────────── */
 function addMachineRowFromDirectory(machine, btn) {
     const row   = btn.closest('.item-card');
     const qty   = parseInt(row.querySelector('.modal-machine-qty-input').value) || 1;
     const price = parseFloat(row.querySelector('.modal-machine-price-input').value) || parseFloat(machine.default_rental_rate);
-    rowCount++;
-    const tbody = document.getElementById('itemsTableBody');
-    const tr    = document.createElement('tr');
-    tr.id = `row_${rowCount}`;
-    const total = (qty * price).toFixed(2);
-    tr.innerHTML = `
-        <td>
-            <span class="type-pill rental">RENTAL</span>
-            <input type="hidden" name="items[${rowCount}][item_type]" value="SERVICE">
-            <input type="hidden" name="items[${rowCount}][service_id]" value="${defaultServiceId}">
-        </td>
-        <td>
-            <div class="fw-semibold text-dark small">Rental: ${htmlspecialchars(machine.machinery_name)}</div>
-            <div class="text-muted font-monospace" style="font-size:.71rem;">Code: ${htmlspecialchars(machine.machinery_code)} | Serial: ${htmlspecialchars(machine.serial_number || '-')}</div>
-            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" value="Machinery Rental Billing" placeholder="Remarks (optional)" style="font-size:.74rem;">
-        </td>
-        <td class="text-center text-muted" id="available_${rowCount}">—</td>
-        <td>
-            <div class="input-group input-group-sm">
-                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
-                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">${htmlspecialchars(machine.rental_unit || 'Hour')}</span>
-            </div>
-        </td>
-        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
-        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total}</td>
-        <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
-    `;
-    tbody.appendChild(tr);
+
+    loadExistingItem({
+        type: 'SERVICE',
+        service_id: defaultServiceId,
+        service_name: 'Rental: ' + machine.machinery_name,
+        service_code: machine.machinery_code,
+        service_unit: machine.rental_unit || 'Hour',
+        quantity: qty,
+        unit_price: price,
+        total: qty * price,
+        description: 'Machinery Rental Billing'
+    });
+
     calculateInvoiceTotal(); updateItemCount();
     bootstrap.Modal.getInstance(document.getElementById('rentalModal')).hide();
     row.querySelector('.modal-machine-qty-input').value = '1';
     row.querySelector('.modal-machine-price-input').value = parseFloat(machine.default_rental_rate).toFixed(2);
-    document.getElementById('rentalSearchInput').value = '';
-    filterModalItems('RENTAL', '');
-}
-
-/* ── Legacy rental (from job) ──────────────────────────── */
-function addRentalRowFromModal(rental, btn) {
-    const row         = btn.closest('.item-card');
-    const totalCharge = parseFloat(row.querySelector('.modal-price-input').value) || parseFloat(rental.total_charge);
-    const qty         = parseInt(rental.quantity) || 1;
-    const rate        = (totalCharge / qty);
-    rowCount++;
-    const tbody = document.getElementById('itemsTableBody');
-    const tr    = document.createElement('tr');
-    tr.id = `row_${rowCount}`;
-    document.getElementById('machinery_rental_id').value = rental.id;
-    tr.innerHTML = `
-        <td>
-            <span class="type-pill rental">RENTAL</span>
-            <input type="hidden" name="items[${rowCount}][item_type]" value="SERVICE">
-            <input type="hidden" name="items[${rowCount}][service_id]" value="${defaultServiceId}">
-        </td>
-        <td>
-            <div class="fw-semibold text-dark small">${htmlspecialchars(rental.rental_number)}: Rental — ${htmlspecialchars(rental.machinery_name)}</div>
-            <div class="text-muted font-monospace" style="font-size:.71rem;">Serial: ${htmlspecialchars(rental.serial_number || '-')}</div>
-            <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" value="Machinery Rental Invoice" placeholder="Remarks" style="font-size:.74rem;">
-        </td>
-        <td class="text-center text-muted" id="available_${rowCount}">—</td>
-        <td>
-            <div class="input-group input-group-sm">
-                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="${qty}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
-                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">${htmlspecialchars(rental.rental_unit || 'Hour')}</span>
-            </div>
-        </td>
-        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${rate.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
-        <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${totalCharge.toFixed(2)}</td>
-        <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
-    `;
-    tbody.appendChild(tr);
-    calculateInvoiceTotal(); updateItemCount();
-    bootstrap.Modal.getInstance(document.getElementById('rentalModal')).hide();
     document.getElementById('rentalSearchInput').value = '';
     filterModalItems('RENTAL', '');
 }
@@ -1057,9 +999,11 @@ function removeRow(id) {
 
 function calculateRowTotal(id) {
     const row   = document.getElementById(`row_${id}`);
-    const qty   = parseFloat(row.querySelector('.qty-input').value) || 0;
-    const price = parseFloat(row.querySelector('.price-input').value) || 0;
-    document.getElementById(`rowtotal_${id}`).textContent = (qty * price).toFixed(2);
+    if (!row) return;
+    const qty   = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+    const price = parseFloat(row.querySelector('.price-input')?.value) || 0;
+    const totEl = document.getElementById(`rowtotal_${id}`);
+    if (totEl) totEl.textContent = (qty * price).toFixed(2);
 }
 
 function calculateDiscountAmount() {
@@ -1096,22 +1040,9 @@ function validateInvoiceForm(event) {
     }
     const rows = document.querySelectorAll('#itemsTableBody tr');
     if (rows.length === 0) {
-        alert('Please add at least one item to the invoice before posting.');
+        alert('Please add at least one item to the invoice before saving.');
         event.preventDefault(); return false;
     }
-    let valid = true;
-    rows.forEach(row => {
-        const typeInput = row.querySelector('input[name$="[item_type]"]');
-        if (!typeInput || typeInput.value !== 'PRODUCT') return;
-        const prodName  = row.querySelector('.fw-semibold')?.textContent || 'Unknown';
-        const available = parseFloat(row.querySelector('[id^="available_"]')?.textContent) || 0;
-        const qty       = parseFloat(row.querySelector('.qty-input')?.value) || 0;
-        if (qty > available) {
-            alert(`Stock Error: Qty for "${prodName}" (${qty}) exceeds available stock (${available}).`);
-            valid = false;
-        }
-    });
-    if (!valid) { event.preventDefault(); return false; }
     return true;
 }
 
@@ -1122,7 +1053,6 @@ function htmlspecialchars(str) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Select2 for searchable dropdown if jQuery and Select2 are loaded
     const custSelect = document.getElementById('customer_id');
     if (typeof jQuery !== 'undefined' && typeof jQuery.fn.select2 !== 'undefined') {
         $('.select2-customer').select2({
@@ -1140,13 +1070,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     handleCustomerChange();
     togglePaymentFields();
-    updateItemCount();
+
+    // Populate existing invoice line items
+    if (Array.isArray(editItemsData) && editItemsData.length > 0) {
+        editItemsData.forEach(item => loadExistingItem(item));
+        calculateInvoiceTotal();
+        updateItemCount();
+    }
 });
 </script>
 
-<!-- Include Select2 CSS and JS if not already in layout -->
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" rel="stylesheet" />
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-

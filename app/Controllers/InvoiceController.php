@@ -213,9 +213,9 @@ class InvoiceController extends Controller {
         $members = $db->query("SELECT id, member_no, full_name, member_type, party_id FROM coop_members WHERE status = 'ACTIVE' AND member_type IN ('MEMBER', 'DIRECTOR') ORDER BY full_name ASC")->fetchAll();
         $staff = $db->query("SELECT id, username, full_name, party_id FROM users WHERE status = 'active' ORDER BY full_name ASC")->fetchAll();
         $warehouses = $db->query("SELECT id, code, name FROM inventory_locations WHERE is_active = 1 ORDER BY name ASC")->fetchAll();
-        $defaultWarehouseId = $warehouses[0]['id'] ?? 1;
+        $defaultWarehouseId = $invoice['warehouse_id'] ?? ($warehouses[0]['id'] ?? 1);
         $cashAccounts = $db->query("SELECT id, name FROM cash_accounts WHERE status = 'active' ORDER BY name ASC")->fetchAll();
-        $bankAccounts = $db->query("SELECT id, account_name, bank_name FROM bank_accounts WHERE status = 'active' ORDER BY account_name ASC")->fetchAll();
+        $bankAccounts = $db->query("SELECT id, account_name, bank_name, account_number FROM bank_accounts WHERE status = 'active' ORDER BY account_name ASC")->fetchAll();
         $products = $db->query("
             SELECT p.*, pc.name AS category_name, u.code AS unit_code
             FROM products p
@@ -236,22 +236,42 @@ class InvoiceController extends Controller {
         $rentals = $db->query("SELECT mr.*, m.machinery_name, m.machinery_code, pt.name AS customer_name FROM machinery_rentals mr JOIN machinery m ON mr.machinery_id = m.id JOIN parties pt ON mr.customer_id = pt.id WHERE mr.status = 'ACTIVE' AND (mr.invoice_id IS NULL OR mr.invoice_id = {$id}) ORDER BY mr.id DESC")->fetchAll();
         $machineryAssets = $db->query("SELECT * FROM machinery WHERE status = 'AVAILABLE' OR 1=1 ORDER BY machinery_name ASC")->fetchAll();
 
-        // Convert the invoice_items back into the format expected by the JS
+        // Check if customer_id belongs to a coop_member or staff user
+        $memberMatch = $db->query("SELECT id FROM coop_members WHERE party_id = " . (int)$invoice['customer_id'])->fetch();
+        $staffMatch = $db->query("SELECT id FROM users WHERE party_id = " . (int)$invoice['customer_id'])->fetch();
+        $selectedCustomerVal = '';
+        if ($memberMatch) {
+            $selectedCustomerVal = 'M_' . $memberMatch['id'];
+        } elseif ($staffMatch) {
+            $selectedCustomerVal = 'U_' . $staffMatch['id'];
+        } else {
+            $selectedCustomerVal = (string)$invoice['customer_id'];
+        }
+
+        // Fetch cheque details if present
+        $chequeData = null;
+        if (!empty($invoice['cheque_id'])) {
+            $chequeData = $db->query("SELECT * FROM cheques WHERE id = " . (int)$invoice['cheque_id'])->fetch();
+        }
+
+        // Convert invoice items for JS loader
         $editItems = [];
         foreach ($invoice['items'] as $itm) {
             $editItems[] = [
                 'type' => $itm['item_type'],
                 'product_id' => $itm['product_id'] ?? '',
                 'product_name' => $itm['product_name'] ?? '',
+                'product_unit' => $itm['product_unit'] ?? 'Qty',
+                'sku' => $itm['sku'] ?? '',
                 'service_id' => $itm['service_id'] ?? '',
                 'service_name' => $itm['service_name'] ?? '',
+                'service_unit' => $itm['service_unit'] ?? '',
+                'service_code' => $itm['service_code'] ?? '',
                 'description' => $itm['description'] ?? '',
-                'unit' => $itm['product_unit'] ?? $itm['service_unit'] ?? 'Qty',
-                'qty' => (float)$itm['quantity'],
-                'price' => (float)$itm['unit_price'],
-                'total' => (float)$itm['total'],
-                'service_job_id' => $itm['service_job_id'] ?? '',
-                'machinery_rental_id' => $itm['machinery_rental_id'] ?? ''
+                'quantity' => (float)$itm['quantity'],
+                'unit_price' => (float)$itm['unit_price'],
+                'discount' => (float)($itm['discount'] ?? 0),
+                'total' => (float)$itm['total']
             ];
         }
 
@@ -261,6 +281,7 @@ class InvoiceController extends Controller {
             'customers' => $customers,
             'members' => $members,
             'staff' => $staff,
+            'selectedCustomerVal' => $selectedCustomerVal,
             'warehouses' => $warehouses,
             'defaultWarehouseId' => $defaultWarehouseId,
             'cashAccounts' => $cashAccounts,
@@ -270,11 +291,11 @@ class InvoiceController extends Controller {
             'rentals' => $rentals,
             'machineryAssets' => $machineryAssets,
             'invoice' => $invoice,
-            'editItems' => $editItems
+            'editItems' => $editItems,
+            'chequeData' => $chequeData
         ]);
     }
 
-    
     public function update(): void {
         $this->validateCsrf();
 
@@ -288,7 +309,7 @@ class InvoiceController extends Controller {
         
         $invoice = $this->invoiceModel->getById($id);
         if (!$invoice || ($invoice['status'] !== 'DRAFT' && $invoice['status'] !== 'POSTED')) {
-            Session::setFlash('error', 'Cannot update this invoice. It may be cancelled.');
+            Session::setFlash('error', 'Cannot update this invoice. It may be cancelled or invalid.');
             Helper::redirect('modules/invoices');
         }
 
@@ -298,7 +319,7 @@ class InvoiceController extends Controller {
             $warehouseId = (int)$db->query("SELECT id FROM inventory_locations WHERE code = 'LOC-MAIN' OR is_active = 1 LIMIT 1")->fetchColumn();
         }
 
-        // Resolve Walk-in Customer ID
+        // Resolve Customer ID
         $customerIdInput = $_POST['customer_id'] ?? '';
         $customerId = 0;
         
@@ -339,169 +360,116 @@ class InvoiceController extends Controller {
             $customerId = (int)$customerIdInput;
         }
 
-        $invoiceDate = $_POST['invoice_date'] ?? date('Y-m-d');
-        $dueDate = $_POST['due_date'] ?? $invoiceDate;
-        $reference = trim($_POST['reference'] ?? '');
-        $notes = trim($_POST['notes'] ?? '');
         $paymentType = $_POST['payment_type'] ?? 'CASH';
-        
+        if ($customerId == $walkinId && $paymentType === 'CREDIT') {
+            Session::setFlash('error', 'Walk-in Customer is NOT allowed to make purchases on Credit.');
+            Helper::redirect('modules/invoices/edit?id=' . $id);
+        }
+
         $cashAccountId = !empty($_POST['cash_account_id']) ? (int)$_POST['cash_account_id'] : null;
+        if ($paymentType === 'CASH' && !$cashAccountId) {
+            $cashAccountId = (int)$db->query("SELECT id FROM cash_accounts WHERE status = 'active' LIMIT 1")->fetchColumn();
+        }
+
         $bankAccountId = !empty($_POST['bank_account_id']) ? (int)$_POST['bank_account_id'] : null;
-        $chequeNo = trim($_POST['cheque_number'] ?? '');
-        $chequeBank = trim($_POST['cheque_bank'] ?? '');
-        $chequeDate = $_POST['cheque_date'] ?? null;
 
-        $itemTypes = $_POST['item_type'] ?? [];
-        $productIds = $_POST['product_id'] ?? [];
-        $serviceIds = $_POST['service_id'] ?? [];
-        $descriptions = $_POST['item_description'] ?? [];
-        $quantities = $_POST['quantity'] ?? [];
-        $unitPrices = $_POST['unit_price'] ?? [];
-        $totals = $_POST['line_total'] ?? [];
-        $serviceJobIds = $_POST['service_job_id'] ?? [];
-        $machineryRentalIds = $_POST['machinery_rental_id'] ?? [];
+        // Compile items from POST
+        $items = [];
+        if (!empty($_POST['items'])) {
+            foreach ($_POST['items'] as $it) {
+                if ((float)($it['quantity'] ?? 0) > 0) {
+                    $items[] = [
+                        'item_type' => $it['item_type'] ?? 'PRODUCT',
+                        'product_id' => !empty($it['product_id']) ? (int)$it['product_id'] : null,
+                        'service_id' => !empty($it['service_id']) ? (int)$it['service_id'] : null,
+                        'description' => trim($it['description'] ?? ''),
+                        'quantity' => (float)$it['quantity'],
+                        'unit_price' => (float)($it['unit_price'] ?? 0),
+                        'discount' => (float)($it['discount'] ?? 0)
+                    ];
+                }
+            }
+        }
 
-        $subtotal = 0.00;
-        $taxAmount = 0.00;
-
-        if (empty($itemTypes)) {
-            Session::setFlash('error', 'Please add at least one item to the invoice.');
+        if (empty($items)) {
+            Session::setFlash('error', 'Please add at least one line item to the invoice.');
             Helper::redirect('modules/invoices/edit?id=' . $id);
         }
 
         try {
             $db->beginTransaction();
 
-                        // If POSTED, we must reverse the old ledger and balances before updating items
-            if ($invoice['status'] === 'POSTED') {
-                if ($invoice['payment_type'] === 'CASH' && $invoice['cash_account_id']) {
+            $wasPosted = ($invoice['status'] === 'POSTED');
+
+            // 1. Revert previous POSTED effects if original invoice was posted
+            if ($wasPosted) {
+                if ($invoice['payment_type'] === 'CASH' && !empty($invoice['cash_account_id'])) {
                     $db->exec("UPDATE cash_accounts SET current_balance = current_balance - {$invoice['total']} WHERE id = {$invoice['cash_account_id']}");
-                } elseif ($invoice['payment_type'] === 'BANK' && $invoice['bank_account_id']) {
+                } elseif ($invoice['payment_type'] === 'BANK' && !empty($invoice['bank_account_id'])) {
                     $db->exec("UPDATE bank_accounts SET current_balance = current_balance - {$invoice['total']} WHERE id = {$invoice['bank_account_id']}");
                 }
-                
-                $journal = $db->query("SELECT id FROM journal_entries WHERE source_module = 'invoices' AND source_transaction_id = {$id}")->fetch();
-                if ($journal) {
-                    $db->exec("DELETE FROM journal_lines WHERE journal_entry_id = {$journal['id']}");
-                    $db->exec("DELETE FROM journal_entries WHERE id = {$journal['id']}");
+
+                if (!empty($invoice['journal_entry_id'])) {
+                    $db->exec("DELETE FROM journal_lines WHERE journal_entry_id = {$invoice['journal_entry_id']}");
+                    $db->exec("DELETE FROM journal_entries WHERE id = {$invoice['journal_entry_id']}");
+                } else {
+                    $journal = $db->query("SELECT id FROM journal_entries WHERE source_module = 'invoices' AND source_transaction_id = {$id}")->fetch();
+                    if ($journal) {
+                        $db->exec("DELETE FROM journal_lines WHERE journal_entry_id = {$journal['id']}");
+                        $db->exec("DELETE FROM journal_entries WHERE id = {$journal['id']}");
+                    }
                 }
-                
+
                 $db->exec("DELETE FROM stock_ledger WHERE source_module = 'SALES_INVOICE' AND source_transaction_id = {$id}");
-                
-                if ($invoice['cheque_id']) {
+
+                if (!empty($invoice['cheque_id'])) {
                     $db->exec("DELETE FROM cheques WHERE id = {$invoice['cheque_id']}");
                 }
 
-                // Temporarily set to DRAFT so postInvoice() can run later
-                $db->exec("UPDATE invoices SET status = 'DRAFT' WHERE id = {$id}");
+                // Reset status to DRAFT so saveInvoice / postInvoice can re-post cleanly
+                $db->exec("UPDATE invoices SET status = 'DRAFT', journal_entry_id = NULL, cheque_id = NULL WHERE id = {$id}");
             }
 
-            // 1. Delete existing items
-            $db->prepare("DELETE FROM invoice_items WHERE invoice_id = :id")->execute(['id' => $id]);
-
-            // 2. Insert new items
-            $insertItemStmt = $db->prepare("
-                INSERT INTO invoice_items 
-                (invoice_id, item_type, product_id, service_id, description, quantity, unit_price, total)
-                VALUES 
-                (:inv_id, :type, :prod_id, :srv_id, :desc, :qty, :price, :tot)
-            ");
-
-            for ($i = 0; $i < count($itemTypes); $i++) {
-                $type = $itemTypes[$i];
-                $pid = !empty($productIds[$i]) ? (int)$productIds[$i] : null;
-                $sid = !empty($serviceIds[$i]) ? (int)$serviceIds[$i] : null;
-                $desc = $descriptions[$i] ?? '';
-                $qty = (float)($quantities[$i] ?? 0);
-                $price = (float)($unitPrices[$i] ?? 0);
-                $tot = (float)($totals[$i] ?? 0);
-                $sjid = !empty($serviceJobIds[$i]) ? (int)$serviceJobIds[$i] : null;
-                $mrid = !empty($machineryRentalIds[$i]) ? (int)$machineryRentalIds[$i] : null;
-
-                if ($tot <= 0) continue;
-
-                $insertItemStmt->execute([
-                    'inv_id' => $id,
-                    'type' => $type,
-                    'prod_id' => $pid,
-                    'srv_id' => $sid,
-                    'desc' => $desc,
-                    'qty' => $qty,
-                    'price' => $price,
-                    'tot' => $tot,
-                    'job_id' => $sjid,
-                    'rental_id' => $mrid
-                ]);
-
-                $subtotal += $tot;
-            }
-
-            $discount = (float)($_POST['discount'] ?? 0);
-            $netTotal = $subtotal - $discount;
-            if ($netTotal < 0) $netTotal = 0;
-
-            // 3. Update invoice header
-            $stmt = $db->prepare("
-                UPDATE invoices SET 
-                    customer_id = :customer_id, 
-                    warehouse_id = :warehouse_id,
-                    invoice_date = :invoice_date, 
-                    reference = :reference,
-                    notes = :notes, 
-                    payment_type = :payment_type, 
-                    cash_account_id = :cash_id, 
-                    bank_account_id = :bank_id,
-                    subtotal = :subtotal, 
-                    discount = :discount, 
-                    total = :total, 
-                    updated_at = NOW()
-                WHERE id = :id
-            ");
-
-            $stmt->execute([
+            // 2. Prepare data for saveInvoice
+            $data = [
+                'id' => $id,
                 'customer_id' => $customerId,
-                'warehouse_id' => $warehouseId,
-                'invoice_date' => $invoiceDate,
-                'reference' => $reference,
-                'notes' => $notes,
+                'invoice_date' => $_POST['invoice_date'] ?? date('Y-m-d'),
+                'reference' => trim($_POST['reference'] ?? ''),
+                'notes' => trim($_POST['notes'] ?? ''),
                 'payment_type' => $paymentType,
-                'cash_id' => $cashAccountId,
-                'bank_id' => $bankAccountId,
-                'subtotal' => $subtotal,
-                'discount' => $discount,
-                'total' => $netTotal,
-                'id' => $id
-            ]);
+                'warehouse_id' => $warehouseId,
+                'cash_account_id' => $cashAccountId,
+                'bank_account_id' => $bankAccountId,
+                'discount' => (float)($_POST['discount'] ?? 0),
+                'items' => $items
+            ];
 
-                        // Save cheque details to session if CHEQUE payment type
-            if ($paymentType === 'CHEQUE') {
-                $_SESSION['temp_cheque_' . $id] = [
-                    'cheque_number' => $chequeNo,
-                    'bank_name' => $chequeBank,
-                    'cheque_date' => $chequeDate
-                ];
-            } else {
-                unset($_SESSION['temp_cheque_' . $id]);
-            }
+            // 3. Update invoice header & items via Engine
+            \App\Services\InvoiceEngine::saveInvoice($data);
 
             $db->commit();
-            
-            if ($invoice['status'] === 'POSTED') {
+
+            // 4. Re-post if it was previously posted or user explicitly posted
+            if ($wasPosted || ($_POST['action'] ?? '') === 'post') {
                 $chequeInfo = [
-                    'cheque_number' => $chequeNo,
-                    'bank_name' => $chequeBank,
-                    'cheque_date' => $chequeDate
+                    'cheque_number' => $_POST['cheque_number'] ?? '',
+                    'bank_name' => $_POST['cheque_bank'] ?? '',
+                    'cheque_date' => $_POST['cheque_date'] ?? date('Y-m-d')
                 ];
                 \App\Services\InvoiceEngine::postInvoice($id, $chequeInfo);
                 Session::setFlash('success', 'Invoice updated and re-posted successfully.');
             } else {
-                Session::setFlash('success', 'Invoice updated successfully.');
+                Session::setFlash('success', 'Draft invoice updated successfully.');
             }
-            
+
             Helper::redirect('modules/invoices/view?id=' . $id);
 
         } catch (\Exception $e) {
-            $db->rollBack();
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            \Core\Logger::error("Error updating invoice {$id}: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
             Session::setFlash('error', 'Error updating invoice: ' . $e->getMessage());
             Helper::redirect('modules/invoices/edit?id=' . $id);
         }
