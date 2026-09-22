@@ -165,6 +165,8 @@ $router->post('/modules/invoices/post', [InvoiceController::class, 'post']);
 $router->post('/modules/invoices/cancel', [InvoiceController::class, 'cancel']);
 $router->post('/modules/invoices/delete', [InvoiceController::class, 'delete']);
 $router->post('/modules/invoices/record-cancelled', [InvoiceController::class, 'recordCancelled']);
+$router->get('/modules/invoices/edit', [InvoiceController::class, 'edit']);
+$router->post('/modules/invoices/update', [InvoiceController::class, 'update']);
 
 // Services Routing (Stage 6B)
 $router->get('/modules/services', [ServiceController::class, 'index']);

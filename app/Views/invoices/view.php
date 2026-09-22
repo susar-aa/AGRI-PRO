@@ -267,6 +267,12 @@
             <i class="bi bi-printer-fill"></i> Print
         </button>
 
+        <?php if ($invoice['status'] === 'DRAFT' && \Core\Auth::hasPermission('invoices.edit')): ?>
+            <a href="<?= \Core\Helper::baseUrl('modules/invoices/edit?id=' . $invoice['id']); ?>" class="bar-btn print-btn" style="color: #0284c7;">
+                <i class="bi bi-pencil-square"></i> Edit
+            </a>
+        <?php endif; ?>
+
         <?php if ($invoice['status'] === 'DRAFT' && \Core\Auth::hasPermission('invoices.post')): ?>
             <?php if ($invoice['payment_type'] === 'CHEQUE'): ?>
                 <button type="button" class="bar-btn post-btn-s" data-bs-toggle="modal" data-bs-target="#postChequeModal">
