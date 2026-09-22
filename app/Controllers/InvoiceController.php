@@ -205,8 +205,8 @@ class InvoiceController extends Controller {
         $id = !empty($_GET['id']) ? (int)$_GET['id'] : 0;
         $invoice = $this->invoiceModel->getById($id);
 
-        if (!$invoice || $invoice['status'] !== 'DRAFT') {
-            Session::setFlash('error', 'Invoice cannot be edited (Not found or already posted).');
+        if (!$invoice || ($invoice['status'] !== 'DRAFT' && $invoice['status'] !== 'POSTED')) {
+            Session::setFlash('error', 'Invoice cannot be edited (Not found or cancelled).');
             Helper::redirect('modules/invoices');
         }
 
@@ -283,8 +283,8 @@ class InvoiceController extends Controller {
         $db = \Core\Database::getInstance();
         
         $invoice = $this->invoiceModel->getById($id);
-        if (!$invoice || $invoice['status'] !== 'DRAFT') {
-            Session::setFlash('error', 'Cannot update this invoice. It may have already been posted.');
+        if (!$invoice || ($invoice['status'] !== 'DRAFT' && $invoice['status'] !== 'POSTED')) {
+            Session::setFlash('error', 'Cannot update this invoice. It may be cancelled.');
             Helper::redirect('modules/invoices');
         }
 
@@ -368,6 +368,30 @@ class InvoiceController extends Controller {
         try {
             $db->beginTransaction();
 
+                        // If POSTED, we must reverse the old ledger and balances before updating items
+            if ($invoice['status'] === 'POSTED') {
+                if ($invoice['payment_type'] === 'CASH' && $invoice['cash_account_id']) {
+                    $db->exec("UPDATE cash_accounts SET current_balance = current_balance - {$invoice['total']} WHERE id = {$invoice['cash_account_id']}");
+                } elseif ($invoice['payment_type'] === 'BANK' && $invoice['bank_account_id']) {
+                    $db->exec("UPDATE bank_accounts SET current_balance = current_balance - {$invoice['total']} WHERE id = {$invoice['bank_account_id']}");
+                }
+                
+                $journal = $db->query("SELECT id FROM journal_entries WHERE source_module = 'invoices' AND source_transaction_id = {$id}")->fetch();
+                if ($journal) {
+                    $db->exec("DELETE FROM journal_lines WHERE journal_entry_id = {$journal['id']}");
+                    $db->exec("DELETE FROM journal_entries WHERE id = {$journal['id']}");
+                }
+                
+                $db->exec("DELETE FROM stock_ledger WHERE source_module = 'SALES_INVOICE' AND source_transaction_id = {$id}");
+                
+                if ($invoice['cheque_id']) {
+                    $db->exec("DELETE FROM cheques WHERE id = {$invoice['cheque_id']}");
+                }
+
+                // Temporarily set to DRAFT so postInvoice() can run later
+                $db->exec("UPDATE invoices SET status = 'DRAFT' WHERE id = {$id}");
+            }
+
             // 1. Delete existing items
             $db->prepare("DELETE FROM invoice_items WHERE invoice_id = :id")->execute(['id' => $id]);
 
@@ -447,7 +471,7 @@ class InvoiceController extends Controller {
                 'id' => $id
             ]);
 
-            // Save cheque details to session if CHEQUE payment type
+                        // Save cheque details to session if CHEQUE payment type
             if ($paymentType === 'CHEQUE') {
                 $_SESSION['temp_cheque_' . $id] = [
                     'cheque_number' => $chequeNo,
@@ -459,7 +483,19 @@ class InvoiceController extends Controller {
             }
 
             $db->commit();
-            Session::setFlash('success', 'Invoice updated successfully.');
+            
+            if ($invoice['status'] === 'POSTED') {
+                $chequeInfo = [
+                    'cheque_number' => $chequeNo,
+                    'bank_name' => $chequeBank,
+                    'cheque_date' => $chequeDate
+                ];
+                \App\Services\InvoiceEngine::postInvoice($id, $chequeInfo);
+                Session::setFlash('success', 'Invoice updated and re-posted successfully.');
+            } else {
+                Session::setFlash('success', 'Invoice updated successfully.');
+            }
+            
             Helper::redirect('modules/invoices/view?id=' . $id);
 
         } catch (\Exception $e) {

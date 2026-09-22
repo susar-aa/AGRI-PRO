@@ -114,7 +114,7 @@
                                     <div class="btn-group gap-1">
                                         <a href="<?= \Core\Helper::baseUrl('modules/invoices/view?id=' . $inv['id']); ?>" class="btn btn-sm btn-outline-success rounded-pill px-3">View</a>
                                         
-                                        <?php if ($inv['status'] === 'DRAFT' && \Core\Auth::hasPermission('invoices.edit')): ?>
+                                        <?php if (($inv['status'] === 'DRAFT' || $inv['status'] === 'POSTED') && \Core\Auth::hasPermission('invoices.edit')): ?>
                                             <a href="<?= \Core\Helper::baseUrl('modules/invoices/edit?id=' . $inv['id']); ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3">Edit</a>
                                         <?php endif; ?>
                                         <?php if ($inv['status'] === 'DRAFT' && \Core\Auth::hasPermission('invoices.post')): ?>
