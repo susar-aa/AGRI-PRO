@@ -420,7 +420,26 @@ class InvoiceEngine {
             }
 
             // 3. Post double-entry journal entry
-            $costCenterId = (int)$db->query("SELECT id FROM cost_centers LIMIT 1")->fetchColumn();
+            // Determine best cost center based on items
+            $costCenterId = 1; // Default
+            $hasFees = false;
+            $hasProducts = false;
+            foreach ($items as $itm) {
+                if ($itm['item_type'] === 'MEMBER_FEE' || $itm['item_type'] === 'SHARE_CAPITAL') {
+                    $hasFees = true;
+                }
+                if ($itm['item_type'] === 'PRODUCT') {
+                    $hasProducts = true;
+                }
+            }
+            
+            if ($hasFees) {
+                $costCenterId = (int)$db->query("SELECT id FROM cost_centers WHERE code = 'CC-009'")->fetchColumn() ?: 9;
+            } elseif ($hasProducts) {
+                $costCenterId = (int)$db->query("SELECT id FROM cost_centers WHERE code = 'CC-003'")->fetchColumn() ?: 3;
+            } else {
+                $costCenterId = (int)$db->query("SELECT id FROM cost_centers WHERE code = 'CC-001'")->fetchColumn() ?: 1;
+            }
             $journalData = [
                 'transaction_date' => $invoice['invoice_date'],
                 'description' => "Central Invoice (" . $invoice['invoice_number'] . ")",
