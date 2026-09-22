@@ -929,7 +929,7 @@ function addDirectAccountItem(type, label) {
             </div>
     `;
 
-    if (type === 'SHARE_CAPITAL') {
+    if (type === 'SHARE_CAPITAL' || type === 'MEMBER_FEE') {
         qtyHtml = `
             <div class="text-center text-muted pt-1">—</div>
             <input type="hidden" class="qty-input" name="items[${rowCount}][quantity]" value="1">
