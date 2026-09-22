@@ -377,6 +377,64 @@ class InvoiceController extends Controller {
         Helper::redirect('modules/invoices/view?id=' . $id);
     }
 
+    public function recordCancelled(): void {
+        Auth::requirePermission('invoices.create');
+        $this->validateCsrf();
+
+        $invoiceNumber = trim($_POST['invoice_number'] ?? '');
+        $reason = trim($_POST['reason'] ?? 'Physically voided');
+
+        if (empty($invoiceNumber)) {
+            Session::setFlash('error', 'Invoice number is required.');
+            Helper::redirect('modules/invoices');
+        }
+
+        $db = \Core\Database::getInstance();
+        
+        // Check if invoice number already exists
+        $exists = $db->query("SELECT id FROM invoices WHERE invoice_number = " . $db->quote($invoiceNumber))->fetchColumn();
+        if ($exists) {
+            Session::setFlash('error', "Invoice number {$invoiceNumber} already exists in the system.");
+            Helper::redirect('modules/invoices');
+        }
+
+        try {
+            $db->beginTransaction();
+
+            $stmt = $db->prepare("
+                INSERT INTO invoices (
+                    invoice_number, customer_id, invoice_date, due_date, status, payment_type, 
+                    subtotal, discount, tax_amount, total, created_by, reversal_reason
+                ) VALUES (
+                    :invoice_number, :customer_id, :invoice_date, :due_date, 'CANCELLED', 'CASH',
+                    0.00, 0.00, 0.00, 0.00, :created_by, :reversal_reason
+                )
+            ");
+            
+            // Assign to a default walk-in customer if available, or just first customer, or null
+            // Table might require customer_id. Let's find first customer.
+            $customerId = (int)$db->query("SELECT id FROM parties WHERE party_type IN ('CUSTOMER','BOTH') LIMIT 1")->fetchColumn();
+            if (!$customerId) $customerId = 1;
+
+            $stmt->execute([
+                'invoice_number' => $invoiceNumber,
+                'customer_id' => $customerId,
+                'invoice_date' => date('Y-m-d'),
+                'due_date' => date('Y-m-d'),
+                'created_by' => Auth::id(),
+                'reversal_reason' => $reason
+            ]);
+
+            $db->commit();
+            Session::setFlash('success', "Invoice {$invoiceNumber} successfully recorded as Cancelled.");
+        } catch (\Exception $e) {
+            $db->rollBack();
+            Session::setFlash('error', 'Failed to record cancelled invoice: ' . $e->getMessage());
+        }
+
+        Helper::redirect('modules/invoices');
+    }
+
     public function cancel(): void {
         Auth::requirePermission('invoices.cancel');
         $this->validateCsrf();

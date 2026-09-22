@@ -17,8 +17,11 @@
         <h4 class="fw-bold mb-1 text-dark">Central Invoices Logs Directory</h4>
         <p class="text-muted small mb-0">List and filter central sales invoices for agricultural services, machinery rentals, and marketplace product sales.</p>
     </div>
-    <div>
+    <div class="d-flex gap-2">
         <?php if (\Core\Auth::hasPermission('invoices.create')): ?>
+            <button type="button" class="btn btn-outline-danger rounded-pill px-3" data-bs-toggle="modal" data-bs-target="#recordCancelModal">
+                <i class="bi bi-x-circle me-1"></i> Record Cancelled
+            </button>
             <a href="<?= \Core\Helper::baseUrl('modules/invoices/create'); ?>" class="btn btn-success rounded-pill px-4" style="background-color: #1b4332; border-color: #1b4332;">
                 <i class="bi bi-plus-lg me-1"></i> Compose Sales Invoice
             </a>
@@ -132,3 +135,35 @@
         </div>
     </div>
 </div>
+
+<!-- Record Cancelled Invoice Modal -->
+<div class="modal fade" id="recordCancelModal" tabindex="-1" aria-labelledby="recordCancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="<?= \Core\Helper::baseUrl('modules/invoices/record-cancelled'); ?>" method="POST" class="modal-content">
+            <?= \Core\CSRF::getFormField(); ?>
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="recordCancelModalLabel"><i class="bi bi-x-circle me-2"></i>Record Cancelled Invoice</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning small">
+                    Use this to record an invoice that was physically voided or cancelled in your manual bill book, so that the invoice number is maintained in the system sequence.
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Invoice Number <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control font-monospace" name="invoice_number" required placeholder="e.g. INV - 004">
+                    <div class="form-text">Enter the exact invoice number from your bill book.</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Reason for Cancellation</label>
+                    <input type="text" class="form-control" name="reason" value="Physically voided in bill book" required>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-danger">Record as Cancelled</button>
+            </div>
+        </form>
+    </div>
+</div>
+
