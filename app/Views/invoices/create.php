@@ -343,10 +343,17 @@
                                         </option>
                                     <?php endforeach; ?>
                                 </optgroup>
-                                <optgroup label="Society Members">
+                                <optgroup label="Society Members & Directors">
                                     <?php foreach ($members as $m): ?>
                                         <option value="M_<?= $m['id']; ?>" data-is-member="1">
                                             <?= htmlspecialchars($m['member_no']); ?> &mdash; <?= htmlspecialchars($m['full_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </optgroup>
+                                <optgroup label="Staff (Internal Users)">
+                                    <?php foreach ($staff as $s): ?>
+                                        <option value="U_<?= $s['id']; ?>" data-is-user="1">
+                                            @<?= htmlspecialchars($s['username']); ?> &mdash; <?= htmlspecialchars($s['full_name']); ?>
                                         </option>
                                     <?php endforeach; ?>
                                 </optgroup>

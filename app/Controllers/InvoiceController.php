@@ -104,8 +104,11 @@ class InvoiceController extends Controller {
         // 1. Fetch active customers
         $customers = $db->query("SELECT id, party_code, name FROM parties WHERE party_type IN ('CUSTOMER', 'BOTH') AND status = 'active' ORDER BY name ASC")->fetchAll();
         
-        // 1.5 Fetch active members
-        $members = $db->query("SELECT id, member_no, full_name, party_id FROM coop_members WHERE status = 'ACTIVE' AND member_type = 'MEMBER' ORDER BY full_name ASC")->fetchAll();
+        // 1.5 Fetch active members and directors
+        $members = $db->query("SELECT id, member_no, full_name, member_type, party_id FROM coop_members WHERE status = 'ACTIVE' AND member_type IN ('MEMBER', 'DIRECTOR') ORDER BY full_name ASC")->fetchAll();
+
+        // 1.6 Fetch active staff (users)
+        $staff = $db->query("SELECT id, username, full_name, party_id FROM users WHERE status = 'active' ORDER BY full_name ASC")->fetchAll();
 
         // 2. Fetch active warehouses (or just resolve the single warehouse system-wide)
         $warehouses = $db->query("SELECT id, code, name FROM inventory_locations WHERE is_active = 1 OR 1=1 ORDER BY name ASC")->fetchAll();
@@ -182,6 +185,7 @@ class InvoiceController extends Controller {
             'activeNav' => 'invoices',
             'customers' => $customers,
             'members' => $members,
+            'staff' => $staff,
             'warehouses' => $warehouses,
             'defaultWarehouseId' => $defaultWarehouseId,
             'cashAccounts' => $cashAccounts,
@@ -217,11 +221,11 @@ class InvoiceController extends Controller {
         if (empty($customerIdInput)) {
             $customerId = $walkinId;
         } elseif (strpos($customerIdInput, 'M_') === 0) {
-            // It's a member
+            // It's a member or director
             $memberId = (int)substr($customerIdInput, 2);
-            $member = $db->query("SELECT * FROM coop_members WHERE id = " . $memberId . " AND member_type = 'MEMBER'")->fetch();
+            $member = $db->query("SELECT * FROM coop_members WHERE id = " . $memberId . " AND member_type IN ('MEMBER', 'DIRECTOR')")->fetch();
             if (!$member) {
-                throw new \Exception("Selected member not found.");
+                throw new \Exception("Selected member/director not found.");
             }
             if (!empty($member['party_id'])) {
                 $customerId = (int)$member['party_id'];
@@ -240,7 +244,33 @@ class InvoiceController extends Controller {
                 ]);
                 $customerId = (int)$db->lastInsertId();
                 // Link party back to member
-                $db->prepare("UPDATE coop_members SET party_id = :pid WHERE id = :mid AND member_type = 'MEMBER'")->execute(['pid' => $customerId, 'mid' => $memberId]);
+                $db->prepare("UPDATE coop_members SET party_id = :pid WHERE id = :mid")->execute(['pid' => $customerId, 'mid' => $memberId]);
+            }
+        } elseif (strpos($customerIdInput, 'U_') === 0) {
+            // It's a staff user
+            $userId = (int)substr($customerIdInput, 2);
+            $user = $db->query("SELECT * FROM users WHERE id = " . $userId)->fetch();
+            if (!$user) {
+                throw new \Exception("Selected staff member not found.");
+            }
+            if (!empty($user['party_id'])) {
+                $customerId = (int)$user['party_id'];
+            } else {
+                // Auto-create a Party for this user
+                $partyCode = 'CUST-' . strtoupper(substr(uniqid(), -6));
+                $stmt = $db->prepare("
+                    INSERT INTO parties (party_code, party_type, name, phone, address, status, credit_limit, opening_balance)
+                    VALUES (:code, 'CUSTOMER', :name, :phone, :address, 'active', 0.00, 0.00)
+                ");
+                $stmt->execute([
+                    'code' => $partyCode,
+                    'name' => $user['full_name'],
+                    'phone' => $user['phone'] ?? '',
+                    'address' => ''
+                ]);
+                $customerId = (int)$db->lastInsertId();
+                // Link party back to user
+                $db->prepare("UPDATE users SET party_id = :pid WHERE id = :uid")->execute(['pid' => $customerId, 'uid' => $userId]);
             }
         } else {
             $customerId = (int)$customerIdInput;
