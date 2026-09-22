@@ -398,9 +398,9 @@ class InvoiceController extends Controller {
             // 2. Insert new items
             $insertItemStmt = $db->prepare("
                 INSERT INTO invoice_items 
-                (invoice_id, item_type, product_id, service_id, description, quantity, unit_price, total, tax_amount, service_job_id, machinery_rental_id)
+                (invoice_id, item_type, product_id, service_id, description, quantity, unit_price, total)
                 VALUES 
-                (:inv_id, :type, :prod_id, :srv_id, :desc, :qty, :price, :tot, 0.00, :job_id, :rental_id)
+                (:inv_id, :type, :prod_id, :srv_id, :desc, :qty, :price, :tot)
             ");
 
             for ($i = 0; $i < count($itemTypes); $i++) {
@@ -449,7 +449,6 @@ class InvoiceController extends Controller {
                     bank_account_id = :bank_id,
                     subtotal = :subtotal, 
                     discount = :discount, 
-                    tax_amount = :tax_amount, 
                     total = :total, 
                     updated_at = NOW()
                 WHERE id = :id
@@ -466,7 +465,6 @@ class InvoiceController extends Controller {
                 'bank_id' => $bankAccountId,
                 'subtotal' => $subtotal,
                 'discount' => $discount,
-                'tax_amount' => $taxAmount,
                 'total' => $netTotal,
                 'id' => $id
             ]);
@@ -710,11 +708,11 @@ class InvoiceController extends Controller {
 
             $stmt = $db->prepare("
                 INSERT INTO invoices (
-                    invoice_number, customer_id, invoice_date, status, payment_type, 
-                    subtotal, discount, tax_amount, total, created_by, reversal_reason
+                    invoice_number, customer_id, invoice_date, status, payment_type, notes, 
+                    subtotal, discount, total, created_by
                 ) VALUES (
-                    :invoice_number, :customer_id, :invoice_date, 'CANCELLED', 'CASH',
-                    0.00, 0.00, 0.00, 0.00, :created_by, :reversal_reason
+                    :invoice_number, :customer_id, :invoice_date, 'CANCELLED', 'CASH', :notes,
+                    0.00, 0.00, 0.00, :created_by
                 )
             ");
             
@@ -728,7 +726,7 @@ class InvoiceController extends Controller {
                 'customer_id' => $customerId,
                 'invoice_date' => date('Y-m-d'),
                 'created_by' => Auth::id(),
-                'reversal_reason' => $reason
+                'notes' => $reason
             ]);
 
             $db->commit();
