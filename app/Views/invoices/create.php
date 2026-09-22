@@ -915,6 +915,20 @@ function addDirectAccountItem(type, label) {
     if (type === 'MEMBER_FEE') pillClass = "text-bg-info";
     else if (type === 'SHARE_CAPITAL') pillClass = "text-bg-warning";
     
+    let qtyHtml = `
+            <div class="input-group input-group-sm">
+                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="1" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
+                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">Unit</span>
+            </div>
+    `;
+
+    if (type === 'SHARE_CAPITAL') {
+        qtyHtml = `
+            <div class="text-center text-muted pt-1">—</div>
+            <input type="hidden" class="qty-input" name="items[${rowCount}][quantity]" value="1">
+        `;
+    }
+
     tr.innerHTML = `
         <td>
             <span class="badge ${pillClass} bg-opacity-10 text-dark fw-bold rounded-pill" style="font-size:0.65rem; padding:0.35rem 0.6rem;">${label.toUpperCase()}</span>
@@ -925,13 +939,8 @@ function addDirectAccountItem(type, label) {
             <input type="text" class="form-control form-control-sm mt-1" name="items[${rowCount}][description]" placeholder="Remarks (optional)" style="font-size:.74rem;">
         </td>
         <td class="text-center text-muted" id="available_${rowCount}">—</td>
-        <td>
-            <div class="input-group input-group-sm">
-                <input type="number" step="1" min="1" class="form-control font-monospace qty-input" name="items[${rowCount}][quantity]" value="1" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();">
-                <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">Unit</span>
-            </div>
-        </td>
-        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();"></td>
+        <td>${qtyHtml}</td>
+        <td><input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace price-input" name="items[${rowCount}][unit_price]" value="${price.toFixed(2)}" required oninput="calculateRowTotal(${rowCount}); calculateInvoiceTotal();" placeholder="Enter Value"></td>
         <td class="text-end fw-bold font-monospace text-dark row-total" id="rowtotal_${rowCount}">${total.toFixed(2)}</td>
         <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
     `;
