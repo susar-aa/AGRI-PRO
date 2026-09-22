@@ -264,7 +264,14 @@ class InvoiceEngine {
                 $cashAccId = (int)$db->query("SELECT id FROM cash_accounts WHERE status = 'active' LIMIT 1")->fetchColumn();
             }
             if (!$cashAccId) {
-                throw new Exception("No active Cash Drawer accounts found.");
+                // Self-healing: Auto-create cash drawer if it's missing
+                $ledgerCashId = (int)$db->query("SELECT id FROM accounts WHERE account_name LIKE '%Cash in Hand%' OR account_code LIKE '%1110%' LIMIT 1")->fetchColumn();
+                if ($ledgerCashId) {
+                    $db->exec("INSERT INTO cash_accounts (account_id, code, name, status) VALUES ($ledgerCashId, 'CASH-MAIN', 'Cash in Hand', 'active')");
+                    $cashAccId = (int)$db->lastInsertId();
+                } else {
+                    throw new Exception("No active Cash Drawer accounts found, and could not auto-create one because the ledger account is missing.");
+                }
             }
             $debitAccountId = (int)$db->query("SELECT account_id FROM cash_accounts WHERE id = " . $cashAccId)->fetchColumn();
         } elseif ($invoice['payment_type'] === 'BANK') {
