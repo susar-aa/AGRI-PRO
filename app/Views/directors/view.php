@@ -17,8 +17,8 @@
         <a href="<?= \Core\Helper::baseUrl('modules/directors/directory'); ?>" class="btn btn-sm btn-outline-secondary rounded-pill mb-2">
             <i class="bi bi-arrow-left me-1"></i> Back to Directory
         </a>
-        <h4 class="fw-bold mb-1 text-dark">Director Profile: <?= htmlspecialchars($director['full_name']); ?></h4>
-        <p class="text-muted small mb-0">Registered on: <strong><?= htmlspecialchars($director['registration_date']); ?></strong> | Directorship No: <strong class="text-success font-monospace"><?= htmlspecialchars($director['member_no']); ?></strong></p>
+        <h4 class="fw-bold mb-1 text-dark">Director Profile: <?= htmlspecialchars($director['full_name'] ?? ''); ?></h4>
+        <p class="text-muted small mb-0">Registered on: <strong><?= htmlspecialchars($director['registration_date'] ?? ''); ?></strong> | Directorship No: <strong class="text-success font-monospace"><?= htmlspecialchars($director['member_no'] ?? ''); ?></strong></p>
     </div>
     
     <div class="d-flex gap-2">
@@ -70,21 +70,21 @@
         <div class="card border-0 shadow-sm rounded-4 mb-4">
             <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
                 <h6 class="fw-bold mb-0 text-dark"><i class="bi bi-person-fill text-success me-2"></i> Profile Specifications</h6>
-                <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill"><?= htmlspecialchars($director['status']); ?></span>
+                <span class="badge bg-success-subtle text-success px-3 py-1 rounded-pill"><?= htmlspecialchars($director['status'] ?? ''); ?></span>
             </div>
             <div class="card-body pt-0 small">
                 <div class="row g-3">
                     <div class="col-6 col-md-4">
                         <small class="text-muted d-block">NIC / ID</small>
-                        <span class="fw-bold text-dark"><?= htmlspecialchars($director['nic']); ?></span>
+                        <span class="fw-bold text-dark"><?= htmlspecialchars($director['nic'] ?? ''); ?></span>
                     </div>
                     <div class="col-6 col-md-4">
                         <small class="text-muted d-block">Gender & DOB</small>
-                        <span class="fw-bold text-dark"><?= htmlspecialchars($director['gender']); ?> | <?= htmlspecialchars($director['dob']); ?></span>
+                        <span class="fw-bold text-dark"><?= htmlspecialchars($director['gender'] ?? ''); ?> | <?= htmlspecialchars($director['dob'] ?? ''); ?></span>
                     </div>
                     <div class="col-6 col-md-4">
                         <small class="text-muted d-block">Contact Number</small>
-                        <span class="fw-bold text-dark"><?= htmlspecialchars($director['phone']); ?></span>
+                        <span class="fw-bold text-dark"><?= htmlspecialchars($director['phone'] ?? ''); ?></span>
                     </div>
                     
                     <div class="col-6 col-md-4 mt-3">
@@ -124,7 +124,7 @@
 
                     <div class="col-12 border-top pt-2 mt-2">
                         <small class="text-muted d-block">Home Address</small>
-                        <span class="fw-semibold text-dark"><?= htmlspecialchars($director['address']); ?>, <?= htmlspecialchars($director['city']); ?></span>
+                        <span class="fw-semibold text-dark"><?= htmlspecialchars($director['address'] ?? ''); ?>, <?= htmlspecialchars($director['city'] ?? ''); ?></span>
                     </div>
                 </div>
             </div>
@@ -181,8 +181,8 @@
                             <?php else: ?>
                                 <?php foreach ($invoices as $inv): ?>
                                     <tr>
-                                        <td class="fw-bold font-monospace"><?= htmlspecialchars($inv['invoice_number']); ?></td>
-                                        <td><?= htmlspecialchars($inv['invoice_date']); ?></td>
+                                        <td class="fw-bold font-monospace"><?= htmlspecialchars($inv['invoice_number'] ?? ''); ?></td>
+                                        <td><?= htmlspecialchars($inv['invoice_date'] ?? ''); ?></td>
                                         <td class="font-monospace fw-semibold"><?= number_format($inv['total'] ?? 0, 2); ?></td>
                                         <td>
                                             <?php
@@ -193,7 +193,7 @@
                                                 default => 'bg-secondary'
                                             };
                                             ?>
-                                            <span class="badge <?= $badge; ?> rounded-pill"><?= htmlspecialchars($inv['status']); ?></span>
+                                            <span class="badge <?= $badge; ?> rounded-pill"><?= htmlspecialchars($inv['status'] ?? ''); ?></span>
                                         </td>
                                         <td class="text-end">
                                             <a href="<?= \Core\Helper::baseUrl('modules/invoices/view?id=' . $inv['id']); ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3">View</a>
@@ -236,9 +236,9 @@
                                 <?php foreach ($ledgerEntries as $entry): ?>
                                     <?php $runningBalance += ($entry['debit'] - $entry['credit']); ?>
                                     <tr>
-                                        <td><?= htmlspecialchars($entry['date']); ?></td>
-                                        <td class="font-monospace text-muted"><?= htmlspecialchars($entry['reference']); ?></td>
-                                        <td><?= htmlspecialchars($entry['description']); ?></td>
+                                        <td><?= htmlspecialchars($entry['date'] ?? ''); ?></td>
+                                        <td class="font-monospace text-muted"><?= htmlspecialchars($entry['reference'] ?? ''); ?></td>
+                                        <td><?= htmlspecialchars($entry['description'] ?? ''); ?></td>
                                         <td class="text-end font-monospace"><?= $entry['debit'] > 0 ? number_format($entry['debit'], 2) : '-'; ?></td>
                                         <td class="text-end font-monospace"><?= $entry['credit'] > 0 ? number_format($entry['credit'], 2) : '-'; ?></td>
                                         <td class="text-end font-monospace fw-bold <?= $runningBalance > 0 ? 'text-danger' : ($runningBalance < 0 ? 'text-success' : 'text-dark'); ?>">

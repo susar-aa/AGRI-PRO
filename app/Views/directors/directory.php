@@ -62,15 +62,15 @@
                                 <?php foreach ($directors as $m): ?>
                                     <tr>
                                         <td>
-                                            <div class="fw-bold text-dark"><?= htmlspecialchars($m['full_name']); ?></div>
-                                            <small class="text-success font-monospace fw-semibold"><?= htmlspecialchars($m['member_no']); ?></small>
+                                            <div class="fw-bold text-dark"><?= htmlspecialchars($m['full_name'] ?? ''); ?></div>
+                                            <small class="text-success font-monospace fw-semibold"><?= htmlspecialchars($m['member_no'] ?? ''); ?></small>
                                         </td>
                                         <td>
-                                            <div class="fw-medium"><?= htmlspecialchars($m['nic']); ?></div>
-                                            <small class="text-muted"><?= htmlspecialchars($m['phone']); ?></small>
+                                            <div class="fw-medium"><?= htmlspecialchars($m['nic'] ?? ''); ?></div>
+                                            <small class="text-muted"><?= htmlspecialchars($m['phone'] ?? ''); ?></small>
                                         </td>
                                         <td>
-                                            <span class="badge bg-success-subtle text-success"><?= htmlspecialchars($m['status']); ?></span>
+                                            <span class="badge bg-success-subtle text-success"><?= htmlspecialchars($m['status'] ?? ''); ?></span>
                                         </td>
                                         <td class="text-end">
                                             <div class="btn-group btn-group-sm">
