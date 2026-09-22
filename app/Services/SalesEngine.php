@@ -358,7 +358,7 @@ class SalesEngine {
                 'source_module' => 'marketplace',
                 'source_transaction_id' => $sale['id'],
                 'cost_center_id' => $costCenterId,
-                'status' => 'approved',
+                'status' => 'posted',
                 'lines' => $journalLines
             ];
 

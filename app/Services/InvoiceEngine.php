@@ -428,7 +428,7 @@ class InvoiceEngine {
                 'source_module' => 'invoices',
                 'source_transaction_id' => $invoice['id'],
                 'cost_center_id' => $costCenterId,
-                'status' => 'approved',
+                'status' => 'posted',
                 'lines' => $journalLines
             ];
 
