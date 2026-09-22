@@ -1110,3 +1110,8 @@ Stack trace:
 #0 C:\xampp\htdocs\AGRI PRO\insert_cash.php(4): PDO->exec('INSERT INTO cas...')
 #1 {main}
   thrown in C:\xampp\htdocs\AGRI PRO\insert_cash.php on line 4
+[22-Sep-2026 12:49:31 Europe/Berlin] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42S02]: Base table or view not found: 1146 Table 'agri_erp.inventory_transactions' doesn't exist in C:\xampp\htdocs\AGRI PRO\describe_inv_tx.php:4
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\describe_inv_tx.php(4): PDO->query('DESCRIBE invent...')
+#1 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\describe_inv_tx.php on line 4

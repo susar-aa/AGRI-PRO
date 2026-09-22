@@ -204,7 +204,7 @@ class AccountingEngine {
 
         if (is_array($entryOrId)) {
             // Stage 1 backwards compatibility: create & post directly
-            $entryOrId['status'] = 'approved';
+            $entryOrId['status'] = 'posted';
             $journalId = self::createJournalEntry($entryOrId);
         } else {
             $journalId = (int)$entryOrId;

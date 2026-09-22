@@ -369,20 +369,26 @@
                             <div class="item-name">
                                 <span class="type-dot <?= strtolower($item['item_type']); ?>"></span>
                                 <?php if ($item['item_type'] === 'PRODUCT'): ?>
-                                    <?= htmlspecialchars($item['product_name']); ?>
-                                    <span class="item-sub"><?= htmlspecialchars($item['sku']); ?></span>
+                                    <?= htmlspecialchars($item['product_name'] ?? ''); ?>
+                                    <span class="item-sub"><?= htmlspecialchars($item['sku'] ?? ''); ?></span>
+                                <?php elseif ($item['item_type'] === 'SERVICE'): ?>
+                                    <?= htmlspecialchars($item['service_name'] ?? ''); ?>
+                                    <span class="item-sub"><?= htmlspecialchars($item['service_code'] ?? ''); ?></span>
                                 <?php else: ?>
-                                    <?= htmlspecialchars($item['service_name']); ?>
-                                    <span class="item-sub"><?= htmlspecialchars($item['service_code']); ?></span>
+                                    <?= htmlspecialchars(str_replace('_', ' ', $item['item_type'])); ?>
                                 <?php endif; ?>
                             </div>
                             <?php if (!empty($item['description'])): ?>
-                                <div class="item-desc"><?= htmlspecialchars($item['description']); ?></div>
+                                <div class="item-desc"><?= htmlspecialchars($item['description'] ?? ''); ?></div>
                             <?php endif; ?>
                         </div>
                         <div class="col-qty text-center">
-                            <?= number_format($item['quantity'], 2); ?>
-                            <div style="font-size:.65rem;color:#94a3b8;"><?= htmlspecialchars($item['item_type'] === 'PRODUCT' ? $item['product_unit'] : $item['service_unit']); ?></div>
+                            <?php if ($item['item_type'] === 'MEMBER_FEE' || $item['item_type'] === 'SHARE_CAPITAL'): ?>
+                                1.00
+                            <?php else: ?>
+                                <?= number_format($item['quantity'], 2); ?>
+                                <div style="font-size:.65rem;color:#94a3b8;"><?= htmlspecialchars($item['item_type'] === 'PRODUCT' ? ($item['product_unit'] ?? '') : ($item['service_unit'] ?? '')); ?></div>
+                            <?php endif; ?>
                         </div>
                         <div class="col-price">LKR <?= number_format($item['unit_price'], 2); ?></div>
                         <div class="col-total">LKR <?= number_format($item['total'], 2); ?></div>
