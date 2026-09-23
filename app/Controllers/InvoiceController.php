@@ -689,10 +689,15 @@ class InvoiceController extends Controller {
                 )
             ");
             
-            // Assign to walk-in or default customer
-            $walkinCustomer = $db->query("SELECT id FROM parties WHERE party_code = 'PTY-WALKIN'")->fetch();
-            $customerId = $walkinCustomer ? (int)$walkinCustomer['id'] : (int)$db->query("SELECT id FROM parties WHERE party_type IN ('CUSTOMER','BOTH') LIMIT 1")->fetchColumn();
-            if (!$customerId) $customerId = 1;
+            // Always resolve Walk-in Customer party specifically
+            $walkinCustomer = $db->query("SELECT id FROM parties WHERE party_code = 'PTY-WALKIN' OR name LIKE '%Walk-in%' OR name LIKE '%Walk in%' LIMIT 1")->fetch();
+            if ($walkinCustomer) {
+                $customerId = (int)$walkinCustomer['id'];
+            } else {
+                $stmtIns = $db->prepare("INSERT INTO parties (party_code, party_type, name, phone, status, credit_limit, opening_balance) VALUES ('PTY-WALKIN', 'CUSTOMER', 'Walk-in Customer', '', 'active', 0.00, 0.00)");
+                $stmtIns->execute();
+                $customerId = (int)$db->lastInsertId();
+            }
 
             $stmt->execute([
                 'invoice_number' => $invoiceNumber,
