@@ -577,27 +577,29 @@ class InvoiceEngine {
                 }
 
                 // 2. Reverse accounting journal entry if present
-                $journalEntryId = !empty($invoice['journal_entry_id']) ? (int)$invoice['journal_entry_id'] : (int)$db->query("SELECT id FROM journal_entries WHERE source_module = 'invoices' AND source_transaction_id = {$invoice['id']}")->fetchColumn();
-                $reversalJournalId = null;
-                if ($journalEntryId > 0) {
+                $journalEntryId = !empty($invoice['journal_entry_id']) ? (int)$invoice['journal_entry_id'] : (int)$db->query("SELECT id FROM journal_entries WHERE source_module = 'invoices' AND source_transaction_id = {$invoice['id']} AND reversal_of_journal_id IS NULL AND status = 'posted' LIMIT 1")->fetchColumn();
+                $reversalJournalId = !empty($invoice['reversal_journal_entry_id']) ? (int)$invoice['reversal_journal_entry_id'] : null;
+                if ($journalEntryId > 0 && !$reversalJournalId) {
                     $reversalJournalId = AccountingEngine::reverseJournalEntry(
                         $journalEntryId,
                         "Reversal of Invoice " . $invoice['invoice_number'] . ": " . $reason
                     );
                 }
 
-                // 3. Revert cash or bank balances
-                if ($invoice['payment_type'] === 'CASH') {
-                    $cashAccId = !empty($invoice['cash_account_id']) ? (int)$invoice['cash_account_id'] : (int)$db->query("SELECT id FROM cash_accounts WHERE status = 'active' LIMIT 1")->fetchColumn();
-                    if ($cashAccId > 0) {
-                        $db->prepare("UPDATE cash_accounts SET current_balance = current_balance - :amt, updated_at = NOW() WHERE id = :id")
-                           ->execute(['amt' => (float)$invoice['total'], 'id' => $cashAccId]);
-                    }
-                } elseif ($invoice['payment_type'] === 'BANK') {
-                    $bankAccId = !empty($invoice['bank_account_id']) ? (int)$invoice['bank_account_id'] : (int)$db->query("SELECT id FROM bank_accounts WHERE status = 'active' LIMIT 1")->fetchColumn();
-                    if ($bankAccId > 0) {
-                        $db->prepare("UPDATE bank_accounts SET current_balance = current_balance - :amt, updated_at = NOW() WHERE id = :id")
-                           ->execute(['amt' => (float)$invoice['total'], 'id' => $bankAccId]);
+                // 3. Revert cash or bank balances (only if not already reversed)
+                if (!$invoice['reversal_journal_entry_id']) {
+                    if ($invoice['payment_type'] === 'CASH') {
+                        $cashAccId = !empty($invoice['cash_account_id']) ? (int)$invoice['cash_account_id'] : (int)$db->query("SELECT id FROM cash_accounts WHERE status = 'active' LIMIT 1")->fetchColumn();
+                        if ($cashAccId > 0) {
+                            $db->prepare("UPDATE cash_accounts SET current_balance = current_balance - :amt, updated_at = NOW() WHERE id = :id")
+                               ->execute(['amt' => (float)$invoice['total'], 'id' => $cashAccId]);
+                        }
+                    } elseif ($invoice['payment_type'] === 'BANK') {
+                        $bankAccId = !empty($invoice['bank_account_id']) ? (int)$invoice['bank_account_id'] : (int)$db->query("SELECT id FROM bank_accounts WHERE status = 'active' LIMIT 1")->fetchColumn();
+                        if ($bankAccId > 0) {
+                            $db->prepare("UPDATE bank_accounts SET current_balance = current_balance - :amt, updated_at = NOW() WHERE id = :id")
+                               ->execute(['amt' => (float)$invoice['total'], 'id' => $bankAccId]);
+                        }
                     }
                 }
 
