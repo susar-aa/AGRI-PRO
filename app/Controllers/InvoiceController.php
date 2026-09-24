@@ -339,8 +339,8 @@ class InvoiceController extends Controller {
                 $customerId = (int)$member['party_id'];
             } else {
                 $partyCode = 'CUST-' . strtoupper(substr(uniqid(), -6));
-                $stmt = $db->prepare("INSERT INTO parties (party_code, party_type, name, phone, address, status) VALUES (:code, 'CUSTOMER', :name, :phone, :address, 'active')");
-                $stmt->execute(['code' => $partyCode, 'name' => $member['full_name'], 'phone' => $member['phone'], 'address' => $member['address']]);
+                $stmt = $db->prepare("INSERT INTO parties (party_code, party_type, name, phone, address, status, created_by) VALUES (:code, 'CUSTOMER', :name, :phone, :address, 'active', :created_by)");
+                $stmt->execute(['code' => $partyCode, 'name' => $member['full_name'], 'phone' => $member['phone'], 'address' => $member['address'], 'created_by' => Auth::id() ?? 1]);
                 $customerId = (int)$db->lastInsertId();
                 $db->prepare("UPDATE coop_members SET party_id = :pid WHERE id = :mid")->execute(['pid' => $customerId, 'mid' => $memberId]);
             }
@@ -353,8 +353,8 @@ class InvoiceController extends Controller {
                 $customerId = (int)$staff['party_id'];
             } else {
                 $partyCode = 'STF-' . strtoupper(substr(uniqid(), -6));
-                $stmt = $db->prepare("INSERT INTO parties (party_code, party_type, name, phone, status) VALUES (:code, 'CUSTOMER', :name, :phone, 'active')");
-                $stmt->execute(['code' => $partyCode, 'name' => $staff['full_name'], 'phone' => $staff['phone'] ?? '']);
+                $stmt = $db->prepare("INSERT INTO parties (party_code, party_type, name, phone, status, created_by) VALUES (:code, 'CUSTOMER', :name, :phone, 'active', :created_by)");
+                $stmt->execute(['code' => $partyCode, 'name' => $staff['full_name'], 'phone' => $staff['phone'] ?? '', 'created_by' => Auth::id() ?? 1]);
                 $customerId = (int)$db->lastInsertId();
                 $db->prepare("UPDATE users SET party_id = :pid WHERE id = :uid")->execute(['pid' => $customerId, 'uid' => $userId]);
             }
@@ -512,14 +512,15 @@ class InvoiceController extends Controller {
                 // Auto-create a Party for this member
                 $partyCode = 'CUST-' . strtoupper(substr(uniqid(), -6));
                 $stmt = $db->prepare("
-                    INSERT INTO parties (party_code, party_type, name, phone, address, status)
-                    VALUES (:code, 'CUSTOMER', :name, :phone, :address, 'active')
+                    INSERT INTO parties (party_code, party_type, name, phone, address, status, created_by)
+                    VALUES (:code, 'CUSTOMER', :name, :phone, :address, 'active', :created_by)
                 ");
                 $stmt->execute([
                     'code' => $partyCode,
                     'name' => $member['full_name'],
                     'phone' => $member['phone'],
-                    'address' => $member['address']
+                    'address' => $member['address'],
+                    'created_by' => Auth::id() ?? 1
                 ]);
                 $customerId = (int)$db->lastInsertId();
                 // Link party back to member
@@ -538,14 +539,15 @@ class InvoiceController extends Controller {
                 // Auto-create a Party for this user
                 $partyCode = 'CUST-' . strtoupper(substr(uniqid(), -6));
                 $stmt = $db->prepare("
-                    INSERT INTO parties (party_code, party_type, name, phone, address, status)
-                    VALUES (:code, 'CUSTOMER', :name, :phone, :address, 'active')
+                    INSERT INTO parties (party_code, party_type, name, phone, address, status, created_by)
+                    VALUES (:code, 'CUSTOMER', :name, :phone, :address, 'active', :created_by)
                 ");
                 $stmt->execute([
                     'code' => $partyCode,
                     'name' => $user['full_name'],
                     'phone' => $user['phone'] ?? '',
-                    'address' => ''
+                    'address' => '',
+                    'created_by' => Auth::id() ?? 1
                 ]);
                 $customerId = (int)$db->lastInsertId();
                 // Link party back to user
@@ -694,8 +696,8 @@ class InvoiceController extends Controller {
             if ($walkinCustomer) {
                 $customerId = (int)$walkinCustomer['id'];
             } else {
-                $stmtIns = $db->prepare("INSERT INTO parties (party_code, party_type, name, phone, status) VALUES ('PTY-WALKIN', 'CUSTOMER', 'Walk-in Customer', '', 'active')");
-                $stmtIns->execute();
+                $stmtIns = $db->prepare("INSERT INTO parties (party_code, party_type, name, phone, status, created_by) VALUES ('PTY-WALKIN', 'CUSTOMER', 'Walk-in Customer', '', 'active', :created_by)");
+                $stmtIns->execute(['created_by' => Auth::id() ?? 1]);
                 $customerId = (int)$db->lastInsertId();
             }
 
