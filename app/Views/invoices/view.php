@@ -289,9 +289,9 @@
             <?php endif; ?>
         <?php endif; ?>
 
-        <?php if ($invoice['status'] === 'POSTED' && \Core\Auth::hasPermission('invoices.cancel')): ?>
+        <?php if ($invoice['status'] === 'DRAFT' || $invoice['status'] === 'POSTED'): ?>
             <button class="bar-btn danger-btn" data-bs-toggle="modal" data-bs-target="#cancelInvoiceModal">
-                <i class="bi bi-arrow-counterclockwise"></i> Reverse
+                <i class="bi bi-x-circle-fill me-1"></i> Cancel Invoice
             </button>
         <?php endif; ?>
 

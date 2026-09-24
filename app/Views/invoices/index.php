@@ -124,6 +124,11 @@
                                                 <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">Post</button>
                                             </form>
                                         <?php endif; ?>
+                                        <?php if ($inv['status'] === 'DRAFT' || $inv['status'] === 'POSTED'): ?>
+                                            <button type="button" class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="openCancelModal(<?= $inv['id']; ?>, '<?= htmlspecialchars($inv['invoice_number']); ?>')">
+                                                Cancel
+                                            </button>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>
@@ -169,4 +174,42 @@
         </form>
     </div>
 </div>
+
+<!-- Cancel Existing Invoice Modal -->
+<div class="modal fade" id="cancelExistingInvoiceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form action="<?= \Core\Helper::baseUrl('modules/invoices/cancel'); ?>" method="POST" class="modal-content">
+            <?= \Core\CSRF::getFormField(); ?>
+            <input type="hidden" name="id" id="cancel_invoice_id" value="">
+            <input type="hidden" name="redirect" value="index">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>Cancel Invoice <span id="cancel_invoice_number_display"></span></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning small">
+                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                    Cancelling this invoice will mark it as <strong>CANCELLED</strong>, reverse cash/bank account balances, restore stock inventory, and post accounting reversal entries.
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Reason for Cancellation <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control" name="reversal_reason" placeholder="e.g. Customer returned goods / Order cancelled" value="Invoice cancelled" required>
+                </div>
+            </div>
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function openCancelModal(id, number) {
+    document.getElementById('cancel_invoice_id').value = id;
+    document.getElementById('cancel_invoice_number_display').textContent = number;
+    var modal = new bootstrap.Modal(document.getElementById('cancelExistingInvoiceModal'));
+    modal.show();
+}
+</script>
 

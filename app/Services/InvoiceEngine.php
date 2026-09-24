@@ -519,7 +519,7 @@ class InvoiceEngine {
     }
 
     /**
-     * Cancel/Reverse a posted central invoice.
+     * Cancel/Reverse a central invoice (DRAFT or POSTED).
      */
     public static function cancelInvoice(int $id, string $reason): bool {
         $db = Database::getInstance();
@@ -528,6 +528,10 @@ class InvoiceEngine {
         $invoice = $invModel->getById($id);
         if (!$invoice) {
             throw new Exception("Invoice not found.");
+        }
+
+        if ($invoice['status'] === 'CANCELLED') {
+            throw new Exception("Invoice is already cancelled.");
         }
 
         $inTransaction = Database::inTransaction();
@@ -540,30 +544,60 @@ class InvoiceEngine {
                 $db->prepare("UPDATE invoices SET status = 'CANCELLED', reversal_reason = :reason, updated_at = NOW() WHERE id = :id")
                    ->execute(['id' => $invoice['id'], 'reason' => $reason]);
             } else {
-                if ($invoice['status'] !== 'POSTED' || empty($invoice['journal_entry_id'])) {
-                    throw new Exception("Only posted invoices can be cancelled.");
+                if ($invoice['status'] !== 'POSTED') {
+                    throw new Exception("Only posted or draft invoices can be cancelled.");
                 }
 
                 // 1. Reverse Stock movements for PRODUCT lines (restores stock)
                 InventoryEngine::reverseStockMovement('SALES_INVOICE', (int)$invoice['id']);
 
-                // 2. Reverse accounting journal entry
-                $reversalJournalId = AccountingEngine::reverseJournalEntry(
-                    (int)$invoice['journal_entry_id'],
-                    "Reversal of Invoice " . $invoice['invoice_number'] . ": " . $reason
-                );
+                // Fallback: If no stock ledger entry was found but invoice contains products, explicitly restore stock
+                $ledgerCount = (int)$db->query("SELECT COUNT(*) FROM stock_ledger WHERE source_module = 'SALES_INVOICE' AND source_transaction_id = {$invoice['id']}")->fetchColumn();
+                if ($ledgerCount == 0 && !empty($invoice['items'])) {
+                    $whId = !empty($invoice['warehouse_id']) ? (int)$invoice['warehouse_id'] : 1;
+                    foreach ($invoice['items'] as $itm) {
+                        if (($itm['item_type'] ?? '') === 'PRODUCT' && !empty($itm['product_id'])) {
+                            InventoryEngine::recordStockIn(
+                                (int)$itm['product_id'],
+                                $whId,
+                                (float)$itm['quantity'],
+                                (float)$itm['unit_price'],
+                                'SALES_RETURN',
+                                'SALES_INVOICE',
+                                (int)$invoice['id'],
+                                'REV-' . $invoice['invoice_number']
+                            );
+                        }
+                    }
+                }
+
+                // 2. Reverse accounting journal entry if present
+                $journalEntryId = !empty($invoice['journal_entry_id']) ? (int)$invoice['journal_entry_id'] : (int)$db->query("SELECT id FROM journal_entries WHERE source_module = 'invoices' AND source_transaction_id = {$invoice['id']}")->fetchColumn();
+                $reversalJournalId = null;
+                if ($journalEntryId > 0) {
+                    $reversalJournalId = AccountingEngine::reverseJournalEntry(
+                        $journalEntryId,
+                        "Reversal of Invoice " . $invoice['invoice_number'] . ": " . $reason
+                    );
+                }
 
                 // 3. Revert cash or bank balances
-                if ($invoice['payment_type'] === 'CASH' && $invoice['cash_account_id']) {
-                    $db->prepare("UPDATE cash_accounts SET current_balance = current_balance - :amt WHERE id = :id")
-                       ->execute(['amt' => (float)$invoice['total'], 'id' => (int)$invoice['cash_account_id']]);
-                } elseif ($invoice['payment_type'] === 'BANK' && $invoice['bank_account_id']) {
-                    $db->prepare("UPDATE bank_accounts SET current_balance = current_balance - :amt WHERE id = :id")
-                       ->execute(['amt' => (float)$invoice['total'], 'id' => (int)$invoice['bank_account_id']]);
+                if ($invoice['payment_type'] === 'CASH') {
+                    $cashAccId = !empty($invoice['cash_account_id']) ? (int)$invoice['cash_account_id'] : (int)$db->query("SELECT id FROM cash_accounts WHERE status = 'active' LIMIT 1")->fetchColumn();
+                    if ($cashAccId > 0) {
+                        $db->prepare("UPDATE cash_accounts SET current_balance = current_balance - :amt, updated_at = NOW() WHERE id = :id")
+                           ->execute(['amt' => (float)$invoice['total'], 'id' => $cashAccId]);
+                    }
+                } elseif ($invoice['payment_type'] === 'BANK') {
+                    $bankAccId = !empty($invoice['bank_account_id']) ? (int)$invoice['bank_account_id'] : (int)$db->query("SELECT id FROM bank_accounts WHERE status = 'active' LIMIT 1")->fetchColumn();
+                    if ($bankAccId > 0) {
+                        $db->prepare("UPDATE bank_accounts SET current_balance = current_balance - :amt, updated_at = NOW() WHERE id = :id")
+                           ->execute(['amt' => (float)$invoice['total'], 'id' => $bankAccId]);
+                    }
                 }
 
                 // 4. Cancel linked cheque if payment type was CHEQUE
-                if ($invoice['payment_type'] === 'CHEQUE' && $invoice['cheque_id']) {
+                if ($invoice['payment_type'] === 'CHEQUE' && !empty($invoice['cheque_id'])) {
                     $db->prepare("UPDATE cheques SET status = 'CANCELLED', updated_at = NOW() WHERE id = :id")
                        ->execute(['id' => (int)$invoice['cheque_id']]);
                 }

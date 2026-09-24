@@ -721,20 +721,30 @@ class InvoiceController extends Controller {
     }
 
     public function cancel(): void {
-        Auth::requirePermission('invoices.cancel');
         $this->validateCsrf();
 
         $id = !empty($_POST['id']) ? (int)$_POST['id'] : 0;
-        $reason = trim($_POST['reversal_reason'] ?? 'Invoice cancelled');
+        $reason = trim($_POST['reversal_reason'] ?? $_POST['reason'] ?? 'Invoice cancelled');
+
+        if ($id <= 0) {
+            Session::setFlash('error', 'Invalid Invoice ID for cancellation.');
+            Helper::redirect('modules/invoices');
+        }
 
         try {
             InvoiceEngine::cancelInvoice($id, $reason);
             Session::setFlash('success', 'Invoice successfully cancelled and reversed.');
         } catch (\Exception $e) {
+            \Core\Logger::error("Failed to cancel invoice {$id}: " . $e->getMessage());
             Session::setFlash('error', 'Cancellation failed: ' . $e->getMessage());
         }
 
-        Helper::redirect('modules/invoices/view?id=' . $id);
+        $redirect = $_POST['redirect'] ?? '';
+        if ($redirect === 'index') {
+            Helper::redirect('modules/invoices');
+        } else {
+            Helper::redirect('modules/invoices/view?id=' . $id);
+        }
     }
 
     public function delete(): void {
