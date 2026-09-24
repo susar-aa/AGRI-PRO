@@ -471,7 +471,7 @@ class InvoiceController extends Controller {
             if ($db->inTransaction()) {
                 $db->rollBack();
             }
-            \Core\Logger::error("Error updating invoice {$id}: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
+            error_log("Error updating invoice {$id}: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
             Session::setFlash('error', 'Error updating invoice: ' . $e->getMessage());
             Helper::redirect('modules/invoices/edit?id=' . $id);
         }
@@ -713,7 +713,7 @@ class InvoiceController extends Controller {
             if ($db->inTransaction()) {
                 $db->rollBack();
             }
-            \Core\Logger::error("Failed to record cancelled invoice {$invoiceNumber}: " . $e->getMessage());
+            error_log("Failed to record cancelled invoice {$invoiceNumber}: " . $e->getMessage());
             Session::setFlash('error', 'Failed to record cancelled invoice: ' . $e->getMessage());
         }
 
@@ -735,7 +735,7 @@ class InvoiceController extends Controller {
             InvoiceEngine::cancelInvoice($id, $reason);
             Session::setFlash('success', 'Invoice successfully cancelled and reversed.');
         } catch (\Exception $e) {
-            \Core\Logger::error("Failed to cancel invoice {$id}: " . $e->getMessage());
+            error_log("Failed to cancel invoice {$id}: " . $e->getMessage());
             Session::setFlash('error', 'Cancellation failed: ' . $e->getMessage());
         }
 
