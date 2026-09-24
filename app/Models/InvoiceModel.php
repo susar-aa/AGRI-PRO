@@ -29,6 +29,16 @@ class InvoiceModel extends Model {
             $invoice['reversal_reason'] = $invoice['notes'];
         }
 
+        if (!empty($invoice['notes']) && preg_match('/\[Customer:\s*([^\]]+)\]/', $invoice['notes'], $matches)) {
+            $customName = trim($matches[1]);
+            $invoice['custom_customer_name'] = $customName;
+            if (empty($invoice['party_code']) || $invoice['party_code'] === 'PTY-WALKIN') {
+                $invoice['customer_name'] = $customName;
+            } else {
+                $invoice['customer_name'] = $customName . ' (' . $invoice['customer_name'] . ')';
+            }
+        }
+
         $invoice['items'] = $this->getInvoiceItems($id);
         return $invoice;
     }
@@ -91,8 +101,21 @@ class InvoiceModel extends Model {
         $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
         $stmt->execute();
+        $invoices = $stmt->fetchAll();
 
-        return $stmt->fetchAll();
+        foreach ($invoices as &$inv) {
+            if (!empty($inv['notes']) && preg_match('/\[Customer:\s*([^\]]+)\]/', $inv['notes'], $matches)) {
+                $customName = trim($matches[1]);
+                $inv['custom_customer_name'] = $customName;
+                if (empty($inv['party_code']) || $inv['party_code'] === 'PTY-WALKIN') {
+                    $inv['customer_name'] = $customName;
+                } else {
+                    $inv['customer_name'] = $customName . ' (' . $inv['customer_name'] . ')';
+                }
+            }
+        }
+
+        return $invoices;
     }
 
     public function getCount(array $filters = []): int {

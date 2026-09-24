@@ -277,6 +277,8 @@ class InvoiceController extends Controller {
             ];
         }
 
+        $customCustomerName = $invoice['custom_customer_name'] ?? '';
+
         $this->render('invoices/edit', [
             'pageTitle' => 'Edit Invoice ' . $invoice['invoice_number'],
             'activeNav' => 'invoices',
@@ -284,6 +286,7 @@ class InvoiceController extends Controller {
             'members' => $members,
             'staff' => $staff,
             'selectedCustomerVal' => $selectedCustomerVal,
+            'customCustomerName' => $customCustomerName,
             'warehouses' => $warehouses,
             'defaultWarehouseId' => $defaultWarehouseId,
             'cashAccounts' => $cashAccounts,
@@ -366,6 +369,14 @@ class InvoiceController extends Controller {
         if ($customerId == $walkinId && $paymentType === 'CREDIT') {
             Session::setFlash('error', 'Walk-in Customer is NOT allowed to make purchases on Credit.');
             Helper::redirect('modules/invoices/edit?id=' . $id);
+        }
+
+        $customCustomerName = trim($_POST['custom_customer_name'] ?? '');
+        $notes = trim($_POST['notes'] ?? '');
+        if (!empty($customCustomerName)) {
+            $notes = preg_replace('/\[Customer:\s*[^\]]+\]\s*-\s*/', '', $notes);
+            $notes = preg_replace('/\[Customer:\s*[^\]]+\]/', '', $notes);
+            $notes = "[Customer: " . $customCustomerName . "]" . (!empty($notes) ? " - " . trim($notes) : "");
         }
 
         $cashAccountId = !empty($_POST['cash_account_id']) ? (int)$_POST['cash_account_id'] : null;
@@ -558,6 +569,14 @@ class InvoiceController extends Controller {
         }
 
         $paymentType = $_POST['payment_type'] ?? 'CASH';
+
+        $customCustomerName = trim($_POST['custom_customer_name'] ?? '');
+        $notes = trim($_POST['notes'] ?? '');
+        if (!empty($customCustomerName)) {
+            if (strpos($notes, '[Customer:') === false) {
+                $notes = "[Customer: " . $customCustomerName . "]" . (!empty($notes) ? " - " . $notes : "");
+            }
+        }
 
         // Walk-in credit restriction validation
         if ($customerId == $walkinId && $paymentType === 'CREDIT') {

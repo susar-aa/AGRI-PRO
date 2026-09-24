@@ -328,6 +328,12 @@
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
+                            <label for="custom_customer_name" class="form-label fw-semibold small text-muted text-uppercase mb-1">
+                                Type Customer Name <small class="text-lowercase fw-normal text-muted">(Optional / One-time)</small>
+                            </label>
+                            <input type="text" class="form-control form-control-sm" id="custom_customer_name" name="custom_customer_name" placeholder="e.g. Mr. John Silva" value="<?= htmlspecialchars($customCustomerName ?? ''); ?>">
+                        </div>
+                        <div class="col-12 col-md-6">
                             <label for="invoice_date" class="form-label fw-semibold small text-muted text-uppercase mb-1">Invoice Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control form-control-sm" id="invoice_date" name="invoice_date" value="<?= htmlspecialchars($invoice['invoice_date'] ?? date('Y-m-d')); ?>" required>
                         </div>
