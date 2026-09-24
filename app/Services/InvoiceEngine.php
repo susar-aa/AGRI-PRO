@@ -541,8 +541,13 @@ class InvoiceEngine {
 
         try {
             if ($invoice['status'] === 'DRAFT') {
-                $db->prepare("UPDATE invoices SET status = 'CANCELLED', reversal_reason = :reason, updated_at = NOW() WHERE id = :id")
-                   ->execute(['id' => $invoice['id'], 'reason' => $reason]);
+                try {
+                    $db->prepare("UPDATE invoices SET status = 'CANCELLED', reversal_reason = :reason, updated_at = NOW() WHERE id = :id")
+                       ->execute(['id' => $invoice['id'], 'reason' => $reason]);
+                } catch (\PDOException $e) {
+                    $db->prepare("UPDATE invoices SET status = 'CANCELLED', notes = CONCAT(COALESCE(notes, ''), ' [Cancelled: ', :reason, ']'), updated_at = NOW() WHERE id = :id")
+                       ->execute(['id' => $invoice['id'], 'reason' => $reason]);
+                }
             } else {
                 if ($invoice['status'] !== 'POSTED') {
                     throw new Exception("Only posted or draft invoices can be cancelled.");
@@ -603,18 +608,33 @@ class InvoiceEngine {
                 }
 
                 // 5. Update invoice status
-                $db->prepare("
-                    UPDATE invoices 
-                    SET status = 'CANCELLED', 
-                        reversal_journal_entry_id = :rev_je_id,
-                        reversal_reason = :reason,
-                        updated_at = NOW()
-                    WHERE id = :id
-                ")->execute([
-                    'id' => $invoice['id'],
-                    'rev_je_id' => $reversalJournalId,
-                    'reason' => $reason
-                ]);
+                try {
+                    $db->prepare("
+                        UPDATE invoices 
+                        SET status = 'CANCELLED', 
+                            reversal_journal_entry_id = :rev_je_id,
+                            reversal_reason = :reason,
+                            updated_at = NOW()
+                        WHERE id = :id
+                    ")->execute([
+                        'id' => $invoice['id'],
+                        'rev_je_id' => $reversalJournalId,
+                        'reason' => $reason
+                    ]);
+                } catch (\PDOException $e) {
+                    $db->prepare("
+                        UPDATE invoices 
+                        SET status = 'CANCELLED', 
+                            reversal_journal_entry_id = :rev_je_id,
+                            notes = CONCAT(COALESCE(notes, ''), ' [Cancelled: ', :reason, ']'),
+                            updated_at = NOW()
+                        WHERE id = :id
+                    ")->execute([
+                        'id' => $invoice['id'],
+                        'rev_je_id' => $reversalJournalId,
+                        'reason' => $reason
+                    ]);
+                }
             }
 
             AuditService::log('cancel_central_invoice', 'finance', $invoice['id'], null, [

@@ -25,6 +25,10 @@ class InvoiceModel extends Model {
             return null;
         }
 
+        if (empty($invoice['reversal_reason']) && !empty($invoice['notes'])) {
+            $invoice['reversal_reason'] = $invoice['notes'];
+        }
+
         $invoice['items'] = $this->getInvoiceItems($id);
         return $invoice;
     }
