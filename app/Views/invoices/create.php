@@ -401,6 +401,10 @@
                             <span class="tile-icon" style="background:#ffedd5; color:#9a3412;"><i class="bi bi-bank"></i></span>
                             Share Capital
                         </button>
+                        <button type="button" class="add-item-tile" style="background:#f0fdf4; color:#166534; border-color:#bbf7d0;" onclick="addDirectAccountItem('DONATION', 'Donation')">
+                            <span class="tile-icon" style="background:#bbf7d0; color:#166534;"><i class="bi bi-heart-fill"></i></span>
+                            Donations
+                        </button>
                     </div>
 
                     <!-- Line Items Table -->
@@ -927,6 +931,7 @@ function addDirectAccountItem(type, label) {
     let pillClass = "text-bg-primary";
     if (type === 'MEMBER_FEE') pillClass = "text-bg-info";
     else if (type === 'SHARE_CAPITAL') pillClass = "text-bg-warning";
+    else if (type === 'DONATION') pillClass = "text-bg-success";
     
     let qtyHtml = `
             <div class="input-group input-group-sm">
@@ -935,7 +940,7 @@ function addDirectAccountItem(type, label) {
             </div>
     `;
 
-    if (type === 'SHARE_CAPITAL' || type === 'MEMBER_FEE') {
+    if (type === 'SHARE_CAPITAL' || type === 'MEMBER_FEE' || type === 'DONATION') {
         qtyHtml = `
             <div class="text-center text-muted pt-1">—</div>
             <input type="hidden" class="qty-input" name="items[${rowCount}][quantity]" value="1">

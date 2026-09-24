@@ -366,6 +366,10 @@
                             <span class="tile-icon" style="background:#ffedd5; color:#9a3412;"><i class="bi bi-bank"></i></span>
                             Share Capital
                         </button>
+                        <button type="button" class="add-item-tile" style="background:#f0fdf4; color:#166534; border-color:#bbf7d0;" onclick="addDirectAccountItem('DONATION', 'Donation')">
+                            <span class="tile-icon" style="background:#bbf7d0; color:#166534;"><i class="bi bi-heart-fill"></i></span>
+                            Donations
+                        </button>
                     </div>
 
                     <!-- Line Items Table -->
@@ -776,8 +780,8 @@ function loadExistingItem(item) {
             <td class="text-center"><button type="button" class="btn btn-sm text-danger p-1 border-0 rounded-circle" onclick="removeRow(${rowCount})" title="Remove"><i class="bi bi-x-circle-fill fs-5"></i></button></td>
         `;
     } else {
-        let label = (type === 'SHARE_CAPITAL') ? 'Share Capital' : 'Member Fee';
-        let pillClass = (type === 'SHARE_CAPITAL') ? 'text-bg-warning' : 'text-bg-info';
+        let label = (type === 'SHARE_CAPITAL') ? 'Share Capital' : ((type === 'DONATION') ? 'Donation' : 'Member Fee');
+        let pillClass = (type === 'SHARE_CAPITAL') ? 'text-bg-warning' : ((type === 'DONATION') ? 'text-bg-success' : 'text-bg-info');
 
         let qtyHtml = `
             <div class="input-group input-group-sm">
@@ -785,7 +789,7 @@ function loadExistingItem(item) {
                 <span class="input-group-text bg-light text-muted" style="font-size:.73rem;">Unit</span>
             </div>
         `;
-        if (type === 'SHARE_CAPITAL' || type === 'MEMBER_FEE') {
+        if (type === 'SHARE_CAPITAL' || type === 'MEMBER_FEE' || type === 'DONATION') {
             qtyHtml = `
                 <div class="text-center text-muted pt-1">—</div>
                 <input type="hidden" class="qty-input" name="items[${rowCount}][quantity]" value="1">

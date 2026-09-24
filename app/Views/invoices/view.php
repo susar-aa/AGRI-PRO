@@ -389,7 +389,7 @@
                             <?php endif; ?>
                         </div>
                         <div class="col-qty text-center">
-                            <?php if ($item['item_type'] === 'MEMBER_FEE' || $item['item_type'] === 'SHARE_CAPITAL'): ?>
+                            <?php if ($item['item_type'] === 'MEMBER_FEE' || $item['item_type'] === 'SHARE_CAPITAL' || $item['item_type'] === 'DONATION'): ?>
                                 1.00
                             <?php else: ?>
                                 <?= number_format($item['quantity'], 2); ?>

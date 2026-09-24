@@ -334,12 +334,14 @@ class InvoiceEngine {
                     $serviceRevenueAllocations[$srvAcc] += (float)$item['total'];
                     $hasServices = true;
                 } else {
-                    // MEMBER_FEE or SHARE_CAPITAL
+                    // MEMBER_FEE, SHARE_CAPITAL, or DONATION
                     if ($item['item_type'] === 'SHARE_CAPITAL') {
                         $accId = 25; // Member Share Capital
+                    } elseif ($item['item_type'] === 'DONATION') {
+                        // Donation Revenue Account (Other Income 4990)
+                        $accId = (int)$db->query("SELECT id FROM accounts WHERE account_code = '4990' OR account_name LIKE '%Other Income%' OR account_name LIKE '%Donation%' LIMIT 1")->fetchColumn() ?: 37;
                     } else {
-                        // MEMBER_FEE -> General Reserves (27) or Member Share Capital
-                        // To avoid Revenue category (Other Income), map to General Reserves
+                        // MEMBER_FEE -> General Reserves (27)
                         $accId = 27; 
                     }
                     if (!isset($serviceRevenueAllocations[$accId])) {
