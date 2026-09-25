@@ -70,7 +70,7 @@ class ReportController extends Controller {
 
         if ($format === 'pdf') {
             // Render space-saving, print-ready document view
-            $this->renderPartial('reports/directory_pdf', [
+            $this->renderAuthView('reports/directory_pdf', [
                 'pageTitle' => 'Directory Report Print - Agri Co-Op ERP',
                 'records' => $records,
                 'filters' => $filters,
