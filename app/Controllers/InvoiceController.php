@@ -159,6 +159,15 @@ class InvoiceController extends Controller {
             ORDER BY s.service_name ASC
         ")->fetchAll();
 
+        if (empty($services)) {
+            $hasAny = $db->query("SELECT id FROM services LIMIT 1")->fetchColumn();
+            if (!$hasAny) {
+                $revAccId = (int)$db->query("SELECT id FROM accounts WHERE account_code IN ('4200', '4100', '4300', '4000') ORDER BY account_code ASC LIMIT 1")->fetchColumn() ?: 37;
+                $db->exec("INSERT INTO services (service_code, service_name, description, unit, default_price, revenue_account_id, is_active, created_by) VALUES ('SRV-MACH-RNT', 'Machinery & Equipment Rental Service', 'Machinery rental billing', 'Hour', 0.00, {$revAccId}, 1, 1)");
+                $services = $db->query("SELECT s.id, s.service_code, s.service_name, s.unit, s.default_price, s.id AS service_id, s.description FROM services s WHERE s.is_active = 1 ORDER BY s.service_name ASC")->fetchAll();
+            }
+        }
+
         // 6. Fetch active/eligible machinery rentals
         $rentals = $db->query("
             SELECT mr.*, m.machinery_name, m.machinery_code, p.name AS customer_name
@@ -235,6 +244,14 @@ class InvoiceController extends Controller {
         }
 
         $services = $db->query("SELECT s.id, s.service_code, s.service_name, s.unit, s.default_price, s.id AS service_id, s.description FROM services s WHERE s.is_active = 1 ORDER BY s.service_name ASC")->fetchAll();
+        if (empty($services)) {
+            $hasAny = $db->query("SELECT id FROM services LIMIT 1")->fetchColumn();
+            if (!$hasAny) {
+                $revAccId = (int)$db->query("SELECT id FROM accounts WHERE account_code IN ('4200', '4100', '4300', '4000') ORDER BY account_code ASC LIMIT 1")->fetchColumn() ?: 37;
+                $db->exec("INSERT INTO services (service_code, service_name, description, unit, default_price, revenue_account_id, is_active, created_by) VALUES ('SRV-MACH-RNT', 'Machinery & Equipment Rental Service', 'Machinery rental billing', 'Hour', 0.00, {$revAccId}, 1, 1)");
+                $services = $db->query("SELECT s.id, s.service_code, s.service_name, s.unit, s.default_price, s.id AS service_id, s.description FROM services s WHERE s.is_active = 1 ORDER BY s.service_name ASC")->fetchAll();
+            }
+        }
         $rentals = $db->query("SELECT mr.*, m.machinery_name, m.machinery_code, pt.name AS customer_name FROM machinery_rentals mr JOIN machinery m ON mr.machinery_id = m.id JOIN parties pt ON mr.customer_id = pt.id WHERE mr.status = 'ACTIVE' AND (mr.invoice_id IS NULL OR mr.invoice_id = {$id}) ORDER BY mr.id DESC")->fetchAll();
         $machineryAssets = $db->query("SELECT * FROM machinery WHERE status = 'AVAILABLE' OR 1=1 ORDER BY machinery_name ASC")->fetchAll();
 

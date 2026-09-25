@@ -63,16 +63,23 @@ class InvoiceEngine {
                 }
                 $price = round((float)($item['unit_price'] ?? $prod['default_selling_price']), 2);
                 $hasProducts = true;
-            } elseif ($type === 'SERVICE') {
-                $srvId = (int)$item['service_id'];
-                $srv = $srvModel->getById($srvId);
-                if (!$srv || !$srv['is_active']) {
-                    throw new Exception("Selected service is invalid or inactive.");
+            } elseif ($type === 'SERVICE' || $type === 'RENTAL') {
+                $srvId = !empty($item['service_id']) ? (int)$item['service_id'] : null;
+                if ($srvId > 0) {
+                    $srv = $srvModel->getById($srvId);
+                    if ($srv && $srv['is_active']) {
+                        $price = round((float)($item['unit_price'] ?? $srv['default_price']), 2);
+                    } else {
+                        // Fallback: If catalog service ID wasn't active/valid but price is provided (e.g. Machinery Rental)
+                        $price = round((float)($item['unit_price'] ?? 0), 2);
+                        $srvId = null;
+                    }
+                } else {
+                    $price = round((float)($item['unit_price'] ?? 0), 2);
+                    $srvId = null;
                 }
-                $price = round((float)($item['unit_price'] ?? $srv['default_price']), 2);
             } else {
-                // MEMBER_FEE or SHARE_CAPITAL or other direct account items
-                // Removed strict partyType check to allow billing Directors and Staff as well
+                // MEMBER_FEE or SHARE_CAPITAL or DONATION or other direct account items
                 $price = round((float)($item['unit_price'] ?? 0), 2);
             }
 
@@ -321,13 +328,22 @@ class InvoiceEngine {
                     $totalCogs += $itemCogs;
                     $productRevenueSum += (float)$item['total'];
                     $hasProducts = true;
-                } elseif ($item['item_type'] === 'SERVICE') {
-                    // Service
-                    $srv = $db->query("SELECT revenue_account_id FROM services WHERE id = " . (int)$item['service_id'])->fetch();
-                    if (!$srv) {
-                        throw new Exception("Service item mapping error.");
+                } elseif ($item['item_type'] === 'SERVICE' || $item['item_type'] === 'RENTAL') {
+                    // Service / Machinery Rental
+                    $srvAcc = null;
+                    if (!empty($item['service_id'])) {
+                        $srv = $db->query("SELECT revenue_account_id FROM services WHERE id = " . (int)$item['service_id'])->fetch();
+                        if ($srv && !empty($srv['revenue_account_id'])) {
+                            $srvAcc = (int)$srv['revenue_account_id'];
+                        }
                     }
-                    $srvAcc = (int)$srv['revenue_account_id'];
+                    if (!$srvAcc) {
+                        // Fallback to Service / Machinery Rental Income Revenue Account (e.g., 4200, 4100, 4300, or 4000 series)
+                        $srvAcc = (int)$db->query("SELECT id FROM accounts WHERE account_code IN ('4200', '4100', '4300', '4000') OR account_name LIKE '%Service%' OR account_name LIKE '%Rental%' OR account_name LIKE '%Sales%' ORDER BY account_code ASC LIMIT 1")->fetchColumn();
+                    }
+                    if (!$srvAcc) {
+                        $srvAcc = $revAccountId; // Fallback to default sales revenue
+                    }
                     if (!isset($serviceRevenueAllocations[$srvAcc])) {
                         $serviceRevenueAllocations[$srvAcc] = 0.00;
                     }
