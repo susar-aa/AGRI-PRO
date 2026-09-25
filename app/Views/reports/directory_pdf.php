@@ -16,7 +16,6 @@ $typeName = match($filters['type'] ?? 'all') {
 };
 
 $searchQuery = trim($filters['search'] ?? '');
-$statusFilter = ucfirst($filters['status'] ?? 'all');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -224,14 +223,14 @@ $statusFilter = ucfirst($filters['status'] ?? 'all');
             <a href="<?= \Core\Helper::baseUrl('reports/directory') . '?' . http_build_query($filters); ?>" class="btn btn-outline-secondary btn-sm me-2">
                 <i class="bi bi-arrow-left"></i> Back to Report View
             </a>
-            <span class="text-muted small">Print Preview Mode</span>
+            <span class="text-muted small">PDF Print Ready Document</span>
         </div>
         <div class="d-flex gap-2">
             <a href="<?= \Core\Helper::baseUrl('reports/directory/export') . '?' . http_build_query(array_merge($filters, ['format' => 'excel'])); ?>" class="btn btn-outline-success btn-sm font-weight-bold">
                 <i class="bi bi-file-earmark-excel"></i> Export Excel
             </a>
-            <button onclick="window.print()" class="btn btn-primary btn-sm font-weight-bold">
-                <i class="bi bi-printer-fill"></i> Print Report Now
+            <button onclick="window.print()" class="btn btn-danger btn-sm font-weight-bold">
+                <i class="bi bi-file-earmark-pdf-fill"></i> Save as PDF / Print Document
             </button>
         </div>
     </div>
@@ -266,7 +265,6 @@ $statusFilter = ucfirst($filters['status'] ?? 'all');
                 <div class="col-6">
                     <div><strong>Category Filter:</strong> <?= htmlspecialchars($typeName); ?></div>
                     <div><strong>Search Term:</strong> <?= $searchQuery !== '' ? '<span class="fw-bold text-success">"' . htmlspecialchars($searchQuery) . '"</span>' : 'All Records (No Search Filter)'; ?></div>
-                    <div><strong>Status Filter:</strong> <?= htmlspecialchars($statusFilter); ?></div>
                 </div>
                 <div class="col-6 text-end">
                     <div><strong>Date & Time Generated:</strong> <?= htmlspecialchars($generatedAt); ?></div>
@@ -281,21 +279,19 @@ $statusFilter = ucfirst($filters['status'] ?? 'all');
             <thead>
                 <tr>
                     <th style="width: 25px;" class="text-center">#</th>
-                    <th style="width: 75px;">Category</th>
-                    <th style="width: 85px;">Code / No</th>
-                    <th style="width: 160px;">Full Name</th>
-                    <th style="width: 90px;">Username</th>
-                    <th style="width: 95px;">Phone</th>
-                    <th style="width: 95px;">NIC / Reg No</th>
+                    <th style="width: 80px;">Category</th>
+                    <th style="width: 100px;">Code / No</th>
+                    <th style="width: 180px;">Full Name</th>
+                    <th style="width: 100px;">Phone</th>
+                    <th style="width: 110px;">NIC / Reg No</th>
                     <th>Address</th>
-                    <th style="width: 90px;">City</th>
-                    <th style="width: 55px;" class="text-center">Status</th>
+                    <th style="width: 100px;">City</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($records)): ?>
                     <tr>
-                        <td colspan="10" class="text-center py-4 text-muted">
+                        <td colspan="8" class="text-center py-4 text-muted">
                             No directory records match the search filter "<?= htmlspecialchars($searchQuery); ?>".
                         </td>
                     </tr>
@@ -327,13 +323,6 @@ $statusFilter = ucfirst($filters['status'] ?? 'all');
                                     }
                                 ?>
                             </td>
-                            <td class="font-monospace">
-                                <?php if (!empty($row['username'])): ?>
-                                    @<?= htmlspecialchars($row['username']); ?>
-                                <?php else: ?>
-                                    -
-                                <?php endif; ?>
-                            </td>
                             <td><?= htmlspecialchars($row['phone'] ?? '-') ?: '-'; ?></td>
                             <td class="font-monospace"><?= htmlspecialchars($row['nic'] ?? '-') ?: '-'; ?></td>
                             <td>
@@ -356,13 +345,6 @@ $statusFilter = ucfirst($filters['status'] ?? 'all');
                                     }
                                 ?>
                             </td>
-                            <td class="text-center fw-bold small">
-                                <?php if (strtolower($row['status'] ?? 'active') === 'active'): ?>
-                                    <span class="text-success">ACT</span>
-                                <?php else: ?>
-                                    <span class="text-danger">INA</span>
-                                <?php endif; ?>
-                            </td>
                         </tr>
                     <?php endforeach; ?>
                 <?php endif; ?>
@@ -372,7 +354,7 @@ $statusFilter = ucfirst($filters['status'] ?? 'all');
         <!-- Printable Footer -->
         <div class="mt-3 pt-2 border-top d-flex justify-content-between align-items-center text-muted" style="font-size: 9px;">
             <div>Agri Co-Op ERP | Central Directory Reporting Engine</div>
-            <div>Page 1 of 1 | Printable Record Count: <?= count($records); ?></div>
+            <div>Printable Record Count: <?= count($records); ?></div>
         </div>
     </div>
 

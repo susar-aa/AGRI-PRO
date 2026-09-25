@@ -24,7 +24,7 @@ $records = $records ?? [];
             <a href="<?= \Core\Helper::baseUrl('reports/directory/export') . '?' . http_build_query(array_merge($filters, ['format' => 'pdf'])); ?>" 
                target="_blank" 
                class="btn btn-danger btn-sm font-weight-bold d-flex align-items-center gap-1 shadow-sm">
-                <i class="bi bi-file-earmark-pdf-fill"></i> Print / PDF Export
+                <i class="bi bi-file-earmark-pdf-fill"></i> Export PDF
             </a>
         </div>
     </div>
@@ -78,8 +78,8 @@ $records = $records ?? [];
         <div class="card-body p-3 bg-light rounded-3">
             <form method="GET" action="<?= \Core\Helper::baseUrl('reports/directory'); ?>" class="row g-2 align-items-center">
                 <!-- Filter by Entity Type -->
-                <div class="col-md-3">
-                    <label class="form-label text-muted small font-weight-bold mb-1">Directory Filter</label>
+                <div class="col-md-4">
+                    <label class="form-label text-muted small font-weight-bold mb-1">Directory Category Filter</label>
                     <select name="type" class="form-select form-select-sm border-secondary-subtle">
                         <option value="all" <?= ($filters['type'] === 'all' || empty($filters['type'])) ? 'selected' : ''; ?>>All Categories (Directors, Members, Staff, Customers)</option>
                         <option value="director" <?= ($filters['type'] === 'director' || $filters['type'] === 'directors') ? 'selected' : ''; ?>>Directors Only</option>
@@ -90,7 +90,7 @@ $records = $records ?? [];
                 </div>
 
                 <!-- Search Input -->
-                <div class="col-md-5">
+                <div class="col-md-6">
                     <label class="form-label text-muted small font-weight-bold mb-1">Search Name, Address, Phone, NIC...</label>
                     <div class="input-group input-group-sm">
                         <span class="input-group-text bg-white"><i class="bi bi-search text-muted"></i></span>
@@ -100,16 +100,6 @@ $records = $records ?? [];
                                class="form-control" 
                                placeholder="e.g., Rambukkana, Member No, Name, Phone..." />
                     </div>
-                </div>
-
-                <!-- Status Filter -->
-                <div class="col-md-2">
-                    <label class="form-label text-muted small font-weight-bold mb-1">Status</label>
-                    <select name="status" class="form-select form-select-sm border-secondary-subtle">
-                        <option value="all" <?= ($filters['status'] === 'all' || empty($filters['status'])) ? 'selected' : ''; ?>>All Status</option>
-                        <option value="active" <?= ($filters['status'] === 'active') ? 'selected' : ''; ?>>Active Only</option>
-                        <option value="inactive" <?= ($filters['status'] === 'inactive') ? 'selected' : ''; ?>>Inactive Only</option>
-                    </select>
                 </div>
 
                 <!-- Action Buttons -->
@@ -123,7 +113,7 @@ $records = $records ?? [];
                 </div>
             </form>
 
-            <?php if (!empty($filters['search']) || ($filters['type'] !== 'all' && !empty($filters['type'])) || ($filters['status'] !== 'all' && !empty($filters['status']))): ?>
+            <?php if (!empty($filters['search']) || ($filters['type'] !== 'all' && !empty($filters['type']))): ?>
                 <div class="mt-2 pt-2 border-top d-flex align-items-center gap-2">
                     <span class="small text-muted font-weight-bold">Active Filters:</span>
                     <?php if (!empty($filters['type']) && $filters['type'] !== 'all'): ?>
@@ -131,9 +121,6 @@ $records = $records ?? [];
                     <?php endif; ?>
                     <?php if (!empty($filters['search'])): ?>
                         <span class="badge bg-success text-white font-weight-normal">Search: "<?= htmlspecialchars($filters['search']); ?>"</span>
-                    <?php endif; ?>
-                    <?php if (!empty($filters['status']) && $filters['status'] !== 'all'): ?>
-                        <span class="badge bg-info text-dark font-weight-normal">Status: <?= ucfirst($filters['status']); ?></span>
                     <?php endif; ?>
                     <span class="small text-muted ms-auto">Showing <?= count($records); ?> record(s)</span>
                 </div>
@@ -149,21 +136,19 @@ $records = $records ?? [];
                     <thead class="table-dark">
                         <tr>
                             <th class="ps-3 text-center" style="width: 50px;">#</th>
-                            <th style="width: 110px;">Category</th>
-                            <th style="width: 120px;">Code / No</th>
+                            <th style="width: 120px;">Category</th>
+                            <th style="width: 140px;">Code / No</th>
                             <th>Full Name</th>
-                            <th style="width: 130px;">Username</th>
-                            <th style="width: 130px;">Phone Number</th>
-                            <th style="width: 130px;">NIC / Reg No</th>
+                            <th style="width: 150px;">Phone Number</th>
+                            <th style="width: 150px;">NIC / Reg No</th>
                             <th>Address</th>
-                            <th style="width: 130px;">City</th>
-                            <th class="text-center pe-3" style="width: 90px;">Status</th>
+                            <th style="width: 150px;">City</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($records)): ?>
                             <tr>
-                                <td colspan="10" class="text-center py-5 text-muted">
+                                <td colspan="8" class="text-center py-5 text-muted">
                                     <i class="bi bi-inbox display-6 d-block text-secondary mb-2"></i>
                                     <span class="font-weight-bold">No Directory Records Found</span><br>
                                     <small>Try broadening your search term or clearing filters.</small>
@@ -188,20 +173,13 @@ $records = $records ?? [];
                                     </td>
                                     <td class="font-monospace fw-bold text-primary"><?= htmlspecialchars($row['code'] ?? '-'); ?></td>
                                     <td class="fw-bold text-dark"><?= htmlspecialchars($row['name'] ?? '-'); ?></td>
-                                    <td>
-                                        <?php if (!empty($row['username'])): ?>
-                                            <span class="badge bg-light text-dark border font-monospace">@<?= htmlspecialchars($row['username']); ?></span>
-                                        <?php else: ?>
-                                            <span class="text-muted small">-</span>
-                                        <?php endif; ?>
-                                    </td>
                                     <td><?= htmlspecialchars($row['phone'] ?? '-') ?: '-'; ?></td>
                                     <td class="font-monospace small"><?= htmlspecialchars($row['nic'] ?? '-') ?: '-'; ?></td>
                                     <td>
                                         <?php 
                                             $addr = $row['address'] ?? '';
                                             if (!empty($filters['search']) && stripos($addr, $filters['search']) !== false) {
-                                                echo '<span class="bg-warning-subtle text-dark px-1 roundedfw-bold">' . htmlspecialchars($addr) . '</span>';
+                                                echo '<span class="bg-warning-subtle text-dark px-1 rounded fw-bold">' . htmlspecialchars($addr) . '</span>';
                                             } else {
                                                 echo htmlspecialchars($addr ?: '-');
                                             }
@@ -216,13 +194,6 @@ $records = $records ?? [];
                                                 echo htmlspecialchars($city ?: '-');
                                             }
                                         ?>
-                                    </td>
-                                    <td class="text-center pe-3">
-                                        <?php if (strtolower($row['status'] ?? 'active') === 'active'): ?>
-                                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">Active</span>
-                                        <?php else: ?>
-                                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">Inactive</span>
-                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

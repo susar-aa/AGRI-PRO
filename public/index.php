@@ -78,6 +78,7 @@ $router->get('/accounting/trial-balance', [JournalController::class, 'trialBalan
 $router->get('/cost-centers', [CostCenterController::class, 'index']);
 $router->post('/cost-centers/store', [CostCenterController::class, 'store']);
 $router->get('/admin/company', [SettingsController::class, 'company']);
+$router->post('/admin/company/update', [SettingsController::class, 'updateCompany']);
 $router->get('/system/customer-activities', [CustomerActivityController::class, 'index']);
 $router->post('/system/customer-activities/store', [CustomerActivityController::class, 'store']);
 
