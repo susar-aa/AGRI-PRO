@@ -163,7 +163,7 @@ class InvoiceController extends Controller {
             $hasAny = $db->query("SELECT id FROM services LIMIT 1")->fetchColumn();
             if (!$hasAny) {
                 $revAccId = (int)$db->query("SELECT id FROM accounts WHERE account_code IN ('4200', '4100', '4300', '4000') ORDER BY account_code ASC LIMIT 1")->fetchColumn() ?: 37;
-                $db->exec("INSERT INTO services (service_code, service_name, description, unit, default_price, revenue_account_id, is_active, created_by) VALUES ('SRV-MACH-RNT', 'Machinery & Equipment Rental Service', 'Machinery rental billing', 'Hour', 0.00, {$revAccId}, 1, 1)");
+                $db->exec("INSERT INTO services (service_code, service_name, description, unit, default_price, is_active) VALUES ('SRV-MACH-RNT', 'Machinery & Equipment Rental Service', 'Machinery rental billing', 'Hour', 0.00, 1)");
                 $services = $db->query("SELECT s.id, s.service_code, s.service_name, s.unit, s.default_price, s.id AS service_id, s.description FROM services s WHERE s.is_active = 1 ORDER BY s.service_name ASC")->fetchAll();
             }
         }
@@ -248,7 +248,7 @@ class InvoiceController extends Controller {
             $hasAny = $db->query("SELECT id FROM services LIMIT 1")->fetchColumn();
             if (!$hasAny) {
                 $revAccId = (int)$db->query("SELECT id FROM accounts WHERE account_code IN ('4200', '4100', '4300', '4000') ORDER BY account_code ASC LIMIT 1")->fetchColumn() ?: 37;
-                $db->exec("INSERT INTO services (service_code, service_name, description, unit, default_price, revenue_account_id, is_active, created_by) VALUES ('SRV-MACH-RNT', 'Machinery & Equipment Rental Service', 'Machinery rental billing', 'Hour', 0.00, {$revAccId}, 1, 1)");
+                $db->exec("INSERT INTO services (service_code, service_name, description, unit, default_price, is_active) VALUES ('SRV-MACH-RNT', 'Machinery & Equipment Rental Service', 'Machinery rental billing', 'Hour', 0.00, 1)");
                 $services = $db->query("SELECT s.id, s.service_code, s.service_name, s.unit, s.default_price, s.id AS service_id, s.description FROM services s WHERE s.is_active = 1 ORDER BY s.service_name ASC")->fetchAll();
             }
         }
