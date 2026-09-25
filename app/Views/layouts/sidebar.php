@@ -3,6 +3,7 @@ $activeNav = $activeNav ?? 'dashboard';
 
 // Determine which accordion groups should be open based on active nav
 $openParties  = in_array($activeNav, ['directory', 'customers', 'suppliers']);
+$openReports  = in_array($activeNav, ['reports_directory', 'reports']);
 $openInventory= in_array($activeNav, ['marketplace_products', 'products']);
 $openOps      = in_array($activeNav, ['marketplace', 'ops_plantation', 'ops_machinery', 'ops_fruit_packing', 'ops_brick_manufacturing', 'ops_construction', 'ops_grinding_mill', 'services', 'fixed_deposits']);
 $openSales    = in_array($activeNav, ['invoices', 'receipts', 'expenses', 'grn', 'coa', 'journal_entries', 'general_ledger', 'trial_balance']);
@@ -44,6 +45,19 @@ $openSystem   = in_array($activeNav, ['cost_centers', 'users', 'company_settings
             </div>
         </li>
 
+
+        <!-- REPORTS GROUP -->
+        <li class="menu-item">
+            <a href="#reportsGroup" class="menu-link menu-group-toggle <?= $openReports ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" aria-expanded="<?= $openReports ? 'true' : 'false'; ?>">
+                <i class="bi bi-file-earmark-bar-graph"></i> <span>Reports</span>
+                <i class="bi bi-chevron-down ms-auto toggle-icon"></i>
+            </a>
+            <div id="reportsGroup" class="collapse <?= $openReports ? 'show' : ''; ?>">
+                <ul class="submenu-list">
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/directory'); ?>" class="submenu-link <?= $activeNav === 'reports_directory' ? 'active' : ''; ?>"><i class="bi bi-journal-text"></i> Directory Report</a></li>
+                </ul>
+            </div>
+        </li>
 
         <!-- SALES & FINANCE GROUP -->
         <li class="menu-item">

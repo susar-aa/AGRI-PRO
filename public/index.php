@@ -41,6 +41,7 @@ use App\Controllers\BankController;
 use App\Controllers\MemberController;
 use App\Controllers\DirectorController;
 use App\Controllers\FDController;
+use App\Controllers\ReportController;
 
 $router = new Router();
 
@@ -258,6 +259,10 @@ $router->post('/modules/fixed-deposits/store', [FDController::class, 'store']);
 $router->get('/modules/fixed-deposits/view', [FDController::class, 'view']);
 $router->post('/modules/fixed-deposits/mature', [FDController::class, 'processMaturity']);
 $router->post('/modules/fixed-deposits/premature-close', [FDController::class, 'prematureClose']);
+
+// Central Directory Reporting Routing
+$router->get('/reports/directory', [ReportController::class, 'directory']);
+$router->get('/reports/directory/export', [ReportController::class, 'exportDirectory']);
 
 // Users Management Routing
 $router->get('/modules/users', [UserController::class, 'index']);
