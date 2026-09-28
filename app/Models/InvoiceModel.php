@@ -32,7 +32,7 @@ class InvoiceModel extends Model {
         if (!empty($invoice['notes']) && preg_match('/\[Customer:\s*([^\]]+)\]/', $invoice['notes'], $matches)) {
             $customName = trim($matches[1]);
             $invoice['custom_customer_name'] = $customName;
-            if (empty($invoice['party_code']) || $invoice['party_code'] === 'PTY-WALKIN') {
+            if (empty($invoice['party_code']) || $invoice['party_code'] === 'PTY-WALKIN' || stripos($invoice['customer_name'] ?? '', 'Walk') !== false) {
                 $invoice['customer_name'] = $customName;
             } else {
                 $invoice['customer_name'] = $customName . ' (' . $invoice['customer_name'] . ')';
@@ -107,7 +107,7 @@ class InvoiceModel extends Model {
             if (!empty($inv['notes']) && preg_match('/\[Customer:\s*([^\]]+)\]/', $inv['notes'], $matches)) {
                 $customName = trim($matches[1]);
                 $inv['custom_customer_name'] = $customName;
-                if (empty($inv['party_code']) || $inv['party_code'] === 'PTY-WALKIN') {
+                if (empty($inv['party_code']) || $inv['party_code'] === 'PTY-WALKIN' || stripos($inv['customer_name'] ?? '', 'Walk') !== false) {
                     $inv['customer_name'] = $customName;
                 } else {
                     $inv['customer_name'] = $customName . ' (' . $inv['customer_name'] . ')';
