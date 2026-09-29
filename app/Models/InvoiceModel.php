@@ -156,7 +156,7 @@ class InvoiceModel extends Model {
     }
 
     public function generateInvoiceNumber(): string {
-        $prefix = 'INV - ';
+        $prefix = 'EXP ';
         $stmt = $this->db->prepare("SELECT invoice_number FROM invoices WHERE invoice_number LIKE :prefix ORDER BY id DESC LIMIT 1");
         $stmt->execute(['prefix' => $prefix . '%']);
         $lastNum = $stmt->fetchColumn();
