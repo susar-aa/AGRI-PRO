@@ -76,6 +76,13 @@ class BankController extends Controller {
     public function store(): void {
         $this->validateCsrf();
         
+        $accountId = !empty($_POST['account_id']) ? (int)$_POST['account_id'] : 0;
+        if (!$accountId) {
+            $db = Database::getInstance();
+            $accStmt = $db->query("SELECT id FROM accounts WHERE account_code LIKE '1120%' OR (category = 'Asset' AND account_name LIKE '%Bank%') LIMIT 1");
+            $accountId = (int)($accStmt->fetchColumn() ?: 10);
+        }
+
         $data = [
             'id' => !empty($_POST['id']) ? (int)$_POST['id'] : null,
             'bank_name' => trim($_POST['bank_name'] ?? ''),
@@ -83,7 +90,7 @@ class BankController extends Controller {
             'account_number' => trim($_POST['account_number'] ?? ''),
             'account_name' => trim($_POST['account_name'] ?? ''),
             'swift_code' => trim($_POST['swift_code'] ?? ''),
-            'account_id' => !empty($_POST['account_id']) ? (int)$_POST['account_id'] : 0,
+            'account_id' => $accountId,
             'opening_balance' => (float)($_POST['opening_balance'] ?? 0),
             'status' => $_POST['status'] ?? 'active'
         ];

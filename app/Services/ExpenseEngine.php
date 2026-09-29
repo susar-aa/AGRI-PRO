@@ -68,27 +68,31 @@ class ExpenseEngine {
         if ($paymentMethod === 'Cash') {
             $cashAccountId = !empty($data['cash_account_id']) ? (int)$data['cash_account_id'] : null;
             if (!$cashAccountId) {
+                $cashAccountId = (int)($db->query("SELECT id FROM cash_accounts WHERE status = 'active' LIMIT 1")->fetchColumn() ?: 0);
+            }
+            if (!$cashAccountId) {
                 throw new Exception("Cash account is required for cash payments.");
             }
             $cashStmt = $db->prepare("SELECT account_id FROM cash_accounts WHERE id = :id LIMIT 1");
             $cashStmt->execute(['id' => $cashAccountId]);
-            $creditAccountId = (int)$cashStmt->fetchColumn();
+            $creditAccountId = (int)($cashStmt->fetchColumn() ?: 0);
             if (!$creditAccountId) {
-                throw new Exception("Invalid cash account.");
+                $accStmt = $db->query("SELECT id FROM accounts WHERE account_code = '1110' LIMIT 1");
+                $creditAccountId = (int)($accStmt->fetchColumn() ?: 9);
+                $db->exec("UPDATE cash_accounts SET account_id = {$creditAccountId} WHERE id = {$cashAccountId}");
             }
         } elseif ($paymentMethod === 'Credit') {
             // Accounts Payable (normally account code '2110', which is ID 20 from seeders)
             $apStmt = $db->prepare("SELECT id FROM accounts WHERE account_code = '2110' LIMIT 1");
             $apStmt->execute();
-            $creditAccountId = (int)$apStmt->fetchColumn();
-            if (!$creditAccountId) {
-                // Fallback to accounts payable if id is different
-                $creditAccountId = 20; 
-            }
+            $creditAccountId = (int)($apStmt->fetchColumn() ?: 20);
             $apAccountId = $creditAccountId;
         } else {
             // Bank transfer, cheque, card, online
             $bankAccountId = !empty($data['bank_account_id']) ? (int)$data['bank_account_id'] : null;
+            if (!$bankAccountId) {
+                $bankAccountId = (int)($db->query("SELECT id FROM bank_accounts WHERE status = 'active' LIMIT 1")->fetchColumn() ?: 0);
+            }
             if (!$bankAccountId) {
                 throw new Exception("Bank account is required for bank/electronic payments.");
             }
@@ -96,16 +100,19 @@ class ExpenseEngine {
             if ($paymentMethod === 'Cheque') {
                 $chqStmt = $db->prepare("SELECT id FROM accounts WHERE account_code = '2115' LIMIT 1");
                 $chqStmt->execute();
-                $creditAccountId = (int)$chqStmt->fetchColumn();
+                $creditAccountId = (int)($chqStmt->fetchColumn() ?: 0);
                 if (!$creditAccountId) {
-                    throw new Exception("Pending Issued Cheques account (2115) is missing in Chart of Accounts.");
+                    $chqStmt = $db->query("SELECT id FROM accounts WHERE account_code = '2110' OR category = 'Liability' LIMIT 1");
+                    $creditAccountId = (int)($chqStmt->fetchColumn() ?: 20);
                 }
             } else {
                 $bankStmt = $db->prepare("SELECT account_id FROM bank_accounts WHERE id = :id LIMIT 1");
                 $bankStmt->execute(['id' => $bankAccountId]);
-                $creditAccountId = (int)$bankStmt->fetchColumn();
+                $creditAccountId = (int)($bankStmt->fetchColumn() ?: 0);
                 if (!$creditAccountId) {
-                    throw new Exception("Invalid bank account.");
+                    $accStmt = $db->query("SELECT id FROM accounts WHERE account_code LIKE '1120%' OR (category = 'Asset' AND account_name LIKE '%Bank%') LIMIT 1");
+                    $creditAccountId = (int)($accStmt->fetchColumn() ?: 10);
+                    $db->exec("UPDATE bank_accounts SET account_id = {$creditAccountId} WHERE id = {$bankAccountId}");
                 }
             }
         }
@@ -277,17 +284,37 @@ class ExpenseEngine {
         // Get credit account (Cash, Bank, or AP)
         $creditAccountId = null;
         if ($exp['payment_method'] === 'Cash') {
-            $cashStmt = $db->prepare("SELECT account_id FROM cash_accounts WHERE id = :id LIMIT 1");
-            $cashStmt->execute(['id' => (int)$exp['cash_account_id']]);
-            $creditAccountId = (int)$cashStmt->fetchColumn();
+            $cashAccId = !empty($exp['cash_account_id']) ? (int)$exp['cash_account_id'] : (int)($db->query("SELECT id FROM cash_accounts WHERE status = 'active' LIMIT 1")->fetchColumn() ?: 0);
+            if ($cashAccId) {
+                $cashStmt = $db->prepare("SELECT account_id FROM cash_accounts WHERE id = :id LIMIT 1");
+                $cashStmt->execute(['id' => $cashAccId]);
+                $creditAccountId = (int)($cashStmt->fetchColumn() ?: 0);
+            }
+            if (!$creditAccountId) {
+                $accStmt = $db->query("SELECT id FROM accounts WHERE account_code = '1110' LIMIT 1");
+                $creditAccountId = (int)($accStmt->fetchColumn() ?: 9);
+                if ($cashAccId) {
+                    $db->exec("UPDATE cash_accounts SET account_id = {$creditAccountId} WHERE id = {$cashAccId}");
+                }
+            }
         } elseif ($exp['payment_method'] === 'Credit') {
             $apStmt = $db->prepare("SELECT id FROM accounts WHERE account_code = '2110' LIMIT 1");
             $apStmt->execute();
-            $creditAccountId = (int)$apStmt->fetchColumn() ?: 20;
+            $creditAccountId = (int)($apStmt->fetchColumn() ?: 20);
         } else {
-            $bankStmt = $db->prepare("SELECT account_id FROM bank_accounts WHERE id = :id LIMIT 1");
-            $bankStmt->execute(['id' => (int)$exp['bank_account_id']]);
-            $creditAccountId = (int)$bankStmt->fetchColumn();
+            $bankAccId = !empty($exp['bank_account_id']) ? (int)$exp['bank_account_id'] : (int)($db->query("SELECT id FROM bank_accounts WHERE status = 'active' LIMIT 1")->fetchColumn() ?: 0);
+            if ($bankAccId) {
+                $bankStmt = $db->prepare("SELECT account_id FROM bank_accounts WHERE id = :id LIMIT 1");
+                $bankStmt->execute(['id' => $bankAccId]);
+                $creditAccountId = (int)($bankStmt->fetchColumn() ?: 0);
+            }
+            if (!$creditAccountId) {
+                $accStmt = $db->query("SELECT id FROM accounts WHERE account_code LIKE '1120%' OR (category = 'Asset' AND account_name LIKE '%Bank%') LIMIT 1");
+                $creditAccountId = (int)($accStmt->fetchColumn() ?: 10);
+                if ($bankAccId) {
+                    $db->exec("UPDATE bank_accounts SET account_id = {$creditAccountId} WHERE id = {$bankAccId}");
+                }
+            }
         }
 
         if (!$creditAccountId) {
@@ -334,11 +361,17 @@ class ExpenseEngine {
 
             // Update cash or bank account current balance if applicable
             if ($exp['payment_method'] === 'Cash') {
-                $updBal = $db->prepare("UPDATE cash_accounts SET current_balance = current_balance - :amount WHERE id = :id");
-                $updBal->execute(['amount' => $exp['amount'], 'id' => $exp['cash_account_id']]);
+                $cashAccIdToUpd = !empty($exp['cash_account_id']) ? (int)$exp['cash_account_id'] : (int)($db->query("SELECT id FROM cash_accounts WHERE status = 'active' LIMIT 1")->fetchColumn() ?: 0);
+                if ($cashAccIdToUpd) {
+                    $updBal = $db->prepare("UPDATE cash_accounts SET current_balance = current_balance - :amount WHERE id = :id");
+                    $updBal->execute(['amount' => $exp['amount'], 'id' => $cashAccIdToUpd]);
+                }
             } elseif ($exp['payment_method'] !== 'Credit' && $exp['payment_method'] !== 'Cheque') {
-                $updBal = $db->prepare("UPDATE bank_accounts SET current_balance = current_balance - :amount WHERE id = :id");
-                $updBal->execute(['amount' => $exp['amount'], 'id' => $exp['bank_account_id']]);
+                $bankAccIdToUpd = !empty($exp['bank_account_id']) ? (int)$exp['bank_account_id'] : (int)($db->query("SELECT id FROM bank_accounts WHERE status = 'active' LIMIT 1")->fetchColumn() ?: 0);
+                if ($bankAccIdToUpd) {
+                    $updBal = $db->prepare("UPDATE bank_accounts SET current_balance = current_balance - :amount WHERE id = :id");
+                    $updBal->execute(['amount' => $exp['amount'], 'id' => $bankAccIdToUpd]);
+                }
             }
 
             // Update expense record status
