@@ -41,7 +41,19 @@ class ExpenseEngine {
         // Resolve Debit Account (Expense Account)
         $catStmt = $db->prepare("SELECT linked_account_id FROM expense_categories WHERE id = :id LIMIT 1");
         $catStmt->execute(['id' => $categoryId]);
-        $linkedAcc = (int)$catStmt->fetchColumn();
+        $linkedAcc = (int)($catStmt->fetchColumn() ?: 0);
+        if (!$linkedAcc) {
+            // Auto fallback to '6990' (Other Operating Expenses) or general expense account
+            $accStmt = $db->query("SELECT id FROM accounts WHERE account_code = '6990' LIMIT 1");
+            $linkedAcc = (int)($accStmt->fetchColumn() ?: 0);
+            if (!$linkedAcc) {
+                $accStmt = $db->query("SELECT id FROM accounts WHERE category = 'Expense' OR account_code LIKE '6%' LIMIT 1");
+                $linkedAcc = (int)($accStmt->fetchColumn() ?: 61);
+            }
+            if ($linkedAcc && $categoryId) {
+                $db->exec("UPDATE expense_categories SET linked_account_id = {$linkedAcc} WHERE id = {$categoryId}");
+            }
+        }
         if (!$linkedAcc) {
             throw new Exception("Selected expense category is invalid or missing linked account.");
         }

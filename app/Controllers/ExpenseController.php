@@ -400,8 +400,20 @@ class ExpenseController extends Controller {
 
         try {
             $db = \Core\Database::getInstance();
-            $stmt = $db->prepare("INSERT INTO expense_categories (name, is_active) VALUES (:name, 1)");
-            $stmt->execute(['name' => $name]);
+            
+            $linkedAccountId = !empty($_POST['linked_account_id']) ? (int)$_POST['linked_account_id'] : 0;
+            if (!$linkedAccountId) {
+                // Find account code 6990 or first expense account
+                $accStmt = $db->query("SELECT id FROM accounts WHERE account_code = '6990' LIMIT 1");
+                $linkedAccountId = (int)($accStmt->fetchColumn() ?: 0);
+                if (!$linkedAccountId) {
+                    $accStmt = $db->query("SELECT id FROM accounts WHERE category = 'Expense' OR account_code LIKE '6%' LIMIT 1");
+                    $linkedAccountId = (int)($accStmt->fetchColumn() ?: 61);
+                }
+            }
+
+            $stmt = $db->prepare("INSERT INTO expense_categories (name, linked_account_id, is_active) VALUES (:name, :linked_account_id, 1)");
+            $stmt->execute(['name' => $name, 'linked_account_id' => $linkedAccountId]);
             $id = $db->lastInsertId();
             
             echo json_encode([
@@ -410,6 +422,7 @@ class ExpenseController extends Controller {
                 'name' => $name
             ]);
         } catch (\Exception $e) {
+            error_log("apiAddCategory error: " . $e->getMessage());
             echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
         }
     }
