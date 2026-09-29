@@ -257,6 +257,7 @@ class ExpenseController extends Controller {
             }
 
         } catch (\Exception $e) {
+            error_log("Expense recording failed: " . $e->getMessage() . "\n" . $e->getTraceAsString());
             Session::setFlash('error', 'Expense recording failed: ' . $e->getMessage());
             if (!empty($_POST['redirect_to'])) {
                 Helper::redirect($_POST['redirect_to']);
