@@ -87,6 +87,8 @@ $router->get('/expenses', [ExpenseController::class, 'index']);
 $router->get('/expenses/view', [ExpenseController::class, 'view']);
 $router->get('/expenses/create', [ExpenseController::class, 'create']);
 $router->post('/expenses/store', [ExpenseController::class, 'store']);
+$router->get('/expenses/edit', [ExpenseController::class, 'edit']);
+$router->post('/expenses/update', [ExpenseController::class, 'update']);
 $router->post('/expenses/submit', [ExpenseController::class, 'submit']);
 $router->post('/expenses/approve', [ExpenseController::class, 'approve']);
 $router->post('/expenses/post', [ExpenseController::class, 'post']);

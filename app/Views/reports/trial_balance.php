@@ -35,7 +35,7 @@ $isBalanced = abs($totDebit - $totCredit) < 0.01;
             <p class="text-muted small mb-0">Debit & Credit equality verification across all active general ledger accounts</p>
         </div>
         <div class="d-flex gap-2">
-            <a href="<?= \Core\Helper::baseUrl('reports/print-preview?' . http_build_query(array_merge($_GET, ['type' => 'trial_balance']))); ?>" 
+            <a href="<?= \Core\Helper::baseUrl('reports/print-preview?' . http_build_query(array_merge($_GET, ['type' => 'trial_balance', 'orientation' => 'portrait']))); ?>" 
                target="_blank" 
                class="btn btn-dark btn-sm shadow-sm d-flex align-items-center gap-1 font-weight-bold">
                 <i class="bi bi-printer-fill text-warning"></i> Print Preview
@@ -49,6 +49,18 @@ $isBalanced = abs($totDebit - $totCredit) < 0.01;
             </button>
         </div>
     </div>
+
+    <style>
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 10mm 10mm 12mm 10mm;
+            }
+            body {
+                font-size: 8.5pt !important;
+            }
+        }
+    </style>
 
     <!-- Official Cooperative Letterhead Header (Visible in Direct Browser Print) -->
     <div class="d-none d-print-block mb-3 border-bottom pb-2">

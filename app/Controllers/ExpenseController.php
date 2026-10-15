@@ -267,6 +267,127 @@ class ExpenseController extends Controller {
         }
     }
 
+    public function edit(): void {
+        Auth::requirePermission('expenses.edit');
+
+        $id = !empty($_GET['id']) ? (int)$_GET['id'] : 0;
+        $expense = $this->expenseModel->getById($id);
+
+        if (!$expense) {
+            Session::setFlash('error', 'Expense voucher not found.');
+            Helper::redirect('expenses');
+        }
+
+        if (in_array($expense['status'], ['cancelled', 'reversed'])) {
+            Session::setFlash('error', "Cannot edit a {$expense['status']} expense voucher.");
+            Helper::redirect('expenses/view?id=' . $id);
+        }
+
+        $categories = $this->expenseModel->getAllCategories();
+        $costCenters = $this->costCenterModel->getActive();
+        $cashAccounts = $this->expenseModel->getCashAccounts();
+        $bankAccounts = $this->expenseModel->getBankAccounts();
+
+        $db = \Core\Database::getInstance();
+        $stmt = $db->prepare("SELECT id, party_code AS supplier_code, name AS name_en FROM parties WHERE party_type IN ('SUPPLIER', 'BOTH') AND status = 'active' ORDER BY name ASC");
+        $stmt->execute();
+        $suppliers = $stmt->fetchAll();
+
+        $serviceJobs = $db->query("SELECT id, job_number, description FROM service_jobs WHERE status IN ('OPEN', 'IN_PROGRESS') ORDER BY job_number DESC")->fetchAll();
+        $machinery = $db->query("SELECT id, machinery_code, machinery_name FROM machinery WHERE status != 'INACTIVE' ORDER BY machinery_name ASC")->fetchAll();
+        $machineryRentals = $db->query("SELECT id, rental_number FROM machinery_rentals WHERE status IN ('DRAFT', 'ACTIVE') ORDER BY rental_number DESC")->fetchAll();
+
+        $this->render('expenses/edit', [
+            'pageTitle' => 'Edit Expense Voucher #' . $expense['expense_number'],
+            'activeNav' => 'expenses',
+            'expense' => $expense,
+            'categories' => $categories,
+            'costCenters' => $costCenters,
+            'cashAccounts' => $cashAccounts,
+            'bankAccounts' => $bankAccounts,
+            'suppliers' => $suppliers,
+            'serviceJobs' => $serviceJobs,
+            'machinery' => $machinery,
+            'machineryRentals' => $machineryRentals
+        ]);
+    }
+
+    public function update(): void {
+        Auth::requirePermission('expenses.edit');
+        $this->validateCsrf();
+
+        $id = !empty($_POST['id']) ? (int)$_POST['id'] : 0;
+        $editReason = trim($_POST['edit_reason'] ?? '');
+
+        // 1. Prepare Data
+        $expenseData = [
+            'expense_date' => trim($_POST['expense_date'] ?? date('Y-m-d')),
+            'payee' => trim($_POST['payee'] ?? ''),
+            'supplier_id' => !empty($_POST['supplier_id']) ? (int)$_POST['supplier_id'] : null,
+            'expense_category_id' => !empty($_POST['expense_category_id']) ? (int)$_POST['expense_category_id'] : 0,
+            'description' => trim($_POST['description'] ?? ''),
+            'amount' => (float)($_POST['amount'] ?? 0),
+            'payment_method' => $_POST['payment_method'] ?? '',
+            'cash_account_id' => !empty($_POST['cash_account_id']) ? (int)$_POST['cash_account_id'] : null,
+            'bank_account_id' => !empty($_POST['bank_account_id']) ? (int)$_POST['bank_account_id'] : null,
+            'cost_center_id' => !empty($_POST['cost_center_id']) ? (int)$_POST['cost_center_id'] : null,
+            'reference_number' => trim($_POST['reference_number'] ?? ''),
+            'notes' => trim($_POST['notes'] ?? ''),
+            'project_id' => !empty($_POST['project_id']) ? (int)$_POST['project_id'] : null,
+            'batch_id' => !empty($_POST['batch_id']) ? (int)$_POST['batch_id'] : null,
+            'service_job_id' => !empty($_POST['service_job_id']) ? (int)$_POST['service_job_id'] : null,
+            'machinery_id' => !empty($_POST['machinery_id']) ? (int)$_POST['machinery_id'] : null,
+            'machinery_rental_id' => !empty($_POST['machinery_rental_id']) ? (int)$_POST['machinery_rental_id'] : null
+        ];
+
+        // 2. Handle File Attachment Upload if provided
+        if (isset($_FILES['attachment_file']) && $_FILES['attachment_file']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['attachment_file'];
+            $fileSize = $file['size'];
+            $fileType = $file['type'];
+            $origName = basename($file['name']);
+            
+            if ($fileSize > 5 * 1024 * 1024) {
+                Session::setFlash('error', 'File size exceeds maximum limit of 5MB.');
+                Helper::redirect('expenses/edit?id=' . $id);
+            }
+
+            $allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+            if (!in_array($fileType, $allowedTypes)) {
+                Session::setFlash('error', 'Invalid file type. Only PDF, JPG, JPEG, and PNG are allowed.');
+                Helper::redirect('expenses/edit?id=' . $id);
+            }
+
+            $ext = pathinfo($origName, PATHINFO_EXTENSION);
+            $storedName = 'exp_' . md5(uniqid((string)time(), true)) . '.' . $ext;
+            $uploadDir = 'c:/xampp/htdocs/AGRI PRO/public/uploads/expenses/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+            $targetPath = $uploadDir . $storedName;
+
+            if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+                $expenseData['attachment_file'] = [
+                    'original_name' => $origName,
+                    'stored_name' => $storedName,
+                    'file_path' => 'uploads/expenses/' . $storedName,
+                    'mime_type' => $fileType,
+                    'file_size' => $fileSize
+                ];
+            }
+        }
+
+        try {
+            ExpenseEngine::updateExpense($id, $expenseData, $editReason);
+            Session::setFlash('success', 'Expense voucher updated successfully.');
+            Helper::redirect('expenses/view?id=' . $id);
+        } catch (\Exception $e) {
+            error_log("Expense update failed: " . $e->getMessage());
+            Session::setFlash('error', 'Update failed: ' . $e->getMessage());
+            Helper::redirect('expenses/edit?id=' . $id);
+        }
+    }
+
     public function submit(): void {
         Auth::requirePermission('expenses.submit');
         $this->validateCsrf();

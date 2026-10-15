@@ -534,7 +534,7 @@ class ReportController extends Controller {
 
         $reportTitle = 'Executive Management Report';
         $reportSubtitle = 'Agri Co-Op Reporting Engine';
-        $orientation = 'landscape';
+        $orientation = 'portrait';
         $data = null;
         $periodLabel = "Period: {$fromDate} to {$toDate}";
         $scopeLabel = 'All Divisions / Society Wide';
@@ -554,7 +554,9 @@ class ReportController extends Controller {
                 $data = $this->journalModel->getTrialBalance($toDate, $fromDate, $costCenterId, $showZero);
                 $reportTitle = 'TRIAL BALANCE STATEMENT';
                 $reportSubtitle = 'Account Balances Double-Entry Audit Schedule';
-                $orientation = 'landscape';
+                $orientation = !empty($_GET['orientation']) && in_array(strtolower($_GET['orientation']), ['portrait', 'landscape'])
+                    ? strtolower($_GET['orientation'])
+                    : 'portrait';
                 $periodLabel = "As of: {$toDate}" . (!empty($fromDate) ? " (from {$fromDate})" : "");
                 break;
 
@@ -656,6 +658,10 @@ class ReportController extends Controller {
             default:
                 $reportTitle = strtoupper(str_replace('_', ' ', $type)) . ' REPORT';
                 break;
+        }
+
+        if (!empty($_GET['orientation']) && in_array(strtolower($_GET['orientation']), ['portrait', 'landscape'])) {
+            $orientation = strtolower($_GET['orientation']);
         }
 
         $this->renderAuthView('reports/print_preview', [

@@ -33,6 +33,12 @@
     <div class="d-flex gap-2 align-items-center">
         <?php $status = $expense['status']; ?>
         
+        <?php if (\Core\Auth::hasPermission('expenses.edit') && !in_array($status, ['cancelled', 'reversed'])): ?>
+            <a href="<?= \Core\Helper::baseUrl('expenses/edit?id=' . $expense['id']); ?>" class="btn btn-outline-primary rounded-pill px-3">
+                <i class="bi bi-pencil-square me-1"></i> Edit Voucher
+            </a>
+        <?php endif; ?>
+
         <?php if ($status === 'draft'): ?>
             <?php if (\Core\Auth::hasPermission('expenses.submit')): ?>
                 <form action="<?= \Core\Helper::baseUrl('expenses/submit'); ?>" method="POST" class="d-inline">

@@ -15,7 +15,7 @@ $contacts = implode(' / ', array_slice($company['contact_numbers'] ?? ['075 377 
 $reportType = $reportType ?? 'report';
 $reportTitle = $reportTitle ?? 'Financial & Operational Report';
 $reportSubtitle = $reportSubtitle ?? 'Cooperative Management Statement';
-$orientation = $orientation ?? 'landscape'; // 'landscape' or 'portrait'
+$orientation = $orientation ?? 'portrait'; // 'landscape' or 'portrait'
 $generatedBy = $generatedBy ?? 'System Officer';
 $generatedAt = $generatedAt ?? date('Y-m-d H:i:s');
 $periodLabel = $periodLabel ?? ('As of ' . date('Y-m-d'));
@@ -37,29 +37,34 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
             background-color: #f1f5f9;
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             color: #0f172a;
-            font-size: 11px;
             margin: 0;
             padding: 0;
         }
 
         /* Screen Toolbar */
         .toolbar {
-            max-width: <?= $orientation === 'landscape' ? '1180px' : '900px'; ?>;
+            max-width: <?= $orientation === 'portrait' ? '794px' : '1120px'; ?>;
             margin: 15px auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 10px;
+            padding: 0 5px;
         }
 
-        /* Document Container */
+        /* Document Container (Standard A4 Dimensions: 210mm x 297mm) */
         .document-container {
-            max-width: <?= $orientation === 'landscape' ? '1180px' : '900px'; ?>;
+            width: 100%;
+            max-width: <?= $orientation === 'portrait' ? '794px' : '1120px'; ?>;
+            min-height: <?= $orientation === 'portrait' ? '1123px' : '794px'; ?>;
             margin: 0 auto 30px auto;
             background: #ffffff;
-            padding: 30px 35px;
+            padding: <?= $orientation === 'portrait' ? '36px 40px' : '30px 35px'; ?>;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
             border-radius: 6px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         /* Official Society Letterhead */
@@ -70,14 +75,14 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
         }
 
         .society-title-si {
-            font-size: 17px;
+            font-size: 16px;
             font-weight: 700;
             color: #15803d;
             line-height: 1.2;
         }
 
         .society-title-en {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 800;
             color: #0f172a;
             letter-spacing: 0.5px;
@@ -85,7 +90,7 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
         }
 
         .society-sub {
-            font-size: 11px;
+            font-size: 10.5px;
             color: #475569;
             margin-top: 2px;
         }
@@ -93,8 +98,8 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
         .report-badge {
             background-color: #15803d;
             color: #ffffff;
-            padding: 6px 14px;
-            font-size: 12px;
+            padding: 5px 12px;
+            font-size: 11px;
             font-weight: 700;
             letter-spacing: 0.5px;
             display: inline-block;
@@ -107,17 +112,18 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
             background-color: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 4px;
-            padding: 10px 14px;
-            margin-bottom: 18px;
-            font-size: 11px;
+            padding: 8px 12px;
+            margin-bottom: 16px;
+            font-size: 10.5px;
         }
 
         /* Standardized High-Precision Printable Table */
         .print-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 10.5px;
+            font-size: 10px;
             margin-bottom: 20px;
+            table-layout: fixed;
         }
 
         .print-table th {
@@ -125,18 +131,20 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
             color: #ffffff !important;
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 9.5px;
-            padding: 6px 8px;
+            font-size: 9px;
+            padding: 6px 6px;
             border: 1px solid #0f172a;
             vertical-align: middle;
             letter-spacing: 0.3px;
         }
 
         .print-table td {
-            padding: 5px 8px;
+            padding: 4.5px 6px;
             border: 1px solid #cbd5e1;
             vertical-align: middle;
             line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .print-table tbody tr:nth-child(even) {
@@ -147,13 +155,14 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
             background-color: #0f172a !important;
             color: #ffffff !important;
             font-weight: 700;
-            padding: 7px 8px;
+            padding: 6px 6px;
             border: 1px solid #0f172a;
         }
 
         .num-cell {
             text-align: right;
             font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+            white-space: nowrap;
         }
 
         /* Triple Endorsement Signature Block */
@@ -170,32 +179,39 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
 
         .signature-line {
             border-top: 1.5px dotted #64748b;
-            margin: 40px auto 6px auto;
+            margin: 35px auto 6px auto;
             width: 85%;
         }
 
         .signature-title {
             font-weight: 700;
-            font-size: 10.5px;
+            font-size: 10px;
             color: #1e293b;
         }
 
         .signature-sub {
-            font-size: 9.5px;
+            font-size: 9px;
             color: #64748b;
         }
 
-        /* Print Media Styles */
+        /* Print Media Styles for Perfect A4 Output */
         @media print {
             @page {
                 size: A4 <?= $orientation; ?>;
-                margin: 8mm 10mm;
+                margin: <?= $orientation === 'portrait' ? '10mm 10mm 12mm 10mm' : '8mm 10mm 10mm 10mm'; ?>;
             }
 
-            body {
+            html, body {
+                background: #ffffff !important;
                 background-color: #ffffff !important;
-                font-size: 10px !important;
+                font-size: <?= $orientation === 'portrait' ? '8pt' : '9pt'; ?> !important;
                 color: #000000 !important;
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
 
             .no-print, .toolbar {
@@ -203,61 +219,122 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
             }
 
             .document-container {
+                width: 100% !important;
                 max-width: 100% !important;
+                min-height: auto !important;
+                height: auto !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 box-shadow: none !important;
                 border: none !important;
+                border-radius: 0 !important;
+                display: block !important;
+            }
+
+            .doc-body {
+                display: block !important;
+            }
+
+            .doc-footer {
+                display: block !important;
+                page-break-inside: avoid !important;
+                margin-top: 15pt !important;
             }
 
             .society-header {
-                border-bottom: 2pt solid #000000 !important;
+                border-bottom: 2pt solid #15803d !important;
+                margin-bottom: 8pt !important;
+                padding-bottom: 6pt !important;
+            }
+
+            .society-title-si {
+                font-size: 13pt !important;
+                color: #15803d !important;
+                line-height: 1.1 !important;
+            }
+
+            .society-title-en {
+                font-size: 11pt !important;
+                color: #000000 !important;
+                font-weight: 800 !important;
+            }
+
+            .society-sub {
+                font-size: 7.5pt !important;
+                line-height: 1.2 !important;
             }
 
             .report-badge {
-                background-color: #000000 !important;
+                background-color: #0f172a !important;
                 color: #ffffff !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                font-size: 8.5pt !important;
+                padding: 3pt 6pt !important;
             }
 
             .meta-strip {
                 background-color: #f8fafc !important;
-                border: 1pt solid #64748b !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                border: 0.5pt solid #64748b !important;
+                padding: 4pt 6pt !important;
+                margin-bottom: 8pt !important;
+                font-size: 7pt !important;
             }
 
             .print-table {
                 width: 100% !important;
-                font-size: 9.5px !important;
+                table-layout: fixed !important;
+                font-size: <?= $orientation === 'portrait' ? '7.5pt' : '8.5pt'; ?> !important;
+                margin-bottom: 8pt !important;
             }
 
             .print-table th {
                 background-color: #1e293b !important;
                 color: #ffffff !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-                font-size: 9px !important;
-                padding: 4px 6px !important;
-                border: 0.5pt solid #000000 !important;
+                font-size: <?= $orientation === 'portrait' ? '7pt' : '8pt'; ?> !important;
+                padding: 3pt 3pt !important;
+                border: 0.5pt solid #0f172a !important;
             }
 
             .print-table td {
-                padding: 3.5px 6px !important;
-                font-size: 9px !important;
-                border: 0.5pt solid #64748b !important;
+                padding: 2.5pt 3pt !important;
+                font-size: <?= $orientation === 'portrait' ? '7pt' : '8pt'; ?> !important;
+                border: 0.5pt solid #94a3b8 !important;
+                word-break: break-word !important;
             }
 
             .print-table tfoot td, .print-table tfoot th {
-                background-color: #000000 !important;
+                background-color: #0f172a !important;
                 color: #ffffff !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                font-size: <?= $orientation === 'portrait' ? '7.5pt' : '8.5pt'; ?> !important;
+                padding: 3pt 4pt !important;
+            }
+
+            .num-cell {
+                text-align: right !important;
+                white-space: nowrap !important;
+                font-size: <?= $orientation === 'portrait' ? '7pt' : '8pt'; ?> !important;
             }
 
             .signature-block {
-                margin-top: 25px !important;
+                margin-top: 15pt !important;
+                padding-top: 6pt !important;
+                border-top: 0.5pt dashed #94a3b8 !important;
+                page-break-inside: avoid !important;
+            }
+
+            .signature-line {
+                border-top: 0.75pt dotted #475569 !important;
+                margin: 20pt auto 3pt auto !important;
+                width: 75% !important;
+            }
+
+            .signature-title {
+                font-size: 7.5pt !important;
+                font-weight: 700 !important;
+            }
+
+            .signature-sub {
+                font-size: 6.5pt !important;
+                color: #475569 !important;
             }
 
             tr {
@@ -270,11 +347,21 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
 
     <!-- Floating Action Toolbar (Screen Only) -->
     <div class="toolbar no-print">
-        <div>
-            <a href="<?= htmlspecialchars($backUrl); ?>" class="btn btn-outline-secondary btn-sm me-2 shadow-sm">
+        <div class="d-flex align-items-center gap-2">
+            <a href="<?= htmlspecialchars($backUrl); ?>" class="btn btn-outline-secondary btn-sm shadow-sm">
                 <i class="bi bi-arrow-left"></i> Back to Report View
             </a>
-            <span class="badge bg-secondary font-monospace"><?= strtoupper($orientation); ?> A4</span>
+            <!-- 1-Click Orientation Toggle -->
+            <div class="btn-group btn-group-sm shadow-sm" role="group">
+                <a href="<?= \Core\Helper::baseUrl('reports/print-preview?' . http_build_query(array_merge($_GET, ['orientation' => 'portrait']))); ?>" 
+                   class="btn <?= $orientation === 'portrait' ? 'btn-success fw-bold text-white' : 'btn-outline-secondary'; ?>">
+                    <i class="bi bi-file-earmark-person"></i> A4 Portrait
+                </a>
+                <a href="<?= \Core\Helper::baseUrl('reports/print-preview?' . http_build_query(array_merge($_GET, ['orientation' => 'landscape']))); ?>" 
+                   class="btn <?= $orientation === 'landscape' ? 'btn-success fw-bold text-white' : 'btn-outline-secondary'; ?>">
+                    <i class="bi bi-file-earmark-ruled"></i> A4 Landscape
+                </a>
+            </div>
         </div>
         <div class="d-flex gap-2">
             <a href="<?= \Core\Helper::baseUrl('reports/export?' . http_build_query($_GET)); ?>" class="btn btn-outline-success btn-sm font-weight-bold shadow-sm">
@@ -288,7 +375,8 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
 
     <!-- Official Printable Document -->
     <div class="document-container">
-        
+        <div class="doc-body">
+            
         <!-- Society Letterhead -->
         <div class="society-header d-flex justify-content-between align-items-start">
             <div>
@@ -342,13 +430,13 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
             <table class="print-table">
                 <thead>
                     <tr>
-                        <th style="width: 10%;">Code</th>
-                        <th style="width: 28%;">Account Name</th>
+                        <th style="width: 9%;">Code</th>
+                        <th style="width: 29%;">Account Name</th>
                         <th style="width: 12%;">Category</th>
-                        <th style="width: 12%; text-align: right;">Cumulative Debit</th>
-                        <th style="width: 12%; text-align: right;">Cumulative Credit</th>
-                        <th style="width: 13%; text-align: right;">Net Debit (LKR)</th>
-                        <th style="width: 13%; text-align: right;">Net Credit (LKR)</th>
+                        <th style="width: 12.5%; text-align: right;">Cumulative Debit</th>
+                        <th style="width: 12.5%; text-align: right;">Cumulative Credit</th>
+                        <th style="width: 12.5%; text-align: right;">Net Debit (LKR)</th>
+                        <th style="width: 12.5%; text-align: right;">Net Credit (LKR)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -725,34 +813,38 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
         <?php else: ?>
             <p class="text-center py-4 text-muted">Statement loaded successfully.</p>
         <?php endif; ?>
+        </div><!-- /.doc-body -->
 
-        <!-- Triple Endorsement Signature Block -->
-        <div class="signature-block">
-            <div class="row">
-                <div class="col-4 signature-box">
-                    <div class="signature-line"></div>
-                    <div class="signature-title">Prepared By</div>
-                    <div class="signature-sub">Accounts Officer / Data Entry</div>
-                </div>
-                <div class="col-4 signature-box">
-                    <div class="signature-line"></div>
-                    <div class="signature-title">Checked & Verified</div>
-                    <div class="signature-sub">Internal Auditor / Hon. Secretary</div>
-                </div>
-                <div class="col-4 signature-box">
-                    <div class="signature-line"></div>
-                    <div class="signature-title">Authorized Approval</div>
-                    <div class="signature-sub">General Manager / President</div>
+        <!-- Document Footer (Anchored for A4 Form Factor) -->
+        <div class="doc-footer">
+            <!-- Triple Endorsement Signature Block -->
+            <div class="signature-block">
+                <div class="row">
+                    <div class="col-4 signature-box">
+                        <div class="signature-line"></div>
+                        <div class="signature-title">Prepared By</div>
+                        <div class="signature-sub">Accounts Officer / Data Entry</div>
+                    </div>
+                    <div class="col-4 signature-box">
+                        <div class="signature-line"></div>
+                        <div class="signature-title">Checked & Verified</div>
+                        <div class="signature-sub">Internal Auditor / Hon. Secretary</div>
+                    </div>
+                    <div class="col-4 signature-box">
+                        <div class="signature-line"></div>
+                        <div class="signature-title">Authorized Approval</div>
+                        <div class="signature-sub">General Manager / President</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Official Footer -->
-        <div class="mt-4 pt-2 border-top d-flex justify-content-between text-muted" style="font-size: 9px;">
-            <div>AGRI CO-OP COOPERATIVE SOCIETY LIMITED (KE/1027) | Financial Reporting Engine</div>
-            <div>Print Timestamp: <?= date('Y-m-d H:i:s'); ?> | Page 1 of 1</div>
-        </div>
-    </div>
+            <!-- Official Footer -->
+            <div class="mt-4 pt-2 border-top d-flex justify-content-between text-muted" style="font-size: 9px;">
+                <div>AGRI CO-OP COOPERATIVE SOCIETY LIMITED (KE/1027) | Financial Reporting Engine</div>
+                <div>Print Timestamp: <?= date('Y-m-d H:i:s'); ?> | Page 1 of 1</div>
+            </div>
+        </div><!-- /.doc-footer -->
+    </div><!-- /.document-container -->
 
 </body>
 </html>

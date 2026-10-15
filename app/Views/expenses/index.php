@@ -149,10 +149,15 @@
                                     ?>
                                     <span class="badge <?= $badgeClass ?> px-3 py-1"><?= ucfirst(str_replace('_', ' ', $st)) ?></span>
                                 </td>
-                                <td class="text-center">
-                                    <a href="<?= \Core\Helper::baseUrl('expenses/view?id=' . $exp['id']); ?>" class="btn btn-sm btn-outline-success rounded-pill px-3">
+                                <td class="text-center text-nowrap">
+                                    <a href="<?= \Core\Helper::baseUrl('expenses/view?id=' . $exp['id']); ?>" class="btn btn-sm btn-outline-success rounded-pill px-2 py-0" title="View Voucher">
                                         <i class="bi bi-eye-fill"></i> View
                                     </a>
+                                    <?php if (\Core\Auth::hasPermission('expenses.edit') && !in_array($exp['status'], ['cancelled', 'reversed'])): ?>
+                                        <a href="<?= \Core\Helper::baseUrl('expenses/edit?id=' . $exp['id']); ?>" class="btn btn-sm btn-outline-primary rounded-pill px-2 py-0 ms-1" title="Edit Voucher">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

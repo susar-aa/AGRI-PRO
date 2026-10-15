@@ -201,6 +201,301 @@ class ExpenseEngine {
     }
 
     /**
+     * Safely update an already recorded expense voucher.
+     * Synchronizes double-entry journal ledger and cash/bank balances if the expense was posted.
+     */
+    public static function updateExpense(int $id, array $data, string $editReason = ''): bool {
+        $db = Database::getInstance();
+
+        // 1. Fetch existing expense record
+        $stmt = $db->prepare("SELECT * FROM expenses WHERE id = :id LIMIT 1");
+        $stmt->execute(['id' => $id]);
+        $oldExpense = $stmt->fetch();
+
+        if (!$oldExpense) {
+            throw new Exception("Expense voucher not found.");
+        }
+
+        if (in_array($oldExpense['status'], ['cancelled', 'reversed'])) {
+            throw new Exception("Cannot edit a " . $oldExpense['status'] . " expense voucher.");
+        }
+
+        // 2. Validate Input Data
+        if (empty($data['payee'])) {
+            throw new Exception("Payee/recipient is required.");
+        }
+        $amount = round((float)($data['amount'] ?? 0), 2);
+        if ($amount <= 0) {
+            throw new Exception("Expense amount must be greater than zero.");
+        }
+        if (empty($data['expense_category_id'])) {
+            throw new Exception("Expense category is required.");
+        }
+        if (empty($data['cost_center_id'])) {
+            throw new Exception("Cost center is required.");
+        }
+        if (empty($data['payment_method'])) {
+            throw new Exception("Payment method is required.");
+        }
+
+        $expenseDate = $data['expense_date'] ?? $oldExpense['expense_date'];
+        $categoryId = (int)$data['expense_category_id'];
+        $costCenterId = (int)$data['cost_center_id'];
+        $paymentMethod = $data['payment_method'];
+
+        // 3. Resolve Accounts
+        // Resolve Debit Account (Expense Account)
+        $catStmt = $db->prepare("SELECT linked_account_id FROM expense_categories WHERE id = :id LIMIT 1");
+        $catStmt->execute(['id' => $categoryId]);
+        $linkedAcc = (int)($catStmt->fetchColumn() ?: 0);
+        if (!$linkedAcc) {
+            $accStmt = $db->query("SELECT id FROM accounts WHERE account_code = '6990' LIMIT 1");
+            $linkedAcc = (int)($accStmt->fetchColumn() ?: 0);
+            if (!$linkedAcc) {
+                $accStmt = $db->query("SELECT id FROM accounts WHERE category = 'Expense' OR account_code LIKE '6%' LIMIT 1");
+                $linkedAcc = (int)($accStmt->fetchColumn() ?: 61);
+            }
+            if ($linkedAcc && $categoryId) {
+                $db->exec("UPDATE expense_categories SET linked_account_id = {$linkedAcc} WHERE id = {$categoryId}");
+            }
+        }
+        $expenseAccountId = !empty($data['expense_account_id']) ? (int)$data['expense_account_id'] : $linkedAcc;
+
+        // Resolve Credit Account (Cash, Bank, AP)
+        $cashAccountId = null;
+        $bankAccountId = null;
+        $apAccountId = null;
+        $creditAccountId = null;
+
+        if ($paymentMethod === 'Cash') {
+            $cashAccountId = !empty($data['cash_account_id']) ? (int)$data['cash_account_id'] : null;
+            if (!$cashAccountId) {
+                $cashAccountId = (int)($db->query("SELECT id FROM cash_accounts WHERE status = 'active' LIMIT 1")->fetchColumn() ?: 1);
+            }
+            $cashStmt = $db->prepare("SELECT account_id FROM cash_accounts WHERE id = :id LIMIT 1");
+            $cashStmt->execute(['id' => $cashAccountId]);
+            $creditAccountId = (int)($cashStmt->fetchColumn() ?: 9);
+        } elseif ($paymentMethod === 'Credit') {
+            $apStmt = $db->prepare("SELECT id FROM accounts WHERE account_code = '2110' LIMIT 1");
+            $apStmt->execute();
+            $creditAccountId = (int)($apStmt->fetchColumn() ?: 20);
+            $apAccountId = $creditAccountId;
+        } else {
+            $bankAccountId = !empty($data['bank_account_id']) ? (int)$data['bank_account_id'] : null;
+            if (!$bankAccountId) {
+                $bankAccountId = (int)($db->query("SELECT id FROM bank_accounts WHERE status = 'active' LIMIT 1")->fetchColumn() ?: 0);
+            }
+            if (!$bankAccountId) {
+                throw new Exception("Bank account is required for bank/electronic payments.");
+            }
+
+            if ($paymentMethod === 'Cheque') {
+                $chqStmt = $db->prepare("SELECT id FROM accounts WHERE account_code = '2115' LIMIT 1");
+                $chqStmt->execute();
+                $creditAccountId = (int)($chqStmt->fetchColumn() ?: 0);
+                if (!$creditAccountId) {
+                    $creditAccountId = (int)($db->query("SELECT id FROM accounts WHERE account_code = '2110' LIMIT 1")->fetchColumn() ?: 20);
+                }
+            } else {
+                $bankStmt = $db->prepare("SELECT account_id FROM bank_accounts WHERE id = :id LIMIT 1");
+                $bankStmt->execute(['id' => $bankAccountId]);
+                $creditAccountId = (int)($bankStmt->fetchColumn() ?: 0);
+                if (!$creditAccountId) {
+                    $accStmt = $db->query("SELECT id FROM accounts WHERE account_code LIKE '1120%' OR (category = 'Asset' AND account_name LIKE '%Bank%') LIMIT 1");
+                    $creditAccountId = (int)($accStmt->fetchColumn() ?: 10);
+                }
+            }
+        }
+
+        if (!$creditAccountId) {
+            throw new Exception("Could not resolve payment method account.");
+        }
+
+        $inTransaction = Database::inTransaction();
+        if (!$inTransaction) {
+            Database::beginTransaction();
+        }
+
+        try {
+            // 4. Financial Synchronization for POSTED Expenses
+            if ($oldExpense['status'] === 'posted') {
+                $oldAmount = (float)$oldExpense['amount'];
+                $newAmount = $amount;
+
+                // A. Revert Old Balance Impact
+                if ($oldExpense['payment_method'] === 'Cash') {
+                    $oldCashId = !empty($oldExpense['cash_account_id']) ? (int)$oldExpense['cash_account_id'] : 1;
+                    $db->prepare("UPDATE cash_accounts SET current_balance = current_balance + :amt WHERE id = :id")
+                       ->execute(['amt' => $oldAmount, 'id' => $oldCashId]);
+                } elseif ($oldExpense['payment_method'] !== 'Credit' && $oldExpense['payment_method'] !== 'Cheque') {
+                    $oldBankId = !empty($oldExpense['bank_account_id']) ? (int)$oldExpense['bank_account_id'] : 0;
+                    if ($oldBankId) {
+                        $db->prepare("UPDATE bank_accounts SET current_balance = current_balance + :amt WHERE id = :id")
+                           ->execute(['amt' => $oldAmount, 'id' => $oldBankId]);
+                    }
+                }
+
+                // B. Apply New Balance Impact
+                if ($paymentMethod === 'Cash') {
+                    $db->prepare("UPDATE cash_accounts SET current_balance = current_balance - :amt WHERE id = :id")
+                       ->execute(['amt' => $newAmount, 'id' => $cashAccountId]);
+                } elseif ($paymentMethod !== 'Credit' && $paymentMethod !== 'Cheque') {
+                    if ($bankAccountId) {
+                        $db->prepare("UPDATE bank_accounts SET current_balance = current_balance - :amt WHERE id = :id")
+                           ->execute(['amt' => $newAmount, 'id' => $bankAccountId]);
+                    }
+                }
+
+                // C. Synchronize Double-Entry Journal Entry
+                $jeId = (int)$oldExpense['journal_entry_id'];
+                if ($jeId > 0) {
+                    $desc = "Expense: " . ($data['description'] ?: 'Operational Expense') . " (" . $data['payee'] . ")";
+                    
+                    $updJe = $db->prepare("
+                        UPDATE journal_entries SET
+                            transaction_date = :tx_date,
+                            description = :desc,
+                            reference = :ref,
+                            cost_center_id = :cost_center_id,
+                            project_id = :project_id,
+                            batch_id = :batch_id,
+                            total_debit = :tot_debit,
+                            total_credit = :tot_credit,
+                            updated_at = NOW()
+                        WHERE id = :je_id
+                    ");
+                    $updJe->execute([
+                        'tx_date' => $expenseDate,
+                        'desc' => $desc,
+                        'ref' => $oldExpense['expense_number'],
+                        'cost_center_id' => $costCenterId,
+                        'project_id' => !empty($data['project_id']) ? (int)$data['project_id'] : null,
+                        'batch_id' => !empty($data['batch_id']) ? (int)$data['batch_id'] : null,
+                        'tot_debit' => $newAmount,
+                        'tot_credit' => $newAmount,
+                        'je_id' => $jeId
+                    ]);
+
+                    // Remove old journal lines and insert clean, balanced lines
+                    $delLines = $db->prepare("DELETE FROM journal_lines WHERE journal_entry_id = :je_id");
+                    $delLines->execute(['je_id' => $jeId]);
+
+                    $insLine = $db->prepare("
+                        INSERT INTO journal_lines (journal_entry_id, account_id, debit, credit, description, created_at)
+                        VALUES (:je_id, :account_id, :debit, :credit, :description, NOW())
+                    ");
+
+                    // Line 1: Debit to Expense Account
+                    $insLine->execute([
+                        'je_id' => $jeId,
+                        'account_id' => $expenseAccountId,
+                        'debit' => $newAmount,
+                        'credit' => 0.00,
+                        'description' => $data['description'] ?: 'Operational Expense'
+                    ]);
+
+                    // Line 2: Credit to Cash/Bank/AP Account
+                    $insLine->execute([
+                        'je_id' => $jeId,
+                        'account_id' => $creditAccountId,
+                        'debit' => 0.00,
+                        'credit' => $newAmount,
+                        'description' => "Payment via " . $paymentMethod
+                    ]);
+                }
+            }
+
+            // 5. Update Expense Record
+            $updExp = $db->prepare("
+                UPDATE expenses SET
+                    expense_date = :expense_date,
+                    reference_number = :reference_number,
+                    payee = :payee,
+                    supplier_id = :supplier_id,
+                    expense_category_id = :expense_category_id,
+                    description = :description,
+                    amount = :amount,
+                    payment_method = :payment_method,
+                    cash_account_id = :cash_account_id,
+                    bank_account_id = :bank_account_id,
+                    accounts_payable_account_id = :accounts_payable_account_id,
+                    expense_account_id = :expense_account_id,
+                    cost_center_id = :cost_center_id,
+                    project_id = :project_id,
+                    batch_id = :batch_id,
+                    service_job_id = :service_job_id,
+                    machinery_id = :machinery_id,
+                    machinery_rental_id = :machinery_rental_id,
+                    notes = :notes,
+                    updated_at = NOW()
+                WHERE id = :id
+            ");
+
+            $updExp->execute([
+                'expense_date' => $expenseDate,
+                'reference_number' => $data['reference_number'] ?? null,
+                'payee' => $data['payee'],
+                'supplier_id' => !empty($data['supplier_id']) ? (int)$data['supplier_id'] : null,
+                'expense_category_id' => $categoryId,
+                'description' => $data['description'] ?: 'Operational Expense',
+                'amount' => $amount,
+                'payment_method' => $paymentMethod,
+                'cash_account_id' => $cashAccountId,
+                'bank_account_id' => $bankAccountId,
+                'accounts_payable_account_id' => $apAccountId,
+                'expense_account_id' => $expenseAccountId,
+                'cost_center_id' => $costCenterId,
+                'project_id' => !empty($data['project_id']) ? (int)$data['project_id'] : null,
+                'batch_id' => !empty($data['batch_id']) ? (int)$data['batch_id'] : null,
+                'service_job_id' => !empty($data['service_job_id']) ? (int)$data['service_job_id'] : null,
+                'machinery_id' => !empty($data['machinery_id']) ? (int)$data['machinery_id'] : null,
+                'machinery_rental_id' => !empty($data['machinery_rental_id']) ? (int)$data['machinery_rental_id'] : null,
+                'notes' => $data['notes'] ?? null,
+                'id' => $id
+            ]);
+
+            // 6. Handle Attachment if uploaded
+            if (!empty($data['attachment_file'])) {
+                self::saveAttachment($id, $data['attachment_file'], Auth::id() ?? 1);
+            }
+
+            // 7. Audit Log
+            AuditService::log('edit_expense', 'finance', $id, [
+                'expense_number' => $oldExpense['expense_number'],
+                'status' => $oldExpense['status'],
+                'old_amount' => $oldExpense['amount'],
+                'old_date' => $oldExpense['expense_date'],
+                'old_payee' => $oldExpense['payee'],
+                'old_category_id' => $oldExpense['expense_category_id'],
+                'old_payment_method' => $oldExpense['payment_method'],
+                'old_cost_center_id' => $oldExpense['cost_center_id']
+            ], [
+                'expense_number' => $oldExpense['expense_number'],
+                'status' => $oldExpense['status'],
+                'new_amount' => $amount,
+                'new_date' => $expenseDate,
+                'new_payee' => $data['payee'],
+                'new_category_id' => $categoryId,
+                'new_payment_method' => $paymentMethod,
+                'new_cost_center_id' => $costCenterId,
+                'edit_reason' => $editReason
+            ]);
+
+            if (!$inTransaction) {
+                Database::commit();
+            }
+
+            return true;
+
+        } catch (Exception $e) {
+            if (!$inTransaction && Database::inTransaction()) {
+                Database::rollBack();
+            }
+            throw $e;
+        }
+    }
+
+    /**
      * Submit an expense draft for approval.
      */
     public static function submitForApproval(int $id): bool {
