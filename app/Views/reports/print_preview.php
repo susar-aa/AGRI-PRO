@@ -356,9 +356,15 @@ $backUrl = $backUrl ?? \Core\Helper::baseUrl('reports');
                         <tr><td colspan="7" class="text-center py-3 text-muted">No accounts posted for this period.</td></tr>
                     <?php else: ?>
                         <?php foreach ($tbRows as $row): ?>
+                            <?php $isSub = !empty($row['parent_id']) && in_array((string)($row['parent_code'] ?? ''), ['1210', '4100', '4200']); ?>
                             <tr>
-                                <td class="font-monospace text-muted"><?= htmlspecialchars($row['account_code']); ?></td>
-                                <td class="fw-bold"><?= htmlspecialchars($row['account_name']); ?></td>
+                                <td class="font-monospace text-muted"><?= $isSub ? '&nbsp;&nbsp;↳ ' : ''; ?><?= htmlspecialchars($row['account_code']); ?></td>
+                                <td class="<?= $isSub ? 'ps-3' : 'fw-bold'; ?>">
+                                    <?= htmlspecialchars($row['account_name']); ?>
+                                    <?php if ($isSub): ?>
+                                        <small style="font-size: 8px; color: #64748b; font-weight: normal;">(Child of <?= htmlspecialchars($row['parent_code']); ?>)</small>
+                                    <?php endif; ?>
+                                </td>
                                 <td><?= htmlspecialchars($row['category']); ?></td>
                                 <td class="num-cell"><?= number_format((float)$row['total_debit'], 2); ?></td>
                                 <td class="num-cell"><?= number_format((float)$row['total_credit'], 2); ?></td>

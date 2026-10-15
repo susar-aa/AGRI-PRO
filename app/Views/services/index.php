@@ -50,6 +50,7 @@
                     <tr>
                         <th>Code</th>
                         <th>Service Name</th>
+                        <th>Mapped GL Account (Trial Balance)</th>
                         <th class="text-end">Default Price</th>
                         <th>Unit</th>
                         <th class="text-center">Status</th>
@@ -65,6 +66,16 @@
                                     <div class="fw-bold text-dark"><?= htmlspecialchars($srv['service_name']); ?></div>
                                     <?php if ($srv['description']): ?>
                                         <small class="text-muted d-block text-truncate" style="max-width: 250px;"><?= htmlspecialchars($srv['description']); ?></small>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if (!empty($srv['revenue_account_code'])): ?>
+                                        <span class="badge bg-light text-dark border font-monospace">
+                                            <i class="bi bi-journal-bookmark text-success me-1"></i>
+                                            <?= htmlspecialchars($srv['revenue_account_code']); ?> - <?= htmlspecialchars($srv['revenue_account_name']); ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary-subtle text-secondary small">Auto (4100 Services / 4200 Rental)</span>
                                     <?php endif; ?>
                                 </td>
                                 <td class="text-end font-monospace fw-bold text-dark">LKR <?= number_format($srv['default_price'], 2); ?></td>
@@ -83,7 +94,8 @@
                                                     data-name="<?= htmlspecialchars($srv['service_name']); ?>"
                                                     data-price="<?= $srv['default_price']; ?>"
                                                     data-unit="<?= htmlspecialchars($srv['unit']); ?>"
-                                                    data-desc="<?= htmlspecialchars($srv['description']); ?>"
+                                                    data-account-id="<?= $srv['revenue_account_id'] ?? ''; ?>"
+                                                    data-desc="<?= htmlspecialchars($srv['description'] ?? ''); ?>"
                                                     data-active="<?= $srv['is_active']; ?>">
                                                 Edit
                                             </button>
@@ -102,7 +114,7 @@
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="8" class="text-center text-muted py-4">No services registered.</td>
+                            <td colspan="7" class="text-center text-muted py-4">No services registered.</td>
                         </tr>
                     <?php endif; ?>
                 </tbody>
@@ -134,8 +146,27 @@
                         <input type="text" class="form-control form-control-sm" id="service_name" name="service_name" required>
                     </div>
 
+                    <div class="mb-3">
+                        <label for="revenue_account_id" class="form-label fw-semibold">
+                            <i class="bi bi-calculator text-success me-1"></i>Mapped GL Revenue Account (Trial Balance)
+                        </label>
+                        <select class="form-select form-select-sm" id="revenue_account_id" name="revenue_account_id">
+                            <option value="">-- Auto-Default (4100 Agri Services / 4200 Rental) --</option>
+                            <?php if (!empty($revenueAccounts)): ?>
+                                <?php foreach ($revenueAccounts as $ra): ?>
+                                    <option value="<?= $ra['id']; ?>">
+                                        <?= htmlspecialchars($ra['account_code']); ?> - <?= htmlspecialchars($ra['account_name']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                        <div class="form-text text-muted" style="font-size: 0.72rem;">
+                            Directly isolates this service into its own ledger line on the Trial Balance & P&L Statement.
+                        </div>
+                    </div>
+
                     <div class="row g-3 mb-3">
-                        <div class="col-12">
+                        <div class="col-6">
                             <label for="unit" class="form-label fw-semibold">Service Unit <span class="text-danger">*</span></label>
                             <select class="form-select form-select-sm" id="unit" name="unit" required>
                                 <option value="Job">Job</option>
@@ -146,16 +177,16 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
-                    </div>
-
-                    <div class="row g-3 mb-3">
-                        <div class="col-12">
-                            <label for="default_price" class="form-label fw-semibold">Default Pricing Rate (LKR) <span class="text-danger">*</span></label>
+                        <div class="col-6">
+                            <label for="default_price" class="form-label fw-semibold">Default Rate (LKR) <span class="text-danger">*</span></label>
                             <input type="number" step="0.01" min="0" class="form-control form-control-sm font-monospace" id="default_price" name="default_price" required>
                         </div>
                     </div>
 
-
+                    <div class="mb-3">
+                        <label for="description" class="form-label fw-semibold">Description / Notes</label>
+                        <textarea class="form-control form-control-sm" id="description" name="description" rows="2" placeholder="Brief service description..."></textarea>
+                    </div>
 
                     <div class="mb-3" id="statusSection" style="display: none;">
                         <label for="is_active" class="form-label fw-semibold">Active Status</label>
@@ -168,7 +199,7 @@
                 </div>
                 <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-secondary btn-sm rounded-pill" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-4" style="background-color: #1b4332; border-color: #1b4332;">Save changes</button>
+                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-4" style="background-color: #1b4332; border-color: #1b4332;">Save Service</button>
                 </div>
             </form>
         </div>
@@ -181,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (editServiceModal) {
         editServiceModal.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget;
-            const id = button.getAttribute('data-id');
+            const id = button ? button.getAttribute('data-id') : null;
             const title = document.getElementById('modalTitle');
             const statusSection = document.getElementById('statusSection');
 
@@ -191,12 +222,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 statusSection.style.display = 'block';
                 
                 document.getElementById('srvId').value = id;
-                document.getElementById('service_code').value = button.getAttribute('data-code');
+                document.getElementById('service_code').value = button.getAttribute('data-code') || '';
                 document.getElementById('service_code').readOnly = true;
-                document.getElementById('service_name').value = button.getAttribute('data-name');
-                document.getElementById('default_price').value = button.getAttribute('data-price');
-                document.getElementById('unit').value = button.getAttribute('data-unit');
-                document.getElementById('is_active').value = button.getAttribute('data-active');
+                document.getElementById('service_name').value = button.getAttribute('data-name') || '';
+                document.getElementById('default_price').value = button.getAttribute('data-price') || '0.00';
+                document.getElementById('unit').value = button.getAttribute('data-unit') || 'Job';
+                document.getElementById('revenue_account_id').value = button.getAttribute('data-account-id') || '';
+                document.getElementById('description').value = button.getAttribute('data-desc') || '';
+                document.getElementById('is_active').value = button.getAttribute('data-active') || '1';
             } else {
                 // Create mode
                 title.innerHTML = '<i class="bi bi-plus-lg me-2"></i> Register Service Item';
@@ -208,6 +241,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('service_name').value = '';
                 document.getElementById('default_price').value = '0.00';
                 document.getElementById('unit').value = 'Job';
+                document.getElementById('revenue_account_id').value = '';
+                document.getElementById('description').value = '';
                 document.getElementById('is_active').value = '1';
             }
         });

@@ -195,12 +195,22 @@ $isBalanced = abs($totDebit - $totCredit) < 0.01;
                             </tr>
                         <?php else: ?>
                             <?php foreach ($trialBalance as $row): ?>
-                                <tr>
-                                    <td class="font-monospace text-muted small"><?= htmlspecialchars($row['account_code']); ?></td>
-                                    <td class="font-weight-bold text-dark">
+                                <?php 
+                                    $isSubAccount = !empty($row['parent_id']) && in_array((string)($row['parent_code'] ?? ''), ['1210', '4100', '4200']);
+                                ?>
+                                <tr <?= $isSubAccount ? 'style="background-color: rgba(248, 249, 250, 0.6);"' : ''; ?>>
+                                    <td class="font-monospace text-muted small">
+                                        <?= $isSubAccount ? '<span class="text-muted fw-bold ps-2">↳</span> ' : ''; ?><?= htmlspecialchars($row['account_code']); ?>
+                                    </td>
+                                    <td class="<?= $isSubAccount ? 'ps-3' : 'font-weight-bold'; ?> text-dark">
                                         <a href="<?= \Core\Helper::baseUrl('accounting/general-ledger?account_id=' . $row['account_id']); ?>" class="text-dark text-decoration-none">
                                             <?= htmlspecialchars($row['account_name']); ?>
                                         </a>
+                                        <?php if ($isSubAccount): ?>
+                                            <span class="badge bg-light text-secondary border ms-1 font-monospace" style="font-size: 0.68rem; font-weight: normal;">
+                                                Child of <?= htmlspecialchars($row['parent_code']); ?>
+                                            </span>
+                                        <?php endif; ?>
                                     </td>
                                     <td>
                                         <span class="badge bg-light text-dark border"><?= htmlspecialchars($row['category']); ?></span>

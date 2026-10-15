@@ -6,26 +6,42 @@ use Core\Model;
 class MachineryModel extends Model {
 
     public function getById(int $id): ?array {
-        $stmt = $this->db->prepare("SELECT * FROM machinery WHERE id = :id LIMIT 1");
+        $stmt = $this->db->prepare("
+            SELECT m.*, 
+                   aa.account_code AS asset_account_code, aa.account_name AS asset_account_name,
+                   ra.account_code AS revenue_account_code, ra.account_name AS revenue_account_name
+            FROM machinery m
+            LEFT JOIN accounts aa ON m.asset_account_id = aa.id
+            LEFT JOIN accounts ra ON m.revenue_account_id = ra.id
+            WHERE m.id = :id LIMIT 1
+        ");
         $stmt->execute(['id' => $id]);
         return $stmt->fetch() ?: null;
     }
 
     public function getAll(array $filters = [], int $limit = 50, int $offset = 0): array {
-        $sql = "SELECT * FROM machinery WHERE 1=1";
+        $sql = "
+            SELECT m.*, 
+                   aa.account_code AS asset_account_code, aa.account_name AS asset_account_name,
+                   ra.account_code AS revenue_account_code, ra.account_name AS revenue_account_name
+            FROM machinery m
+            LEFT JOIN accounts aa ON m.asset_account_id = aa.id
+            LEFT JOIN accounts ra ON m.revenue_account_id = ra.id
+            WHERE 1=1
+        ";
         $params = [];
 
         if (isset($filters['status'])) {
-            $sql .= " AND is_active = :is_active";
+            $sql .= " AND m.is_active = :is_active";
             $params['is_active'] = ($filters['status'] === 'INACTIVE') ? 0 : 1;
         }
         if (!empty($filters['search'])) {
-            $sql .= " AND (machinery_code LIKE :search_code OR machinery_name LIKE :search_name)";
+            $sql .= " AND (m.machinery_code LIKE :search_code OR m.machinery_name LIKE :search_name)";
             $params['search_code'] = '%' . $filters['search'] . '%';
             $params['search_name'] = '%' . $filters['search'] . '%';
         }
 
-        $sql .= " ORDER BY machinery_name ASC LIMIT :limit OFFSET :offset";
+        $sql .= " ORDER BY m.machinery_name ASC LIMIT :limit OFFSET :offset";
 
         $stmt = $this->db->prepare($sql);
         foreach ($params as $key => $val) {
@@ -62,12 +78,17 @@ class MachineryModel extends Model {
     }
 
     public function save(array $data): int {
+        $assetAccId = !empty($data['asset_account_id']) ? (int)$data['asset_account_id'] : null;
+        $revAccId = !empty($data['revenue_account_id']) ? (int)$data['revenue_account_id'] : null;
+
         if (!empty($data['id'])) {
             $stmt = $this->db->prepare("
                 UPDATE machinery 
                 SET machinery_name = :name,
                     default_rental_rate = :default_rental_rate,
                     rental_unit = :rental_unit,
+                    asset_account_id = :asset_account_id,
+                    revenue_account_id = :revenue_account_id,
                     is_active = :is_active
                 WHERE id = :id
             ");
@@ -76,6 +97,8 @@ class MachineryModel extends Model {
                 'name' => $data['machinery_name'],
                 'default_rental_rate' => (float)$data['default_rental_rate'],
                 'rental_unit' => $data['rental_unit'] ?? 'Hour',
+                'asset_account_id' => $assetAccId,
+                'revenue_account_id' => $revAccId,
                 'is_active' => $isActive,
                 'id' => (int)$data['id']
             ]);
@@ -89,9 +112,9 @@ class MachineryModel extends Model {
 
             $stmt = $this->db->prepare("
                 INSERT INTO machinery 
-                (machinery_code, machinery_name, default_rental_rate, rental_unit, is_active)
+                (machinery_code, machinery_name, default_rental_rate, rental_unit, asset_account_id, revenue_account_id, is_active)
                 VALUES 
-                (:code, :name, :default_rental_rate, :rental_unit, :is_active)
+                (:code, :name, :default_rental_rate, :rental_unit, :asset_account_id, :revenue_account_id, :is_active)
             ");
             $isActive = (isset($data['status']) && $data['status'] === 'INACTIVE') ? 0 : 1;
             $stmt->execute([
@@ -99,6 +122,8 @@ class MachineryModel extends Model {
                 'name' => $data['machinery_name'],
                 'default_rental_rate' => (float)$data['default_rental_rate'],
                 'rental_unit' => $data['rental_unit'] ?? 'Hour',
+                'asset_account_id' => $assetAccId,
+                'revenue_account_id' => $revAccId,
                 'is_active' => $isActive
             ]);
             return (int)$this->db->lastInsertId();

@@ -93,6 +93,9 @@ class Journal extends Model {
                 a.id AS account_id,
                 a.account_code,
                 a.account_name,
+                a.parent_id,
+                p.account_code AS parent_code,
+                p.account_name AS parent_name,
                 a.category,
                 a.normal_balance,
                 COALESCE(SUM(CASE WHEN je.id IS NOT NULL THEN jl.debit ELSE 0.00 END), 0.00) AS total_debit,
@@ -108,6 +111,7 @@ class Journal extends Model {
                     ELSE 0.00 
                 END AS net_credit
             FROM accounts a
+            LEFT JOIN accounts p ON a.parent_id = p.id
             LEFT JOIN journal_lines jl ON a.id = jl.account_id
             LEFT JOIN journal_entries je ON jl.journal_entry_id = je.id 
                 AND je.status = 'posted' 
@@ -126,7 +130,7 @@ class Journal extends Model {
         }
 
         $sql .= " WHERE a.deleted_at IS NULL
-            GROUP BY a.id, a.account_code, a.account_name, a.category, a.normal_balance
+            GROUP BY a.id, a.account_code, a.account_name, a.parent_id, p.account_code, p.account_name, a.category, a.normal_balance
             {$havingClause}
             ORDER BY a.account_code ASC";
 

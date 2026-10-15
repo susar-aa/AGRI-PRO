@@ -31,10 +31,20 @@ class ServiceController extends Controller {
         $totalItems = $this->serviceModel->getCount($filters);
         $totalPages = ceil($totalItems / $limit);
 
+        // Fetch eligible Revenue Accounts for GL mapping
+        $db = \Core\Database::getInstance();
+        $revenueAccounts = $db->query("
+            SELECT id, account_code, account_name, parent_id 
+            FROM accounts 
+            WHERE category = 'Revenue' AND is_active = 1 AND deleted_at IS NULL 
+            ORDER BY account_code ASC
+        ")->fetchAll();
+
         $this->render('services/index', [
             'pageTitle' => 'Service Master Registry',
             'activeNav' => 'services',
             'services' => $services,
+            'revenueAccounts' => $revenueAccounts,
             'filters' => $filters,
             'pagination' => [
                 'current' => $page,
@@ -60,6 +70,7 @@ class ServiceController extends Controller {
             'description' => trim($_POST['description'] ?? ''),
             'default_price' => (float)($_POST['default_price'] ?? 0),
             'unit' => trim($_POST['unit'] ?? 'Job'),
+            'revenue_account_id' => !empty($_POST['revenue_account_id']) ? (int)$_POST['revenue_account_id'] : null,
             'is_active' => isset($_POST['is_active']) ? (int)$_POST['is_active'] : 1
         ];
 

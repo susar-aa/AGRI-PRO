@@ -7,8 +7,9 @@ class ServiceModel extends Model {
 
     public function getById(int $id): ?array {
         $stmt = $this->db->prepare("
-            SELECT s.*
+            SELECT s.*, a.account_code AS revenue_account_code, a.account_name AS revenue_account_name
             FROM services s
+            LEFT JOIN accounts a ON s.revenue_account_id = a.id
             WHERE s.id = :id LIMIT 1
         ");
         $stmt->execute(['id' => $id]);
@@ -17,8 +18,9 @@ class ServiceModel extends Model {
 
     public function getAll(array $filters = [], int $limit = 50, int $offset = 0): array {
         $sql = "
-            SELECT s.*
+            SELECT s.*, a.account_code AS revenue_account_code, a.account_name AS revenue_account_name
             FROM services s
+            LEFT JOIN accounts a ON s.revenue_account_id = a.id
             WHERE 1=1
         ";
         $params = [];
@@ -70,6 +72,8 @@ class ServiceModel extends Model {
     }
 
     public function save(array $data): int {
+        $revAccountId = !empty($data['revenue_account_id']) ? (int)$data['revenue_account_id'] : null;
+
         if (!empty($data['id'])) {
             $stmt = $this->db->prepare("
                 UPDATE services 
@@ -77,6 +81,7 @@ class ServiceModel extends Model {
                     description = :desc,
                     default_price = :price,
                     unit = :unit,
+                    revenue_account_id = :revenue_account_id,
                     is_active = :is_active
                 WHERE id = :id
             ");
@@ -85,6 +90,7 @@ class ServiceModel extends Model {
                 'desc' => $data['description'] ?? null,
                 'price' => (float)$data['default_price'],
                 'unit' => $data['unit'] ?? 'Job',
+                'revenue_account_id' => $revAccountId,
                 'is_active' => (int)$data['is_active'],
                 'id' => (int)$data['id']
             ]);
@@ -98,9 +104,9 @@ class ServiceModel extends Model {
 
             $stmt = $this->db->prepare("
                 INSERT INTO services 
-                (service_code, service_name, description, default_price, unit, is_active)
+                (service_code, service_name, description, default_price, unit, revenue_account_id, is_active)
                 VALUES 
-                (:code, :name, :desc, :price, :unit, :is_active)
+                (:code, :name, :desc, :price, :unit, :revenue_account_id, :is_active)
             ");
             $stmt->execute([
                 'code' => $data['service_code'],
@@ -108,6 +114,7 @@ class ServiceModel extends Model {
                 'desc' => $data['description'] ?? null,
                 'price' => (float)$data['default_price'],
                 'unit' => $data['unit'] ?? 'Job',
+                'revenue_account_id' => $revAccountId,
                 'is_active' => (int)$data['is_active']
             ]);
             return (int)$this->db->lastInsertId();

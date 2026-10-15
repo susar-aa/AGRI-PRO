@@ -985,8 +985,9 @@ function addMachineRowFromDirectory(machine, btn) {
     tr.innerHTML = `
         <td>
             <span class="type-pill rental">RENTAL</span>
-            <input type="hidden" name="items[${rowCount}][item_type]" value="SERVICE">
+            <input type="hidden" name="items[${rowCount}][item_type]" value="RENTAL">
             <input type="hidden" name="items[${rowCount}][service_id]" value="${defaultServiceId}">
+            <input type="hidden" name="items[${rowCount}][machinery_id]" value="${machine.id}">
         </td>
         <td>
             <div class="fw-semibold text-dark small">Rental: ${htmlspecialchars(machine.machinery_name)}</div>
@@ -1027,8 +1028,9 @@ function addRentalRowFromModal(rental, btn) {
     tr.innerHTML = `
         <td>
             <span class="type-pill rental">RENTAL</span>
-            <input type="hidden" name="items[${rowCount}][item_type]" value="SERVICE">
+            <input type="hidden" name="items[${rowCount}][item_type]" value="RENTAL">
             <input type="hidden" name="items[${rowCount}][service_id]" value="${defaultServiceId}">
+            <input type="hidden" name="items[${rowCount}][machinery_id]" value="${rental.machinery_id}">
         </td>
         <td>
             <div class="fw-semibold text-dark small">${htmlspecialchars(rental.rental_number)}: Rental — ${htmlspecialchars(rental.machinery_name)}</div>

@@ -72,6 +72,8 @@
                     <tr>
                         <th>Machinery Code</th>
                         <th>Name</th>
+                        <th>Asset Account (Balance Sheet)</th>
+                        <th>Rental Revenue Account (P&L)</th>
                         <th class="text-end">Default Rate</th>
                         <th>Rental Unit</th>
                         <th class="text-center">Status</th>
@@ -85,6 +87,26 @@
                                 <td class="fw-bold font-monospace text-dark"><?= htmlspecialchars($mac['machinery_code']); ?></td>
                                 <td>
                                     <div class="fw-semibold text-dark"><?= htmlspecialchars($mac['machinery_name']); ?></div>
+                                </td>
+                                <td>
+                                    <?php if (!empty($mac['asset_account_code'])): ?>
+                                        <span class="badge bg-light text-dark border font-monospace">
+                                            <i class="bi bi-box-seam text-primary me-1"></i>
+                                            <?= htmlspecialchars($mac['asset_account_code']); ?> - <?= htmlspecialchars($mac['asset_account_name']); ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary-subtle text-secondary small">Default (1210 PPE)</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <?php if (!empty($mac['revenue_account_code'])): ?>
+                                        <span class="badge bg-light text-dark border font-monospace">
+                                            <i class="bi bi-cash-coin text-success me-1"></i>
+                                            <?= htmlspecialchars($mac['revenue_account_code']); ?> - <?= htmlspecialchars($mac['revenue_account_name']); ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span class="badge bg-secondary-subtle text-secondary small">Default (4200 Rental)</span>
+                                    <?php endif; ?>
                                 </td>
                                 <td class="text-end font-monospace fw-bold text-dark">LKR <?= number_format($mac['default_rental_rate'], 2); ?></td>
                                 <td>per <?= htmlspecialchars($mac['rental_unit']); ?></td>
@@ -145,7 +167,40 @@
 
                     <div class="mb-3">
                         <label for="form_name" class="form-label fw-semibold">Machinery Asset Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="form_name" name="machinery_name" placeholder="e.g. Caterpillar Diesel Generator 10kVA" required>
+                        <input type="text" class="form-control" id="form_name" name="machinery_name" placeholder="e.g. Tractor ( RI - 7640 )" required>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="form_asset_account_id" class="form-label fw-semibold">
+                                <i class="bi bi-box-seam text-primary me-1"></i>Asset Account (Balance Sheet)
+                            </label>
+                            <select class="form-select form-select-sm" id="form_asset_account_id" name="asset_account_id">
+                                <option value="">-- Auto-Default (1210 Machinery) --</option>
+                                <?php if (!empty($assetAccounts)): ?>
+                                    <?php foreach ($assetAccounts as $aa): ?>
+                                        <option value="<?= $aa['id']; ?>">
+                                            <?= htmlspecialchars($aa['account_code']); ?> - <?= htmlspecialchars($aa['account_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="form_revenue_account_id" class="form-label fw-semibold">
+                                <i class="bi bi-cash-coin text-success me-1"></i>Rental Revenue Account (P&L)
+                            </label>
+                            <select class="form-select form-select-sm" id="form_revenue_account_id" name="revenue_account_id">
+                                <option value="">-- Auto-Default (4200 Machinery Rental) --</option>
+                                <?php if (!empty($revenueAccounts)): ?>
+                                    <?php foreach ($revenueAccounts as $ra): ?>
+                                        <option value="<?= $ra['id']; ?>">
+                                            <?= htmlspecialchars($ra['account_code']); ?> - <?= htmlspecialchars($ra['account_name']); ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </select>
+                        </div>
                     </div>
 
                     <div class="row g-3 mb-3">
@@ -179,6 +234,8 @@ function openCreateModal() {
     document.getElementById('machineryForm').reset();
     document.getElementById('machinery_id').value = '';
     document.getElementById('form_code').disabled = false;
+    document.getElementById('form_asset_account_id').value = '';
+    document.getElementById('form_revenue_account_id').value = '';
 }
 
 function openEditModal(mac) {
@@ -191,6 +248,8 @@ function openEditModal(mac) {
     document.getElementById('form_name').value = mac.machinery_name;
     document.getElementById('form_rate').value = mac.default_rental_rate;
     document.getElementById('form_unit').value = mac.rental_unit;
+    document.getElementById('form_asset_account_id').value = mac.asset_account_id || '';
+    document.getElementById('form_revenue_account_id').value = mac.revenue_account_id || '';
 
     const modal = new bootstrap.Modal(document.getElementById('machineryModal'));
     modal.show();

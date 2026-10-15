@@ -33,10 +33,28 @@ class MachineryController extends Controller {
 
         $categories = $this->machineryModel->getCategories();
 
+        // Fetch eligible Asset Accounts (1200 PPE series) and Revenue Accounts (4200 Rental series)
+        $db = \Core\Database::getInstance();
+        $assetAccounts = $db->query("
+            SELECT id, account_code, account_name 
+            FROM accounts 
+            WHERE category = 'Asset' AND (account_code LIKE '12%' OR parent_id = 16) AND is_active = 1 AND deleted_at IS NULL 
+            ORDER BY account_code ASC
+        ")->fetchAll();
+
+        $revenueAccounts = $db->query("
+            SELECT id, account_code, account_name 
+            FROM accounts 
+            WHERE category = 'Revenue' AND is_active = 1 AND deleted_at IS NULL 
+            ORDER BY account_code ASC
+        ")->fetchAll();
+
         $this->render('machinery/index', [
             'pageTitle' => 'Machinery Assets Directory',
             'activeNav' => 'machinery',
             'machineryList' => $machineryList,
+            'assetAccounts' => $assetAccounts,
+            'revenueAccounts' => $revenueAccounts,
             'filters' => $filters,
             'categories' => $categories,
             'pagination' => [
@@ -65,6 +83,8 @@ class MachineryController extends Controller {
             'serial_number' => trim($_POST['serial_number'] ?? ''),
             'default_rental_rate' => (float)($_POST['default_rental_rate'] ?? 0),
             'rental_unit' => $_POST['rental_unit'] ?? 'Hour',
+            'asset_account_id' => !empty($_POST['asset_account_id']) ? (int)$_POST['asset_account_id'] : null,
+            'revenue_account_id' => !empty($_POST['revenue_account_id']) ? (int)$_POST['revenue_account_id'] : null,
             'status' => $_POST['status'] ?? 'AVAILABLE',
             'notes' => trim($_POST['notes'] ?? '')
         ];

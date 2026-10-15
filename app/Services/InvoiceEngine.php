@@ -92,10 +92,13 @@ class InvoiceEngine {
 
             $subtotal += $qty * $price;
 
+            $machineryId = !empty($item['machinery_id']) ? (int)$item['machinery_id'] : null;
+
             $itemsToInsert[] = [
                 'item_type' => $type,
                 'product_id' => $prodId,
                 'service_id' => $srvId,
+                'machinery_id' => $machineryId,
                 'description' => trim($item['description'] ?? ''),
                 'quantity' => $qty,
                 'unit_price' => $price,
@@ -195,8 +198,8 @@ class InvoiceEngine {
 
             // Insert items
             $itemStmt = $db->prepare("
-                INSERT INTO invoice_items (invoice_id, item_type, product_id, service_id, description, quantity, unit_price, discount, total)
-                VALUES (:invoice_id, :item_type, :product_id, :service_id, :description, :quantity, :unit_price, :discount, :total)
+                INSERT INTO invoice_items (invoice_id, item_type, product_id, service_id, machinery_id, description, quantity, unit_price, discount, total)
+                VALUES (:invoice_id, :item_type, :product_id, :service_id, :machinery_id, :description, :quantity, :unit_price, :discount, :total)
             ");
             foreach ($itemsToInsert as $item) {
                 $item['invoice_id'] = $invoiceId;
@@ -329,17 +332,52 @@ class InvoiceEngine {
                     $productRevenueSum += (float)$item['total'];
                     $hasProducts = true;
                 } elseif ($item['item_type'] === 'SERVICE' || $item['item_type'] === 'RENTAL') {
-                    // Service / Machinery Rental
+                    // Service / Machinery Rental Account Resolution
                     $srvAcc = null;
-                    if (!empty($item['service_id'])) {
-                        $srv = $db->query("SELECT revenue_account_id FROM services WHERE id = " . (int)$item['service_id'])->fetch();
-                        if ($srv && !empty($srv['revenue_account_id'])) {
-                            $srvAcc = (int)$srv['revenue_account_id'];
+
+                    // 1. Check if line item specifies a machinery asset
+                    if (!empty($item['machinery_id'])) {
+                        $stmtMac = $db->prepare("SELECT revenue_account_id FROM machinery WHERE id = :id");
+                        $stmtMac->execute(['id' => (int)$item['machinery_id']]);
+                        $macRow = $stmtMac->fetch();
+                        if ($macRow && !empty($macRow['revenue_account_id'])) {
+                            $srvAcc = (int)$macRow['revenue_account_id'];
                         }
                     }
+
+                    // 2. Check if line item specifies a catalog service
+                    if (!$srvAcc && !empty($item['service_id'])) {
+                        $stmtSrv = $db->prepare("SELECT revenue_account_id FROM services WHERE id = :id");
+                        $stmtSrv->execute(['id' => (int)$item['service_id']]);
+                        $srvRow = $stmtSrv->fetch();
+                        if ($srvRow && !empty($srvRow['revenue_account_id'])) {
+                            $srvAcc = (int)$srvRow['revenue_account_id'];
+                        }
+                    }
+
+                    // 3. Check if invoice is linked to a machinery rental job
                     if (!$srvAcc) {
-                        // Fallback to Service / Machinery Rental Income Revenue Account (e.g., 4200, 4100, 4300, or 4000 series)
-                        $srvAcc = (int)$db->query("SELECT id FROM accounts WHERE account_code IN ('4200', '4100', '4300', '4000') OR account_name LIKE '%Service%' OR account_name LIKE '%Rental%' OR account_name LIKE '%Sales%' ORDER BY account_code ASC LIMIT 1")->fetchColumn();
+                        $stmtRental = $db->prepare("
+                            SELECT m.revenue_account_id 
+                            FROM machinery_rentals mr 
+                            JOIN machinery m ON mr.machinery_id = m.id 
+                            WHERE mr.invoice_id = :inv_id AND m.revenue_account_id IS NOT NULL 
+                            LIMIT 1
+                        ");
+                        $stmtRental->execute(['inv_id' => (int)$invoice['id']]);
+                        $rentalAcc = $stmtRental->fetchColumn();
+                        if ($rentalAcc) {
+                            $srvAcc = (int)$rentalAcc;
+                        }
+                    }
+
+                    // 4. Fallback to general Service / Machinery Rental GL Account
+                    if (!$srvAcc) {
+                        $srvAcc = (int)$db->query("
+                            SELECT id FROM accounts 
+                            WHERE account_code IN ('4200', '4100', '4300', '4000') 
+                            ORDER BY account_code ASC LIMIT 1
+                        ")->fetchColumn();
                     }
                     if (!$srvAcc) {
                         $srvAcc = $revAccountId; // Fallback to default sales revenue
