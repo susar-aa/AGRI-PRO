@@ -278,6 +278,7 @@ $router->get('/reports/fixed-deposits', [ReportController::class, 'fixedDeposits
 $router->get('/reports/machinery-utilization', [ReportController::class, 'machineryUtilization']);
 $router->get('/reports/cost-centers', [ReportController::class, 'costCentersPerformance']);
 $router->get('/reports/export', [ReportController::class, 'exportGeneric']);
+$router->get('/reports/print-preview', [ReportController::class, 'printPreview']);
 $router->get('/reports/directory', [ReportController::class, 'directory']);
 $router->get('/reports/directory/export', [ReportController::class, 'exportDirectory']);
 

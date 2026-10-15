@@ -4,6 +4,7 @@ $movements = $movements ?? [];
 $products = $products ?? [];
 $warehouses = $warehouses ?? [];
 $filters = $filters ?? [];
+$selectedMonth = $selectedMonth ?? ($filters['month'] ?? date('Y-m'));
 $pagination = $pagination ?? ['current' => 1, 'total' => 1, 'count' => 0];
 
 $totIn = array_sum(array_column($movements, 'quantity_in'));
@@ -11,8 +12,8 @@ $totOut = array_sum(array_column($movements, 'quantity_out'));
 ?>
 
 <div class="content-wrapper p-4">
-    <!-- Header Section -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Header Section (Screen Only) -->
+    <div class="d-flex justify-content-between align-items-center mb-4 d-print-none">
         <div>
             <div class="d-flex align-items-center gap-2 mb-1">
                 <a href="<?= \Core\Helper::baseUrl('reports'); ?>" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Hub</a>
@@ -23,25 +24,63 @@ $totOut = array_sum(array_column($movements, 'quantity_out'));
             <p class="text-muted small mb-0">Chronological stock ledger tracking inventory inflows, outflows, transfers and balance reconciliations</p>
         </div>
         <div class="d-flex gap-2">
+            <a href="<?= \Core\Helper::baseUrl('reports/print-preview?' . http_build_query(array_merge($_GET, ['type' => 'stock_movement']))); ?>" 
+               target="_blank" 
+               class="btn btn-dark btn-sm shadow-sm d-flex align-items-center gap-1 font-weight-bold">
+                <i class="bi bi-printer-fill text-warning"></i> Print Preview
+            </a>
+            <a href="<?= \Core\Helper::baseUrl('reports/export?' . http_build_query(array_merge($_GET, ['type' => 'stock_movement']))); ?>" 
+               class="btn btn-outline-success btn-sm shadow-sm d-flex align-items-center gap-1 font-weight-bold">
+                <i class="bi bi-file-earmark-excel"></i> Export Excel
+            </a>
             <button onclick="window.print()" class="btn btn-outline-secondary btn-sm shadow-sm d-flex align-items-center gap-1">
-                <i class="bi bi-printer"></i> Print Statement
+                <i class="bi bi-printer"></i> Quick Print
             </button>
         </div>
     </div>
 
-    <!-- Filter Card -->
+    <!-- Official Cooperative Letterhead Header (Visible in Direct Browser Print) -->
+    <div class="d-none d-print-block mb-3 border-bottom pb-2">
+        <div class="d-flex justify-content-between align-items-start">
+            <div>
+                <h5 class="mb-0 fw-bold" style="color:#15803d;">සීමා සහිත ඇග්රි කෝප් සමූපකාර සමිතිය</h5>
+                <h6 class="mb-0 fw-bold text-dark">AGRI CO-OP COOPERATIVE SOCIETY LIMITED</h6>
+                <small class="text-muted">Reg: KE/1027 | Miduma, Yatagama, Rambukkana | Tel: 075 377 0 145</small>
+            </div>
+            <div class="text-end">
+                <span class="badge bg-dark text-white p-2">STOCK MOVEMENT STATEMENT</span>
+                <div class="small fw-bold text-muted mt-1">Period: <?= htmlspecialchars($filters['from_date'] ?? ''); ?> to <?= htmlspecialchars($filters['to_date'] ?? ''); ?></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Card (Screen Only) -->
     <div class="card border-0 shadow-sm rounded-3 mb-4 d-print-none">
         <div class="card-body p-3">
-            <form action="<?= \Core\Helper::baseUrl('reports/stock-movement'); ?>" method="GET" class="row g-2 align-items-end">
+            <form id="filterForm" action="<?= \Core\Helper::baseUrl('reports/stock-movement'); ?>" method="GET" class="row g-2 align-items-end">
+                <!-- Direct Month Selector -->
+                <div class="col-md-3">
+                    <label class="form-label small font-weight-bold text-success mb-1">
+                        <i class="bi bi-calendar-month text-success me-1"></i>Select Month Directly
+                    </label>
+                    <div class="input-group input-group-sm">
+                        <input type="month" class="form-control" name="month" id="filter_month" 
+                               value="<?= htmlspecialchars($selectedMonth); ?>" 
+                               onchange="applyMonthFilter(this.value)">
+                        <button class="btn btn-outline-secondary" type="button" onclick="setQuickMonth('current')" title="Current Month">This</button>
+                        <button class="btn btn-outline-secondary" type="button" onclick="setQuickMonth('last')" title="Last Month">Last</button>
+                    </div>
+                </div>
+
                 <div class="col-md-2">
                     <label class="form-label small font-weight-bold text-muted mb-1">From Date</label>
-                    <input type="date" class="form-control form-control-sm" name="from_date" value="<?= htmlspecialchars($filters['from_date'] ?? ''); ?>">
+                    <input type="date" class="form-control form-control-sm" name="from_date" id="from_date" value="<?= htmlspecialchars($filters['from_date'] ?? ''); ?>">
                 </div>
                 <div class="col-md-2">
                     <label class="form-label small font-weight-bold text-muted mb-1">To Date</label>
-                    <input type="date" class="form-control form-control-sm" name="to_date" value="<?= htmlspecialchars($filters['to_date'] ?? ''); ?>">
+                    <input type="date" class="form-control form-control-sm" name="to_date" id="to_date" value="<?= htmlspecialchars($filters['to_date'] ?? ''); ?>">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label small font-weight-bold text-muted mb-1">Product</label>
                     <select class="form-select form-select-sm" name="product_id">
                         <option value="">-- All Products --</option>
@@ -53,18 +92,19 @@ $totOut = array_sum(array_column($movements, 'quantity_out'));
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label small font-weight-bold text-muted mb-1">Movement Type</label>
-                    <select class="form-select form-select-sm" name="movement_type">
-                        <option value="">-- All Types --</option>
-                        <option value="GRN" <?= (($filters['movement_type'] ?? '') === 'GRN') ? 'selected' : ''; ?>>Goods Receipt (GRN)</option>
-                        <option value="SALES_INVOICE" <?= (($filters['movement_type'] ?? '') === 'SALES_INVOICE') ? 'selected' : ''; ?>>Sales Invoice</option>
-                        <option value="TRANSFER" <?= (($filters['movement_type'] ?? '') === 'TRANSFER') ? 'selected' : ''; ?>>Warehouse Transfer</option>
-                        <option value="ADJUSTMENT" <?= (($filters['movement_type'] ?? '') === 'ADJUSTMENT') ? 'selected' : ''; ?>>Adjustment</option>
+                    <label class="form-label small font-weight-bold text-muted mb-1">Warehouse</label>
+                    <select class="form-select form-select-sm" name="location_id">
+                        <option value="">-- All Warehouses --</option>
+                        <?php foreach ($warehouses as $w): ?>
+                            <option value="<?= $w['id']; ?>" <?= (($filters['location_id'] ?? '') == $w['id']) ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($w['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-dark btn-sm w-100 font-weight-bold">
-                        <i class="bi bi-funnel me-1"></i> Filter
+                <div class="col-md-1 d-flex gap-1">
+                    <button type="submit" class="btn btn-dark btn-sm w-100 font-weight-bold" title="Filter">
+                        <i class="bi bi-funnel"></i>
                     </button>
                     <a href="<?= \Core\Helper::baseUrl('reports/stock-movement'); ?>" class="btn btn-outline-secondary btn-sm" title="Reset">
                         <i class="bi bi-arrow-counterclockwise"></i>
@@ -74,57 +114,57 @@ $totOut = array_sum(array_column($movements, 'quantity_out'));
         </div>
     </div>
 
-    <!-- Summary KPI Row -->
-    <div class="row g-3 mb-4">
+    <!-- KPI Summary Row -->
+    <div class="row g-3 mb-4 d-print-none">
         <div class="col-md-4">
             <div class="card border-0 shadow-sm border-start border-4 border-success rounded-3">
                 <div class="card-body p-3">
-                    <div class="text-muted small font-weight-bold text-uppercase">Page Stock Inflow (Units IN)</div>
-                    <div class="h4 font-weight-bold text-success mb-0">+ <?= number_format($totIn, 2); ?></div>
-                    <small class="text-muted">Goods Received & Transfers In</small>
+                    <div class="text-muted small font-weight-bold text-uppercase">Total Quantity In (Additions)</div>
+                    <div class="h4 font-weight-bold text-success mb-0">+<?= number_format($totIn, 2); ?> Units</div>
+                    <small class="text-muted">GRNs, returns and positive adjustments</small>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
             <div class="card border-0 shadow-sm border-start border-4 border-danger rounded-3">
                 <div class="card-body p-3">
-                    <div class="text-muted small font-weight-bold text-uppercase">Page Stock Outflow (Units OUT)</div>
-                    <div class="h4 font-weight-bold text-danger mb-0">- <?= number_format($totOut, 2); ?></div>
-                    <small class="text-muted">Invoiced Sales & Deliveries</small>
+                    <div class="text-muted small font-weight-bold text-uppercase">Total Quantity Out (Deductions)</div>
+                    <div class="h4 font-weight-bold text-danger mb-0">-<?= number_format($totOut, 2); ?> Units</div>
+                    <small class="text-muted">Sales, dispatches and consumption</small>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card border-0 shadow-sm border-start border-4 border-dark rounded-3">
+            <div class="card border-0 shadow-sm border-start border-4 border-primary rounded-3">
                 <div class="card-body p-3">
-                    <div class="text-muted small font-weight-bold text-uppercase">Total Movement Records</div>
-                    <div class="h4 font-weight-bold text-dark mb-0"><?= number_format($pagination['count']); ?> Entries</div>
-                    <small class="text-muted">Stock movements recorded</small>
+                    <div class="text-muted small font-weight-bold text-uppercase">Recorded Movements</div>
+                    <div class="h4 font-weight-bold text-primary mb-0"><?= count($movements); ?> Transactions</div>
+                    <small class="text-muted">Stock ledger entries in query</small>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Movements Table Sheet -->
+    <!-- Table Sheet -->
     <div class="card border-0 shadow-sm rounded-3">
-        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+        <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center d-print-none">
             <div>
-                <h6 class="mb-0 font-weight-bold text-dark">Stock Ledger Audit Entries</h6>
-                <small class="text-muted">Page <?= $pagination['current']; ?> of <?= max(1, $pagination['total']); ?></small>
+                <h6 class="mb-0 font-weight-bold text-dark">Chronological Stock Ledger Schedule</h6>
+                <small class="text-muted">Filtered period: <?= htmlspecialchars($filters['from_date'] ?? ''); ?> to <?= htmlspecialchars($filters['to_date'] ?? ''); ?></small>
             </div>
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-hover table-striped align-middle mb-0">
+                <table class="table table-hover table-striped align-middle mb-0" style="width: 100%; table-layout: auto;">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 11%;">Date</th>
-                            <th style="width: 14%;">Ref Number</th>
+                            <th style="width: 10%;">Date</th>
+                            <th style="width: 12%;">Ref / Transaction #</th>
                             <th style="width: 12%;">Type</th>
-                            <th style="width: 25%;">Product Description</th>
-                            <th style="width: 12%;">Warehouse</th>
-                            <th style="width: 8%; text-align: right;">Qty IN</th>
-                            <th style="width: 8%; text-align: right;">Qty OUT</th>
+                            <th style="width: 24%;">Product Item</th>
+                            <th style="width: 14%;">Warehouse</th>
+                            <th style="width: 9%; text-align: right;">Qty In</th>
+                            <th style="width: 9%; text-align: right;">Qty Out</th>
                             <th style="width: 10%; text-align: right;">Balance Qty</th>
                         </tr>
                     </thead>
@@ -191,4 +231,55 @@ $totOut = array_sum(array_column($movements, 'quantity_out'));
             </div>
         <?php endif; ?>
     </div>
+
+    <!-- Printable Signature Footer (Visible Only in Print) -->
+    <div class="d-none d-print-block mt-4 pt-4 border-top">
+        <div class="row text-center" style="font-size: 10px;">
+            <div class="col-4">
+                <div style="border-top: 1px dotted #333; width: 80%; margin: 30px auto 4px auto;"></div>
+                <strong>Prepared By</strong><br><span class="text-muted">Inventory Storekeeper</span>
+            </div>
+            <div class="col-4">
+                <div style="border-top: 1px dotted #333; width: 80%; margin: 30px auto 4px auto;"></div>
+                <strong>Checked & Verified</strong><br><span class="text-muted">Internal Auditor / Secretary</span>
+            </div>
+            <div class="col-4">
+                <div style="border-top: 1px dotted #333; width: 80%; margin: 30px auto 4px auto;"></div>
+                <strong>Approved By</strong><br><span class="text-muted">General Manager / President</span>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+function applyMonthFilter(monthVal) {
+    if (!monthVal) return;
+    const parts = monthVal.split('-');
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    const lastDay = new Date(year, month, 0).getDate();
+    
+    document.getElementById('from_date').value = `${monthVal}-01`;
+    document.getElementById('to_date').value = `${monthVal}-${String(lastDay).padStart(2, '0')}`;
+    document.getElementById('filterForm').submit();
+}
+
+function setQuickMonth(period) {
+    const now = new Date();
+    let year = now.getFullYear();
+    let month = now.getMonth() + 1;
+    if (period === 'last') {
+        month -= 1;
+        if (month === 0) {
+            month = 12;
+            year -= 1;
+        }
+    }
+    const mStr = `${year}-${String(month).padStart(2, '0')}`;
+    const mInput = document.getElementById('filter_month');
+    if (mInput) {
+        mInput.value = mStr;
+        applyMonthFilter(mStr);
+    }
+}
+</script>

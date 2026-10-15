@@ -29,6 +29,28 @@ class ReportController extends Controller {
     }
 
     /**
+     * Resolves selected month and date boundaries.
+     * Supports direct month input (YYYY-MM), custom date ranges, and as-of dates.
+     */
+    private function extractMonthAndDates(array $params, string $defaultFrom = ''): array {
+        $month = trim($params['month'] ?? '');
+
+        if (!empty($month) && preg_match('/^\d{4}-\d{2}$/', $month)) {
+            $fromDate = $month . '-01';
+            $toDate = date('Y-m-t', strtotime($fromDate));
+        } else {
+            $fromDate = !empty($params['from_date']) ? $params['from_date'] : $defaultFrom;
+            $toDate = !empty($params['to_date']) ? $params['to_date'] : ($params['as_of_date'] ?? date('Y-m-d'));
+            if (empty($fromDate)) {
+                $fromDate = $defaultFrom ?: date('Y-m-01');
+            }
+            $month = date('Y-m', strtotime($toDate ?: 'now'));
+        }
+
+        return [$month, $fromDate, $toDate];
+    }
+
+    /**
      * Reports Hub / Master Index
      */
     public function index(): void {
@@ -49,8 +71,7 @@ class ReportController extends Controller {
     public function profitLoss(): void {
         Auth::requirePermission('parties.view');
 
-        $fromDate = $_GET['from_date'] ?? date('Y-01-01');
-        $toDate = $_GET['to_date'] ?? date('Y-m-d');
+        [$month, $fromDate, $toDate] = $this->extractMonthAndDates($_GET, date('Y-01-01'));
         $costCenterId = !empty($_GET['cost_center_id']) ? (int)$_GET['cost_center_id'] : null;
 
         $pnl = $this->reportModel->getProfitAndLoss($fromDate, $toDate, $costCenterId);
@@ -61,6 +82,7 @@ class ReportController extends Controller {
             'activeNav' => 'reports_pnl',
             'pnl' => $pnl,
             'costCenters' => $costCenters,
+            'selectedMonth' => $month,
             'fromDate' => $fromDate,
             'toDate' => $toDate,
             'selectedCostCenterId' => $costCenterId
@@ -73,13 +95,20 @@ class ReportController extends Controller {
     public function balanceSheet(): void {
         Auth::requirePermission('parties.view');
 
-        $asOfDate = $_GET['as_of_date'] ?? date('Y-m-d');
+        if (!empty($_GET['month']) && preg_match('/^\d{4}-\d{2}$/', $_GET['month'])) {
+            $month = $_GET['month'];
+            $asOfDate = date('Y-m-t', strtotime($month . '-01'));
+        } else {
+            $asOfDate = $_GET['as_of_date'] ?? date('Y-m-d');
+            $month = date('Y-m', strtotime($asOfDate));
+        }
         $balanceSheet = $this->reportModel->getBalanceSheet($asOfDate);
 
         $this->render('reports/balance_sheet', [
             'pageTitle' => 'Balance Sheet (Statement of Financial Position)',
             'activeNav' => 'reports_balance_sheet',
             'balanceSheet' => $balanceSheet,
+            'selectedMonth' => $month,
             'asOfDate' => $asOfDate
         ]);
     }
@@ -90,8 +119,7 @@ class ReportController extends Controller {
     public function trialBalance(): void {
         Auth::requirePermission('parties.view');
 
-        $fromDate = $_GET['from_date'] ?? '';
-        $toDate = $_GET['to_date'] ?? date('Y-m-d');
+        [$month, $fromDate, $toDate] = $this->extractMonthAndDates($_GET, '');
         $costCenterId = !empty($_GET['cost_center_id']) ? (int)$_GET['cost_center_id'] : null;
         $showZero = !empty($_GET['show_zero']);
 
@@ -103,6 +131,7 @@ class ReportController extends Controller {
             'activeNav' => 'reports_trial_balance',
             'trialBalance' => $trialBalance,
             'costCenters' => $costCenters,
+            'selectedMonth' => $month,
             'fromDate' => $fromDate,
             'toDate' => $toDate,
             'selectedCostCenterId' => $costCenterId,
@@ -116,8 +145,7 @@ class ReportController extends Controller {
     public function cashBankBook(): void {
         Auth::requirePermission('parties.view');
 
-        $fromDate = $_GET['from_date'] ?? date('Y-m-01');
-        $toDate = $_GET['to_date'] ?? date('Y-m-d');
+        [$month, $fromDate, $toDate] = $this->extractMonthAndDates($_GET, date('Y-m-01'));
         $accountId = !empty($_GET['account_id']) ? (int)$_GET['account_id'] : null;
 
         $page = !empty($_GET['page']) ? (int)$_GET['page'] : 1;
@@ -142,6 +170,7 @@ class ReportController extends Controller {
             'activeNav' => 'reports_cash_bank',
             'entries' => $entries,
             'accounts' => $accounts,
+            'selectedMonth' => $month,
             'fromDate' => $fromDate,
             'toDate' => $toDate,
             'selectedAccountId' => $accountId,
@@ -159,9 +188,12 @@ class ReportController extends Controller {
     public function salesSummary(): void {
         Auth::requirePermission('parties.view');
 
+        [$month, $fromDate, $toDate] = $this->extractMonthAndDates($_GET, date('Y-m-01'));
+
         $filters = [
-            'from_date' => $_GET['from_date'] ?? date('Y-m-01'),
-            'to_date' => $_GET['to_date'] ?? date('Y-m-d'),
+            'month' => $month,
+            'from_date' => $fromDate,
+            'to_date' => $toDate,
             'customer_id' => $_GET['customer_id'] ?? '',
             'payment_type' => $_GET['payment_type'] ?? '',
             'status' => $_GET['status'] ?? ''
@@ -186,6 +218,7 @@ class ReportController extends Controller {
             'aggregates' => $aggregates,
             'customers' => $customers,
             'filters' => $filters,
+            'selectedMonth' => $month,
             'pagination' => [
                 'current' => $page,
                 'total' => $totalPages,
@@ -229,9 +262,12 @@ class ReportController extends Controller {
     public function purchasesSummary(): void {
         Auth::requirePermission('parties.view');
 
+        [$month, $fromDate, $toDate] = $this->extractMonthAndDates($_GET, date('Y-m-01'));
+
         $filters = [
-            'from_date' => $_GET['from_date'] ?? date('Y-m-01'),
-            'to_date' => $_GET['to_date'] ?? date('Y-m-d'),
+            'month' => $month,
+            'from_date' => $fromDate,
+            'to_date' => $toDate,
             'supplier_id' => $_GET['supplier_id'] ?? ''
         ];
 
@@ -252,6 +288,7 @@ class ReportController extends Controller {
             'purchases' => $purchases,
             'suppliers' => $suppliers,
             'filters' => $filters,
+            'selectedMonth' => $month,
             'pagination' => [
                 'current' => $page,
                 'total' => $totalPages,
@@ -295,8 +332,7 @@ class ReportController extends Controller {
     public function expensesAnalysis(): void {
         Auth::requirePermission('parties.view');
 
-        $fromDate = $_GET['from_date'] ?? date('Y-01-01');
-        $toDate = $_GET['to_date'] ?? date('Y-m-d');
+        [$month, $fromDate, $toDate] = $this->extractMonthAndDates($_GET, date('Y-01-01'));
         $costCenterId = !empty($_GET['cost_center_id']) ? (int)$_GET['cost_center_id'] : null;
 
         $expenseData = $this->reportModel->getExpenseAnalysis($fromDate, $toDate, $costCenterId);
@@ -307,6 +343,7 @@ class ReportController extends Controller {
             'activeNav' => 'reports_expenses',
             'expenseData' => $expenseData,
             'costCenters' => $costCenters,
+            'selectedMonth' => $month,
             'fromDate' => $fromDate,
             'toDate' => $toDate,
             'selectedCostCenterId' => $costCenterId
@@ -350,9 +387,12 @@ class ReportController extends Controller {
     public function stockMovement(): void {
         Auth::requirePermission('parties.view');
 
+        [$month, $fromDate, $toDate] = $this->extractMonthAndDates($_GET, date('Y-m-01'));
+
         $filters = [
-            'from_date' => $_GET['from_date'] ?? date('Y-m-01'),
-            'to_date' => $_GET['to_date'] ?? date('Y-m-d'),
+            'month' => $month,
+            'from_date' => $fromDate,
+            'to_date' => $toDate,
             'product_id' => $_GET['product_id'] ?? '',
             'location_id' => $_GET['location_id'] ?? '',
             'movement_type' => $_GET['movement_type'] ?? ''
@@ -377,6 +417,7 @@ class ReportController extends Controller {
             'products' => $products,
             'warehouses' => $warehouses,
             'filters' => $filters,
+            'selectedMonth' => $month,
             'pagination' => [
                 'current' => $page,
                 'total' => $totalPages,
@@ -452,8 +493,7 @@ class ReportController extends Controller {
     public function costCentersPerformance(): void {
         Auth::requirePermission('parties.view');
 
-        $fromDate = $_GET['from_date'] ?? date('Y-01-01');
-        $toDate = $_GET['to_date'] ?? date('Y-m-d');
+        [$month, $fromDate, $toDate] = $this->extractMonthAndDates($_GET, date('Y-01-01'));
 
         $divisions = $this->reportModel->getCostCentersPerformance($fromDate, $toDate);
 
@@ -468,9 +508,170 @@ class ReportController extends Controller {
             'activeNav' => 'reports_cost_centers',
             'divisions' => $divisions,
             'totals' => $totals,
+            'selectedMonth' => $month,
             'fromDate' => $fromDate,
             'toDate' => $toDate
         ]);
+    }
+
+    /**
+     * Universal Executive Print Preview
+     */
+    public function printPreview(): void {
+        Auth::requirePermission('parties.view');
+
+        $type = $_GET['type'] ?? 'trial_balance';
+        [$month, $fromDate, $toDate] = $this->extractMonthAndDates($_GET, date('Y-01-01'));
+
+        $companyConfig = file_exists(__DIR__ . '/../../config/company.php')
+            ? require __DIR__ . '/../../config/company.php'
+            : [];
+
+        $currentUser = Auth::user();
+        $generatedBy = $currentUser['full_name'] ?? Session::get('full_name') ?? 'System Officer';
+        $generatedAt = date('Y-m-d H:i:s');
+        $backUrl = Helper::baseUrl('reports');
+
+        $reportTitle = 'Executive Management Report';
+        $reportSubtitle = 'Agri Co-Op Reporting Engine';
+        $orientation = 'landscape';
+        $data = null;
+        $periodLabel = "Period: {$fromDate} to {$toDate}";
+        $scopeLabel = 'All Divisions / Society Wide';
+
+        $costCenterId = !empty($_GET['cost_center_id']) ? (int)$_GET['cost_center_id'] : null;
+        if ($costCenterId) {
+            $cc = $this->costCenterModel->getById($costCenterId);
+            if ($cc) {
+                $scopeLabel = "Division: {$cc['code']} - {$cc['name']}";
+            }
+        }
+
+        switch ($type) {
+            case 'trial_balance':
+                $backUrl = Helper::baseUrl('reports/trial-balance?' . http_build_query($_GET));
+                $showZero = !empty($_GET['show_zero']);
+                $data = $this->journalModel->getTrialBalance($toDate, $fromDate, $costCenterId, $showZero);
+                $reportTitle = 'TRIAL BALANCE STATEMENT';
+                $reportSubtitle = 'Account Balances Double-Entry Audit Schedule';
+                $orientation = 'landscape';
+                $periodLabel = "As of: {$toDate}" . (!empty($fromDate) ? " (from {$fromDate})" : "");
+                break;
+
+            case 'profit_loss':
+                $backUrl = Helper::baseUrl('reports/profit-loss?' . http_build_query($_GET));
+                $data = $this->reportModel->getProfitAndLoss($fromDate, $toDate, $costCenterId);
+                $reportTitle = 'PROFIT & LOSS STATEMENT';
+                $reportSubtitle = 'Statement of Financial Performance & Operating Results';
+                $orientation = 'portrait';
+                $periodLabel = "Reporting Period: {$fromDate} to {$toDate}";
+                break;
+
+            case 'balance_sheet':
+                $backUrl = Helper::baseUrl('reports/balance-sheet?' . http_build_query($_GET));
+                $asOfDate = !empty($_GET['month']) && preg_match('/^\d{4}-\d{2}$/', $_GET['month'])
+                    ? date('Y-m-t', strtotime($_GET['month'] . '-01'))
+                    : ($_GET['as_of_date'] ?? $toDate);
+                $data = $this->reportModel->getBalanceSheet($asOfDate);
+                $reportTitle = 'BALANCE SHEET STATEMENT';
+                $reportSubtitle = 'Statement of Financial Position & Capital Structure';
+                $orientation = 'portrait';
+                $periodLabel = "Financial Position as of: {$asOfDate}";
+                break;
+
+            case 'cash_bank_book':
+                $backUrl = Helper::baseUrl('reports/cash-bank-book?' . http_build_query($_GET));
+                $accountId = !empty($_GET['account_id']) ? (int)$_GET['account_id'] : null;
+                $data = $this->reportModel->getCashBankBook($fromDate, $toDate, $accountId, 500, 0);
+                $reportTitle = 'CASH & BANK BOOK LEDGER';
+                $reportSubtitle = 'Detailed Cash, Bank & Cheque Inflow/Outflow Journal';
+                $orientation = 'landscape';
+                $periodLabel = "Ledger Period: {$fromDate} to {$toDate}";
+                if ($accountId) {
+                    $acc = $this->accountModel->getById($accountId);
+                    if ($acc) $scopeLabel = "Account: {$acc['account_code']} - {$acc['account_name']}";
+                }
+                break;
+
+            case 'sales':
+                $backUrl = Helper::baseUrl('reports/sales?' . http_build_query($_GET));
+                $filters = [
+                    'from_date' => $fromDate,
+                    'to_date' => $toDate,
+                    'customer_id' => $_GET['customer_id'] ?? '',
+                    'payment_type' => $_GET['payment_type'] ?? '',
+                    'status' => $_GET['status'] ?? ''
+                ];
+                $data = [
+                    'sales' => $this->reportModel->getSalesSummary($filters, 500, 0),
+                    'aggregates' => $this->reportModel->getSalesSummaryAggregates($filters)
+                ];
+                $reportTitle = 'SALES & REVENUE SUMMARY';
+                $reportSubtitle = 'Customer Invoices, Revenue & Payment Channels';
+                $orientation = 'landscape';
+                $periodLabel = "Billing Period: {$fromDate} to {$toDate}";
+                break;
+
+            case 'purchases':
+                $backUrl = Helper::baseUrl('reports/purchases?' . http_build_query($_GET));
+                $filters = [
+                    'from_date' => $fromDate,
+                    'to_date' => $toDate,
+                    'supplier_id' => $_GET['supplier_id'] ?? ''
+                ];
+                $data = $this->reportModel->getPurchasesSummary($filters, 500, 0);
+                $reportTitle = 'PURCHASES & GRN REPORT';
+                $reportSubtitle = 'Goods Received Notes & Supplier Procurement Audit';
+                $orientation = 'landscape';
+                $periodLabel = "Procurement Period: {$fromDate} to {$toDate}";
+                break;
+
+            case 'expenses':
+                $backUrl = Helper::baseUrl('reports/expenses-analysis?' . http_build_query($_GET));
+                $data = $this->reportModel->getExpenseAnalysis($fromDate, $toDate, $costCenterId);
+                $reportTitle = 'EXPENSES ANALYSIS STATEMENT';
+                $reportSubtitle = 'Operational Expenditure Breakdown & Cost Centers';
+                $orientation = 'portrait';
+                $periodLabel = "Expense Period: {$fromDate} to {$toDate}";
+                break;
+
+            case 'ar_aging':
+                $backUrl = Helper::baseUrl('reports/ar-aging?' . http_build_query($_GET));
+                $data = $this->reportModel->getArAgingReport(['search' => trim($_GET['search'] ?? '')]);
+                $reportTitle = 'ACCOUNTS RECEIVABLE (AR) AGING';
+                $reportSubtitle = 'Customer Debt Aging & Outstanding Balances';
+                $orientation = 'landscape';
+                $periodLabel = "As of: " . date('Y-m-d');
+                break;
+
+            case 'cost_centers':
+                $backUrl = Helper::baseUrl('reports/cost-centers?' . http_build_query($_GET));
+                $data = $this->reportModel->getCostCentersPerformance($fromDate, $toDate);
+                $reportTitle = 'COST CENTERS PERFORMANCE STATEMENT';
+                $reportSubtitle = 'Divisional Revenue, Direct Expenses & Net Contribution';
+                $orientation = 'portrait';
+                $periodLabel = "Performance Period: {$fromDate} to {$toDate}";
+                break;
+
+            default:
+                $reportTitle = strtoupper(str_replace('_', ' ', $type)) . ' REPORT';
+                break;
+        }
+
+        $this->renderAuthView('reports/print_preview', [
+            'company' => $companyConfig,
+            'reportType' => $type,
+            'reportTitle' => $reportTitle,
+            'reportSubtitle' => $reportSubtitle,
+            'orientation' => $orientation,
+            'generatedBy' => $generatedBy,
+            'generatedAt' => $generatedAt,
+            'periodLabel' => $periodLabel,
+            'scopeLabel' => $scopeLabel,
+            'backUrl' => $backUrl,
+            'data' => $data
+        ]);
+        exit;
     }
 
     /**
@@ -480,6 +681,9 @@ class ReportController extends Controller {
         Auth::requirePermission('parties.view');
 
         $reportType = $_GET['type'] ?? 'report';
+        [$month, $fromDate, $toDate] = $this->extractMonthAndDates($_GET, date('Y-01-01'));
+        $costCenterId = !empty($_GET['cost_center_id']) ? (int)$_GET['cost_center_id'] : null;
+
         $filename = 'AgriPro_' . ucfirst($reportType) . '_' . date('Ymd_His') . '.xls';
 
         header('Content-Type: application/vnd.ms-excel; charset=utf-8');
@@ -490,16 +694,28 @@ class ReportController extends Controller {
         echo "\xEF\xBB\xBF"; // UTF-8 BOM
 
         $companyConfig = file_exists(__DIR__ . '/../../config/company.php') ? require __DIR__ . '/../../config/company.php' : [];
-        $companyName = $companyConfig['company_name'] ?? 'Agri Co-Op Cooperative Society Limited';
+        $companyName = $companyConfig['company_name_en'] ?? 'Agri Co-Op Cooperative Society Limited';
 
         echo "<table border='1' cellpadding='5' cellspacing='0'>";
-        echo "<tr style='background-color:#1e3d2f;color:#ffffff;'><th colspan='6' style='font-size:16px;text-align:center;'>{$companyName}</th></tr>";
-        echo "<tr style='background-color:#f4f6f8;'><th colspan='6' style='text-align:center;'>Report: " . strtoupper($reportType) . " | Generated: " . date('Y-m-d H:i:s') . "</th></tr>";
+        echo "<tr style='background-color:#1e3d2f;color:#ffffff;'><th colspan='7' style='font-size:16px;text-align:center;'>{$companyName} (Reg: KE/1027)</th></tr>";
+        echo "<tr style='background-color:#f4f6f8;'><th colspan='7' style='text-align:center;'>Report: " . strtoupper(str_replace('_', ' ', $reportType)) . " | Generated: " . date('Y-m-d H:i:s') . "</th></tr>";
         echo "</table><br>";
 
-        // Fetch data based on report type
-        if ($reportType === 'profit_loss') {
-            $pnl = $this->reportModel->getProfitAndLoss($_GET['from_date'] ?? null, $_GET['to_date'] ?? null);
+        if ($reportType === 'trial_balance') {
+            $showZero = !empty($_GET['show_zero']);
+            $tb = $this->journalModel->getTrialBalance($toDate, $fromDate, $costCenterId, $showZero);
+            echo "<table border='1' cellpadding='4' cellspacing='0'>";
+            echo "<tr style='background-color:#1e293b;color:#ffffff;'><th>Code</th><th>Account Name</th><th>Category</th><th>Cumulative Debit</th><th>Cumulative Credit</th><th>Net Debit (LKR)</th><th>Net Credit (LKR)</th></tr>";
+            $tDeb = 0; $tCred = 0; $tNDeb = 0; $tNCred = 0;
+            foreach ($tb as $r) {
+                $tDeb += (float)$r['total_debit']; $tCred += (float)$r['total_credit'];
+                $tNDeb += (float)($r['net_debit'] ?? 0); $tNCred += (float)($r['net_credit'] ?? 0);
+                echo "<tr><td>{$r['account_code']}</td><td>{$r['account_name']}</td><td>{$r['category']}</td><td style='text-align:right;'>" . number_format((float)$r['total_debit'], 2) . "</td><td style='text-align:right;'>" . number_format((float)$r['total_credit'], 2) . "</td><td style='text-align:right;'>" . number_format((float)($r['net_debit'] ?? 0), 2) . "</td><td style='text-align:right;'>" . number_format((float)($r['net_credit'] ?? 0), 2) . "</td></tr>";
+            }
+            echo "<tr style='background-color:#1e293b;color:#ffffff;font-weight:bold;'><td colspan='3'>GRAND TOTALS</td><td style='text-align:right;'>" . number_format($tDeb, 2) . "</td><td style='text-align:right;'>" . number_format($tCred, 2) . "</td><td style='text-align:right;'>" . number_format($tNDeb, 2) . "</td><td style='text-align:right;'>" . number_format($tNCred, 2) . "</td></tr>";
+            echo "</table>";
+        } elseif ($reportType === 'profit_loss') {
+            $pnl = $this->reportModel->getProfitAndLoss($fromDate, $toDate, $costCenterId);
             echo "<table border='1' cellpadding='5' cellspacing='0'>";
             echo "<tr style='background-color:#e8f4ec;'><th>Code</th><th>Account Name</th><th>Category</th><th>Amount (LKR)</th></tr>";
             foreach ($pnl['revenues'] as $r) {
@@ -517,7 +733,10 @@ class ReportController extends Controller {
             echo "<tr style='background-color:#fff3cd;font-weight:bold;font-size:14px;'><td colspan='3'>NET OPERATING SURPLUS / (DEFICIT)</td><td style='text-align:right;'>" . number_format($pnl['net_profit'], 2) . "</td></tr>";
             echo "</table>";
         } elseif ($reportType === 'balance_sheet') {
-            $bs = $this->reportModel->getBalanceSheet($_GET['as_of_date'] ?? null);
+            $asOfDate = !empty($_GET['month']) && preg_match('/^\d{4}-\d{2}$/', $_GET['month'])
+                ? date('Y-m-t', strtotime($_GET['month'] . '-01'))
+                : ($_GET['as_of_date'] ?? $toDate);
+            $bs = $this->reportModel->getBalanceSheet($asOfDate);
             echo "<table border='1' cellpadding='5' cellspacing='0'>";
             echo "<tr style='background-color:#e8f4ec;'><th>Code</th><th>Account Name</th><th>Category</th><th>Balance (LKR)</th></tr>";
             echo "<tr style='background-color:#cfe2ff;font-weight:bold;'><td colspan='4'>ASSETS</td></tr>";
@@ -537,6 +756,33 @@ class ReportController extends Controller {
             echo "<tr><td colspan='3'>Current Year Surplus / (Deficit)</td><td style='text-align:right;'>" . number_format($bs['current_earnings'], 2) . "</td></tr>";
             echo "<tr style='background-color:#a3cfbb;font-weight:bold;'><td colspan='3'>Total Equity</td><td style='text-align:right;'>" . number_format($bs['total_equity'], 2) . "</td></tr>";
             echo "<tr style='background-color:#fff3cd;font-weight:bold;'><td colspan='3'>TOTAL LIABILITIES & EQUITY</td><td style='text-align:right;'>" . number_format($bs['total_liabilities_and_equity'], 2) . "</td></tr>";
+            echo "</table>";
+        } elseif ($reportType === 'cash_bank_book') {
+            $accountId = !empty($_GET['account_id']) ? (int)$_GET['account_id'] : null;
+            $entries = $this->reportModel->getCashBankBook($fromDate, $toDate, $accountId, 1000, 0);
+            echo "<table border='1' cellpadding='4' cellspacing='0'>";
+            echo "<tr style='background-color:#1e293b;color:#ffffff;'><th>Date</th><th>Entry #</th><th>Account</th><th>Description / Party</th><th>Debit (Inflow)</th><th>Credit (Outflow)</th></tr>";
+            foreach ($entries as $e) {
+                echo "<tr><td>{$e['transaction_date']}</td><td>{$e['entry_number']}</td><td>{$e['account_name']}</td><td>" . htmlspecialchars($e['description'] ?? $e['party_name'] ?? '') . "</td><td style='text-align:right;'>" . number_format((float)$e['debit'], 2) . "</td><td style='text-align:right;'>" . number_format((float)$e['credit'], 2) . "</td></tr>";
+            }
+            echo "</table>";
+        } elseif ($reportType === 'sales') {
+            $filters = ['from_date' => $fromDate, 'to_date' => $toDate, 'customer_id' => $_GET['customer_id'] ?? '', 'payment_type' => $_GET['payment_type'] ?? '', 'status' => $_GET['status'] ?? ''];
+            $sales = $this->reportModel->getSalesSummary($filters, 1000, 0);
+            echo "<table border='1' cellpadding='4' cellspacing='0'>";
+            echo "<tr style='background-color:#1e293b;color:#ffffff;'><th>Date</th><th>Invoice #</th><th>Customer</th><th>Payment</th><th>Subtotal</th><th>Discount</th><th>Total Amount</th></tr>";
+            foreach ($sales as $s) {
+                echo "<tr><td>{$s['invoice_date']}</td><td>{$s['invoice_number']}</td><td>{$s['customer_name']}</td><td>{$s['payment_type']}</td><td style='text-align:right;'>" . number_format((float)$s['subtotal'], 2) . "</td><td style='text-align:right;'>" . number_format((float)$s['discount_amount'], 2) . "</td><td style='text-align:right;'>" . number_format((float)$s['total_amount'], 2) . "</td></tr>";
+            }
+            echo "</table>";
+        } elseif ($reportType === 'expenses') {
+            $exp = $this->reportModel->getExpenseAnalysis($fromDate, $toDate, $costCenterId);
+            echo "<table border='1' cellpadding='4' cellspacing='0'>";
+            echo "<tr style='background-color:#1e293b;color:#ffffff;'><th>Account Code</th><th>Account Name</th><th>Cost Center</th><th>Amount (LKR)</th></tr>";
+            foreach ($exp['rows'] as $r) {
+                echo "<tr><td>{$r['account_code']}</td><td>{$r['account_name']}</td><td>{$r['cost_center_name']}</td><td style='text-align:right;'>" . number_format((float)$r['amount'], 2) . "</td></tr>";
+            }
+            echo "<tr style='background-color:#fff3cd;font-weight:bold;'><td colspan='3'>TOTAL EXPENSES</td><td style='text-align:right;'>" . number_format((float)$exp['total_amount'], 2) . "</td></tr>";
             echo "</table>";
         } else {
             echo "<p>Export generated successfully for " . htmlspecialchars($reportType) . ".</p>";
