@@ -282,8 +282,9 @@ class JournalController extends Controller {
         $fromDate = $_GET['from_date'] ?? '';
         $toDate = $_GET['to_date'] ?? date('Y-m-d');
         $costCenterId = !empty($_GET['cost_center_id']) ? (int)$_GET['cost_center_id'] : null;
+        $showZero = !empty($_GET['show_zero']);
 
-        $trialBalance = $this->journalModel->getTrialBalance($toDate, $fromDate, $costCenterId);
+        $trialBalance = $this->journalModel->getTrialBalance($toDate, $fromDate, $costCenterId, $showZero);
         $costCenters = $this->costCenterModel->getActive();
 
         $this->render('accounting/trial_balance', [
@@ -293,7 +294,8 @@ class JournalController extends Controller {
             'costCenters' => $costCenters,
             'fromDate' => $fromDate,
             'toDate' => $toDate,
-            'selectedCostCenterId' => $costCenterId
+            'selectedCostCenterId' => $costCenterId,
+            'showZero' => $showZero
         ]);
     }
 }

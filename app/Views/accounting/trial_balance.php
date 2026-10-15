@@ -29,6 +29,10 @@
                 <input type="date" class="form-control" id="to_date" name="to_date" value="<?= htmlspecialchars($toDate); ?>">
             </div>
             <div class="col-12 col-md-2">
+                <div class="form-check mb-1">
+                    <input class="form-check-input" type="checkbox" name="show_zero" value="1" id="showZeroCheckAcc" <?= !empty($showZero) ? 'checked' : ''; ?>>
+                    <label class="form-check-label small" for="showZeroCheckAcc">Show Inactive</label>
+                </div>
                 <button type="submit" class="btn btn-success w-100 rounded-pill" style="background-color: #1b4332; border-color: #1b4332;">
                     <i class="bi bi-filter me-1"></i> Update
                 </button>

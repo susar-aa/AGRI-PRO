@@ -83,9 +83,11 @@ class Journal extends Model {
         return $stmt->fetchAll();
     }
 
-    public function getTrialBalance(?string $toDate = null, ?string $fromDate = null, ?int $costCenterId = null): array {
+    public function getTrialBalance(?string $toDate = null, ?string $fromDate = null, ?int $costCenterId = null, bool $showZero = false): array {
         $toDate = $toDate ?: date('Y-m-d');
         
+        $havingClause = $showZero ? "" : "HAVING total_debit > 0 OR total_credit > 0";
+
         $sql = "
             SELECT 
                 a.id AS account_id,
@@ -94,7 +96,17 @@ class Journal extends Model {
                 a.category,
                 a.normal_balance,
                 COALESCE(SUM(CASE WHEN je.id IS NOT NULL THEN jl.debit ELSE 0.00 END), 0.00) AS total_debit,
-                COALESCE(SUM(CASE WHEN je.id IS NOT NULL THEN jl.credit ELSE 0.00 END), 0.00) AS total_credit
+                COALESCE(SUM(CASE WHEN je.id IS NOT NULL THEN jl.credit ELSE 0.00 END), 0.00) AS total_credit,
+                CASE 
+                    WHEN COALESCE(SUM(CASE WHEN je.id IS NOT NULL THEN jl.debit ELSE 0.00 END), 0) >= COALESCE(SUM(CASE WHEN je.id IS NOT NULL THEN jl.credit ELSE 0.00 END), 0) 
+                    THEN COALESCE(SUM(CASE WHEN je.id IS NOT NULL THEN (jl.debit - jl.credit) ELSE 0.00 END), 0.00) 
+                    ELSE 0.00 
+                END AS net_debit,
+                CASE 
+                    WHEN COALESCE(SUM(CASE WHEN je.id IS NOT NULL THEN jl.credit ELSE 0.00 END), 0) > COALESCE(SUM(CASE WHEN je.id IS NOT NULL THEN jl.debit ELSE 0.00 END), 0) 
+                    THEN COALESCE(SUM(CASE WHEN je.id IS NOT NULL THEN (jl.credit - jl.debit) ELSE 0.00 END), 0.00) 
+                    ELSE 0.00 
+                END AS net_credit
             FROM accounts a
             LEFT JOIN journal_lines jl ON a.id = jl.account_id
             LEFT JOIN journal_entries je ON jl.journal_entry_id = je.id 
@@ -115,7 +127,7 @@ class Journal extends Model {
 
         $sql .= " WHERE a.deleted_at IS NULL
             GROUP BY a.id, a.account_code, a.account_name, a.category, a.normal_balance
-            HAVING total_debit > 0 OR total_credit > 0
+            {$havingClause}
             ORDER BY a.account_code ASC";
 
         $stmt = $this->db->prepare($sql);
