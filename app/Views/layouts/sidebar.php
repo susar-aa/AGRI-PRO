@@ -3,7 +3,7 @@ $activeNav = $activeNav ?? 'dashboard';
 
 // Determine which accordion groups should be open based on active nav
 $openParties  = in_array($activeNav, ['directory', 'customers', 'suppliers']);
-$openReports  = in_array($activeNav, ['reports_directory', 'reports']);
+$openReports  = in_array($activeNav, ['reports_directory', 'reports', 'reports_hub', 'reports_pnl', 'reports_balance_sheet', 'reports_trial_balance', 'reports_cash_bank', 'reports_sales', 'reports_ar_aging', 'reports_purchases', 'reports_ap_aging', 'reports_expenses', 'reports_inventory_valuation', 'reports_stock_movement', 'reports_fixed_deposits', 'reports_machinery', 'reports_cost_centers']);
 $openInventory= in_array($activeNav, ['marketplace_products', 'products']);
 $openOps      = in_array($activeNav, ['marketplace', 'ops_plantation', 'ops_machinery', 'ops_fruit_packing', 'ops_brick_manufacturing', 'ops_construction', 'ops_grinding_mill', 'services', 'fixed_deposits']);
 $openSales    = in_array($activeNav, ['invoices', 'receipts', 'expenses', 'grn', 'coa', 'journal_entries', 'general_ledger', 'trial_balance']);
@@ -49,11 +49,26 @@ $openSystem   = in_array($activeNav, ['cost_centers', 'users', 'company_settings
         <!-- REPORTS GROUP -->
         <li class="menu-item">
             <a href="#reportsGroup" class="menu-link menu-group-toggle <?= $openReports ? '' : 'collapsed'; ?>" data-bs-toggle="collapse" aria-expanded="<?= $openReports ? 'true' : 'false'; ?>">
-                <i class="bi bi-file-earmark-bar-graph"></i> <span>Reports</span>
+                <i class="bi bi-file-earmark-bar-graph"></i> <span>Reports & Analytics</span>
                 <i class="bi bi-chevron-down ms-auto toggle-icon"></i>
             </a>
             <div id="reportsGroup" class="collapse <?= $openReports ? 'show' : ''; ?>">
                 <ul class="submenu-list">
+                    <li><a href="<?= \Core\Helper::baseUrl('reports'); ?>" class="submenu-link <?= $activeNav === 'reports_hub' ? 'active' : ''; ?>"><i class="bi bi-grid-fill"></i> Reports Hub</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/profit-loss'); ?>" class="submenu-link <?= $activeNav === 'reports_pnl' ? 'active' : ''; ?>"><i class="bi bi-graph-up"></i> Profit & Loss (P&L)</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/balance-sheet'); ?>" class="submenu-link <?= $activeNav === 'reports_balance_sheet' ? 'active' : ''; ?>"><i class="bi bi-bank"></i> Balance Sheet</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/trial-balance'); ?>" class="submenu-link <?= $activeNav === 'reports_trial_balance' ? 'active' : ''; ?>"><i class="bi bi-calculator"></i> Trial Balance</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/cash-bank-book'); ?>" class="submenu-link <?= $activeNav === 'reports_cash_bank' ? 'active' : ''; ?>"><i class="bi bi-cash-stack"></i> Cash & Bank Book</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/sales'); ?>" class="submenu-link <?= $activeNav === 'reports_sales' ? 'active' : ''; ?>"><i class="bi bi-receipt-cutoff"></i> Sales Summary</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/ar-aging'); ?>" class="submenu-link <?= $activeNav === 'reports_ar_aging' ? 'active' : ''; ?>"><i class="bi bi-clock-history"></i> AR Aging (Customers)</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/purchases'); ?>" class="submenu-link <?= $activeNav === 'reports_purchases' ? 'active' : ''; ?>"><i class="bi bi-cart-check"></i> Purchases & GRN</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/ap-aging'); ?>" class="submenu-link <?= $activeNav === 'reports_ap_aging' ? 'active' : ''; ?>"><i class="bi bi-hourglass-split"></i> AP Aging (Suppliers)</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/expenses-analysis'); ?>" class="submenu-link <?= $activeNav === 'reports_expenses' ? 'active' : ''; ?>"><i class="bi bi-pie-chart"></i> Expense Breakdown</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/inventory-valuation'); ?>" class="submenu-link <?= $activeNav === 'reports_inventory_valuation' ? 'active' : ''; ?>"><i class="bi bi-boxes"></i> Stock Valuation</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/stock-movement'); ?>" class="submenu-link <?= $activeNav === 'reports_stock_movement' ? 'active' : ''; ?>"><i class="bi bi-arrow-left-right"></i> Stock Ledger Trail</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/fixed-deposits'); ?>" class="submenu-link <?= $activeNav === 'reports_fixed_deposits' ? 'active' : ''; ?>"><i class="bi bi-safe"></i> Fixed Deposits</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/machinery-utilization'); ?>" class="submenu-link <?= $activeNav === 'reports_machinery' ? 'active' : ''; ?>"><i class="bi bi-truck-flatbed"></i> Machinery Rental</a></li>
+                    <li><a href="<?= \Core\Helper::baseUrl('reports/cost-centers'); ?>" class="submenu-link <?= $activeNav === 'reports_cost_centers' ? 'active' : ''; ?>"><i class="bi bi-building"></i> Operations Divisions</a></li>
                     <li><a href="<?= \Core\Helper::baseUrl('reports/directory'); ?>" class="submenu-link <?= $activeNav === 'reports_directory' ? 'active' : ''; ?>"><i class="bi bi-journal-text"></i> Directory Report</a></li>
                 </ul>
             </div>

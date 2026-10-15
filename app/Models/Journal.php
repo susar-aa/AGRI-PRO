@@ -113,7 +113,7 @@ class Journal extends Model {
             $params['cost_center_id'] = $costCenterId;
         }
 
-        $sql .= " WHERE a.deleted_at IS NULL AND a.allow_manual_posting = 1
+        $sql .= " WHERE a.deleted_at IS NULL
             GROUP BY a.id, a.account_code, a.account_name, a.category, a.normal_balance
             HAVING total_debit > 0 OR total_credit > 0
             ORDER BY a.account_code ASC";

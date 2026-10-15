@@ -261,7 +261,23 @@ $router->get('/modules/fixed-deposits/view', [FDController::class, 'view']);
 $router->post('/modules/fixed-deposits/mature', [FDController::class, 'processMaturity']);
 $router->post('/modules/fixed-deposits/premature-close', [FDController::class, 'prematureClose']);
 
-// Central Directory Reporting Routing
+// Central Reporting Engine Routing
+$router->get('/reports', [ReportController::class, 'index']);
+$router->get('/reports/profit-loss', [ReportController::class, 'profitLoss']);
+$router->get('/reports/balance-sheet', [ReportController::class, 'balanceSheet']);
+$router->get('/reports/trial-balance', [ReportController::class, 'trialBalance']);
+$router->get('/reports/cash-bank-book', [ReportController::class, 'cashBankBook']);
+$router->get('/reports/sales', [ReportController::class, 'salesSummary']);
+$router->get('/reports/ar-aging', [ReportController::class, 'arAging']);
+$router->get('/reports/purchases', [ReportController::class, 'purchasesSummary']);
+$router->get('/reports/ap-aging', [ReportController::class, 'apAging']);
+$router->get('/reports/expenses-analysis', [ReportController::class, 'expensesAnalysis']);
+$router->get('/reports/inventory-valuation', [ReportController::class, 'inventoryValuation']);
+$router->get('/reports/stock-movement', [ReportController::class, 'stockMovement']);
+$router->get('/reports/fixed-deposits', [ReportController::class, 'fixedDepositsReport']);
+$router->get('/reports/machinery-utilization', [ReportController::class, 'machineryUtilization']);
+$router->get('/reports/cost-centers', [ReportController::class, 'costCentersPerformance']);
+$router->get('/reports/export', [ReportController::class, 'exportGeneric']);
 $router->get('/reports/directory', [ReportController::class, 'directory']);
 $router->get('/reports/directory/export', [ReportController::class, 'exportDirectory']);
 
