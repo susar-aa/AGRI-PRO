@@ -1,0 +1,17 @@
+# Logs
+logs/*.log
+logs/error.log
+!logs/.gitkeep
+
+# Temporary & Scratch Files
+scratch/
+tests/test_*.csv
+tests/test_*.xls
+tests/test_*.xlsx
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment & Backups
+*.bak
