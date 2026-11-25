@@ -19,7 +19,13 @@ class MemberModel extends Model {
 
     public function getAll(array $filters = [], int $limit = 50, int $offset = 0): array {
         $sql = "
-            SELECT m.*, p.name AS customer_name, p.party_code
+            SELECT 
+                m.id, m.member_type, m.member_no, m.party_id, m.full_name, m.nic, m.dob, m.gender, 
+                m.occupation, m.phone, m.email, m.whatsapp, m.agricultural_sector, m.address, m.city, 
+                m.registration_date, m.membership_type, m.status, m.registration_fee, m.shares_fee, 
+                m.payment_method, m.payment_status, m.notes, m.heir_name, m.heir_address, m.heir_nic, 
+                m.heir_contact_number, m.journal_entry_id, m.created_at,
+                p.name AS customer_name, p.party_code
             FROM coop_members m
             LEFT JOIN parties p ON m.party_id = p.id
             WHERE m.member_type = 'MEMBER'
@@ -47,6 +53,40 @@ class MemberModel extends Model {
         $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
         $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
         $stmt->execute();
+        return $stmt->fetchAll();
+    }
+
+    public function getAllForExport(array $filters = []): array {
+        $sql = "
+            SELECT 
+                m.id, m.member_no, m.party_id, m.full_name, m.nic, m.dob, m.gender, 
+                m.occupation, m.phone, m.email, m.whatsapp, m.agricultural_sector, m.address, m.city, 
+                m.registration_date, m.membership_type, m.status, m.registration_fee, m.shares_fee, 
+                m.payment_method, m.payment_status, m.notes, m.heir_name, m.heir_address, m.heir_nic, 
+                m.heir_contact_number, m.created_at,
+                p.name AS customer_name, p.party_code
+            FROM coop_members m
+            LEFT JOIN parties p ON m.party_id = p.id
+            WHERE m.member_type = 'MEMBER'
+        ";
+        $params = [];
+
+        if (!empty($filters['search'])) {
+            $sql .= " AND (m.full_name LIKE :search_name OR m.member_no LIKE :search_no OR m.nic LIKE :search_nic OR m.phone LIKE :search_phone)";
+            $params['search_name'] = '%' . $filters['search'] . '%';
+            $params['search_no'] = '%' . $filters['search'] . '%';
+            $params['search_nic'] = '%' . $filters['search'] . '%';
+            $params['search_phone'] = '%' . $filters['search'] . '%';
+        }
+        if (!empty($filters['status'])) {
+            $sql .= " AND m.status = :status";
+            $params['status'] = $filters['status'];
+        }
+
+        $sql .= " ORDER BY m.member_no ASC, m.full_name ASC";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
         return $stmt->fetchAll();
     }
 

@@ -1120,3 +1120,13 @@ Stack trace:
 #0 C:\xampp\htdocs\AGRI PRO\inspect_schema.php(15): PDO->query('SELECT id, mach...')
 #1 {main}
   thrown in C:\xampp\htdocs\AGRI PRO\inspect_schema.php on line 15
+[25-Nov-2026 05:52:57 Europe/Berlin] PHP Fatal error:  Uncaught AssertionError: Expected 2 rows from XML file in C:\xampp\htdocs\AGRI PRO\tests\test_member_excel_service.php:83
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\tests\test_member_excel_service.php(83): assert(false, 'Expected 2 rows...')
+#1 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\tests\test_member_excel_service.php on line 83
+[25-Nov-2026 05:53:45 Europe/Berlin] PHP Fatal error:  Uncaught AssertionError: At least 3 new members should be imported in C:\xampp\htdocs\AGRI PRO\tests\test_member_excel_service.php:47
+Stack trace:
+#0 C:\xampp\htdocs\AGRI PRO\tests\test_member_excel_service.php(47): assert(false, 'At least 3 new ...')
+#1 {main}
+  thrown in C:\xampp\htdocs\AGRI PRO\tests\test_member_excel_service.php on line 47

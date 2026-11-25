@@ -237,6 +237,9 @@ $router->post('/modules/bank-accounts/transaction', [BankController::class, 'tra
 
 // Society Member & Directory Routing
 $router->get('/modules/members/directory', [MemberController::class, 'directory']);
+$router->get('/modules/members/export', [MemberController::class, 'exportExcel']);
+$router->get('/modules/members/template', [MemberController::class, 'downloadTemplate']);
+$router->post('/modules/members/import', [MemberController::class, 'importExcel']);
 $router->get('/modules/members/register', [MemberController::class, 'registerForm']);
 $router->post('/modules/members/store', [MemberController::class, 'store']);
 $router->get('/modules/members/view', [MemberController::class, 'view']);

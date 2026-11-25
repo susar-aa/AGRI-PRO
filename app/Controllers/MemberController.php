@@ -26,18 +26,111 @@ class MemberController extends Controller {
         $search = trim($_GET['search'] ?? '');
         $status = $_GET['status'] ?? '';
 
-        // Fetch Society Members
+        // Fetch Society Members with server-side pagination
         $filters = ['search' => $search];
         if ($status) $filters['status'] = strtoupper($status);
-        $members = $this->memberModel->getAll($filters, 100);
+
+        $page = max(1, (int)($_GET['page'] ?? 1));
+        $perPage = 25;
+        $total = $this->memberModel->getCount($filters);
+        $totalPages = max(1, (int)ceil($total / $perPage));
+        if ($page > $totalPages && $totalPages > 0) $page = $totalPages;
+        $offset = ($page - 1) * $perPage;
+
+        $members = $this->memberModel->getAll($filters, $perPage, $offset);
+
+        // Retrieve import report if set from recent import
+        $importResult = Session::get('import_result');
+        Session::remove('import_result');
 
         $this->render('members/directory', [
-            'pageTitle' => 'Members',
-            'activeNav' => 'directory',
-            'search' => $search,
-            'status' => $status,
-            'members' => $members
+            'pageTitle'    => 'Members Directory',
+            'activeNav'    => 'directory',
+            'search'       => $search,
+            'status'       => $status,
+            'members'      => $members,
+            'page'         => $page,
+            'perPage'      => $perPage,
+            'total'        => $total,
+            'totalPages'   => $totalPages,
+            'importResult' => $importResult
         ]);
+    }
+
+    public function exportExcel(): void {
+        Auth::requirePermission('parties.view');
+
+        $search = trim($_GET['search'] ?? '');
+        $status = $_GET['status'] ?? '';
+        $filters = ['search' => $search];
+        if ($status) $filters['status'] = strtoupper($status);
+
+        $members = $this->memberModel->getAllForExport($filters);
+
+        $companyConfig = file_exists(__DIR__ . '/../../config/company.php')
+            ? require __DIR__ . '/../../config/company.php'
+            : [];
+
+        \App\Services\MemberExcelService::exportExcel($members, $companyConfig);
+    }
+
+    public function downloadTemplate(): void {
+        Auth::requirePermission('parties.create');
+        \App\Services\MemberExcelService::downloadTemplate();
+    }
+
+    public function importExcel(): void {
+        Auth::requirePermission('parties.create');
+        $this->validateCsrf();
+
+        if (empty($_FILES['excel_file']['tmp_name']) || $_FILES['excel_file']['error'] !== UPLOAD_ERR_OK) {
+            Session::setFlash('error', 'Please choose a valid Excel (.xlsx, .xls) or CSV file to upload.');
+            Helper::redirect('modules/members/directory');
+        }
+
+        $file = $_FILES['excel_file'];
+        $maxSize = 10 * 1024 * 1024; // 10MB limit
+        if ($file['size'] > $maxSize) {
+            Session::setFlash('error', 'The uploaded file exceeds the 10MB limit.');
+            Helper::redirect('modules/members/directory');
+        }
+
+        $originalName = $file['name'];
+        $ext = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
+        if (!in_array($ext, ['xlsx', 'xls', 'csv', 'xml'], true)) {
+            Session::setFlash('error', 'Invalid file type. Allowed formats: .xlsx, .xls, .csv');
+            Helper::redirect('modules/members/directory');
+        }
+
+        $duplicateMode = $_POST['duplicate_mode'] ?? 'skip';
+        if (!in_array($duplicateMode, ['skip', 'update'], true)) {
+            $duplicateMode = 'skip';
+        }
+
+        try {
+            $rawRows = \App\Services\MemberExcelService::parseUploadedFile($file['tmp_name'], $originalName);
+            $result = \App\Services\MemberExcelService::processImport($rawRows, $duplicateMode, Auth::id() ?? 1);
+
+            AuditService::log('IMPORT', 'coop_members', null, null, [
+                'filename' => $originalName,
+                'mode'     => $duplicateMode,
+                'imported' => $result['imported'],
+                'updated'  => $result['updated'],
+                'skipped'  => $result['skipped']
+            ]);
+
+            Session::set('import_result', $result);
+            $msg = "Import finished: {$result['imported']} created, {$result['updated']} updated, {$result['skipped']} skipped.";
+            if (!empty($result['errors'])) {
+                Session::setFlash('warning', $msg . " Notice: Some rows had validation issues.");
+            } else {
+                Session::setFlash('success', $msg);
+            }
+        } catch (\Exception $e) {
+            Session::setFlash('error', 'Import failed: ' . $e->getMessage());
+        }
+
+        Helper::redirect('modules/members/directory');
     }
 
     public function registerForm(): void {
